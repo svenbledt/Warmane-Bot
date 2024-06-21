@@ -60,6 +60,110 @@ module.exports = new ApplicationCommand({
                         professions: data.professions
                     };
 
+                    // Switch based on characters Faction icon
+                    switch (character.faction) {
+                        case 'Alliance':
+                            character.icon = config.base.iconAlliance;
+                            break;
+                        case 'Horde':
+                            character.icon = config.base.iconHorde;
+                            break;
+                    }
+
+                    // check character race and gender to set thumbnail icon
+                    switch (character.race) {
+                        case 'Human':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.humanFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.humanMale;
+                                    break;
+                            }
+                        case 'Orc':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.orcFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.orcMale;
+                                    break;
+                            }
+                        case 'Dwarf':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.dwarfFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.dwarfMale;
+                                    break;
+                            }
+                        case 'Night Elf':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.nightelfFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.nightelfMale;
+                                    break;
+                            }
+                        case 'Undead':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.undeadFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.undeadMale;
+                                    break;
+                            }
+                        case 'Tauren':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.taurenFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.taurenMale;
+                                    break;
+                            }
+                        case 'Gnome':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.gnomeFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.gnomeMale;
+                                    break;
+                            }
+                        case 'Troll':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.trollFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.trollMale;
+                                    break;
+                            }
+                        case 'Blood Elf':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.bloodelfFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.bloodelfMale;
+                                    break;
+                            }
+                        case 'Draenei':
+                            switch(character.gender){
+                                case 'Female':
+                                    character.portrait = config.base.draeneiFemale;
+                                    break;
+                                case 'Male':
+                                    character.portrait = config.base.draeneiMale;
+                                    break;
+                            }
+                    }
+
                     // set color based on class
                     switch (character.class) {
                         case 'Death Knight':
@@ -114,9 +218,9 @@ module.exports = new ApplicationCommand({
                                 {name: 'Achievement Points', value: character.achievementpoints, inline: true},
                                 {name: 'Talents', value: character.talents.join(', '), inline: true},
                             )
-                            .setThumbnail(client.user.displayAvatarURL())
+                            .setThumbnail(character.portrait)
                             .setTimestamp(new Date())
-                            .setFooter({text: interaction.guild.name, iconURL: client.user.displayAvatarURL()});
+                            .setFooter({text: interaction.guild.name, iconURL: character.icon});
 
                         // Check if the character has professions
                         if (character.professions && character.professions.length > 0) {

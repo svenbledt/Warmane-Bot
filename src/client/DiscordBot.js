@@ -26,7 +26,7 @@ class DiscordBot extends Client {
     statusMessages = [
         { name: 'Selling members data', type: 4 },
         { name: 'Watching your dm\'s', type: 4 },
-        { name: 'Licking Boet\'s arse', type: 4 }
+        { name: 'Sending useful information', type: 4 }
     ];
 
     commands_handler = new CommandsHandler(this);
