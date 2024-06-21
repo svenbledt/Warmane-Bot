@@ -9,7 +9,7 @@ const ApplicationCommand = require("../../structure/ApplicationCommand");
 module.exports = new ApplicationCommand({
     command: {
         name: "blacklist-show",
-        description: "Blacklist or unblacklist someone from the Guild.",
+        description: "Shows the global Blacklist.",
         type: 1,
     },
     options: {

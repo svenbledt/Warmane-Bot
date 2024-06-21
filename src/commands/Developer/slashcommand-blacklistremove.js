@@ -8,7 +8,7 @@ const ApplicationCommand = require("../../structure/ApplicationCommand");
 module.exports = new ApplicationCommand({
     command: {
         name: "blacklist-remove",
-        description: "Remove someone from the Guild blacklist.",
+        description: "Remove someone from the Global blacklist.",
         type: 1,
         options: [
             {
