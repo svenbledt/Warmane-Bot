@@ -42,24 +42,26 @@ module.exports = new Event({
         let welcomeMessageEnabled = guildSettings.welcomeMessage;
         let BlockListEnabled = guildSettings.BlockList;
 
-        if (obj.includes(member.id)) {
-            try {
-                await member.send(
-                    "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff."
-                );
-            } catch (error) {
-                console.error(`Failed to send a DM to ${member.tag}.`);
+        if (BlockListEnabled) {
+            if (obj.includes(member.id)) {
+                try {
+                    await member.send(
+                        "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff."
+                    );
+                } catch (error) {
+                    console.error(`Failed to send a DM to ${member.tag}.`);
+                    return;
+                }
+                try {
+                    await member.kick("Blacklisted user.");
+                    success(`Kicked ${member.user.tag} due to being blacklisted.`);
+                } catch (error) {
+                    console.error(
+                        `Failed to kick ${member.user.tag} due to: ${error.message}.`
+                    );
+                }
                 return;
             }
-            try {
-                await member.kick("Blacklisted user.");
-                success(`Kicked ${member.user.tag} due to being blacklisted.`);
-            } catch (error) {
-                console.error(
-                    `Failed to kick ${member.user.tag} due to: ${error.message}.`
-                );
-            }
-            return;
         }
 
         if (charNameAskEnabled) {
