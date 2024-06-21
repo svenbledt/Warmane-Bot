@@ -7,6 +7,7 @@ module.exports = new Event({
     run: async (client, member) => {
         // check if the joined ID is blacklisted
         let obj = client.database.get("blacklisted") || [];
+        let settings = client.database.get("settings") || [];
         let guildSettings = settings.find(setting => setting.guild === interaction.guild.id);
         if (!guildSettings) {
             guildSettings = {guild: interaction.guild.id, welcomeMessage: false, CharNameAsk: false};
