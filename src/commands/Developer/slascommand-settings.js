@@ -1,7 +1,6 @@
 const {
     ChatInputCommandInteraction,
     ApplicationCommandOptionType,
-    EmbedBuilder,
     PermissionsBitField,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
