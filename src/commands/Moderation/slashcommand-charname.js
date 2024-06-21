@@ -1,33 +1,35 @@
-const {UserContextMenuCommandInteraction} = require("discord.js");
+const {ChatInputCommandInteraction, ApplicationCommandOptionType, PermissionsBitField} = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
 module.exports = new ApplicationCommand({
     command: {
-        name: 'Ask for Charname',
-        type: 2,
-    },
-    options: {
+        name: 'charname', description: 'Ask\'s someone for his Character name.', type: 1, options: [{
+            name: 'user',
+            description: 'The user to ask for his Charname.',
+            type: ApplicationCommandOptionType.User,
+            required: true,
+        }],
+    }, options: {
         cooldown: 5000,
-        botDevelopers: true
-    },
-    /**
+    }, /**
      *
      * @param {DiscordBot} client
-     * @param {UserContextMenuCommandInteraction} interaction
+     * @param {ChatInputCommandInteraction} interaction
      */
     run: async (client, interaction) => {
-        const member = interaction.targetMember;
-
-        if (!member) {
+        // Get the member from the interaction that was selected
+        const user = interaction.options.getUser('user', true);
+        const member = interaction.guild.members.cache.get(user.id);
+        // check if the user has admin permissions
+        if (!interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers])) {
             await interaction.reply({
-                content: `Invalid target!`
+                content: `You don't have the required permissions to use this command.`,
+                ephemeral: true,
             });
-
             return;
         }
-
-        // Send message to the user and await for his response with his character main name
+        // Send a message to the user on DM
         try {
             await member.send('Hey, I would like to ask you for your main Character name. Please respond with your main Character name.')
         } catch (error) {

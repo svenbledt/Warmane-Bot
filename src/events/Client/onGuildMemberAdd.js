@@ -1,6 +1,26 @@
 const {success} = require("../../utils/Console");
 const Event = require("../../structure/Event");
 
+function ensureGuildSettings(guildSettings) {
+    const defaultSettings = {
+        welcomeMessage: false,
+        CharNameAsk: false,
+        BlockList: true,
+        // Add any other default settings here
+    };
+
+    let updated = false;
+
+    for (const [key, value] of Object.entries(defaultSettings)) {
+        if (!guildSettings.hasOwnProperty(key)) {
+            guildSettings[key] = value;
+            updated = true;
+        }
+    }
+
+    return updated;
+}
+
 module.exports = new Event({
     event: "guildMemberAdd",
     once: false,
@@ -8,15 +28,19 @@ module.exports = new Event({
         // check if the joined ID is blacklisted
         let obj = client.database.get("blacklisted") || [];
         let settings = client.database.get("settings") || [];
-        let guildSettings = settings.find(setting => setting.guild === interaction.guild.id);
+        let guildSettings = settings.find(setting => setting.guild === member.guild.id);
         if (!guildSettings) {
-            guildSettings = {guild: interaction.guild.id, welcomeMessage: false, CharNameAsk: false};
+            guildSettings = {guild: member.guild.id};
             settings.push(guildSettings);
-            settings.set("settings", guildSettings);
+        }
+
+        if (ensureGuildSettings(guildSettings)) {
+            client.database.set("settings", settings);
         }
 
         let charNameAskEnabled = guildSettings.CharNameAsk;
         let welcomeMessageEnabled = guildSettings.welcomeMessage;
+        let BlockListEnabled = guildSettings.BlockList;
 
         if (obj.includes(member.id)) {
             try {

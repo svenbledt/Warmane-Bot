@@ -7,6 +7,26 @@ const {
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
+function ensureGuildSettings(guildSettings) {
+    const defaultSettings = {
+        welcomeMessage: false,
+        CharNameAsk: false,
+        BlockList: true,
+        // Add any other default settings here
+    };
+
+    let updated = false;
+
+    for (const [key, value] of Object.entries(defaultSettings)) {
+        if (!guildSettings.hasOwnProperty(key)) {
+            guildSettings[key] = value;
+            updated = true;
+        }
+    }
+
+    return updated;
+}
+
 module.exports = new ApplicationCommand({
     command: {
         name: "settings",
@@ -20,12 +40,12 @@ module.exports = new ApplicationCommand({
                 choices: [
                     {name: 'WelcomeMessage', value: 'welcomeMessage'},
                     {name: 'CharNameAsk', value: 'CharNameAsk'},
+                    {name: 'BlockList', value: 'BlockList'},
                 ]
             }
         ],
     },
-    options: {
-    }
+    options: {}
     /**
      *
      * @param {DiscordBot} client
@@ -45,8 +65,12 @@ module.exports = new ApplicationCommand({
 
         let guildSettings = settings.find(setting => setting.guild === interaction.guild.id);
         if (!guildSettings) {
-            guildSettings = {guild: interaction.guild.id, welcomeMessage: false, CharNameAsk: false};
+            guildSettings = {guild: interaction.guild.id};
             settings.push(guildSettings);
+        }
+
+        if (ensureGuildSettings(guildSettings)) {
+            client.database.set("settings", settings);
         }
 
         if (guildSettings[settingName]) {

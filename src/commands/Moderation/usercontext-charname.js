@@ -1,27 +1,38 @@
-const {ChatInputCommandInteraction, ApplicationCommandOptionType} = require("discord.js");
+const {UserContextMenuCommandInteraction, PermissionsBitField} = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
 module.exports = new ApplicationCommand({
     command: {
-        name: 'charname', description: 'Ask\'s someone for his Character name.', type: 1, options: [{
-            name: 'user',
-            description: 'The user to ask for his Charname.',
-            type: ApplicationCommandOptionType.User,
-            required: true,
-        }],
-    }, options: {
-        botDevelopers: true
-    }, /**
+        name: 'Ask for Charname',
+        type: 2,
+    },
+    options: {
+        cooldown: 5000,
+    },
+    /**
      *
      * @param {DiscordBot} client
-     * @param {ChatInputCommandInteraction} interaction
+     * @param {UserContextMenuCommandInteraction} interaction
      */
     run: async (client, interaction) => {
-        // Get the member from the interaction that was selected
-        const user = interaction.options.getUser('user', true);
-        const member = interaction.guild.members.cache.get(user.id);
-        // Send a message to the user on DM
+        const member = interaction.targetMember;
+        if (!interaction.targetMember.permissions.has([PermissionsBitField.Flags.Administrator])) {
+            await interaction.reply({
+                content: `You don't have the required permissions to use this command.`,
+                ephemeral: true,
+            });
+            return;
+        }
+        if (!member) {
+            await interaction.reply({
+                content: `Invalid target!`
+            });
+
+            return;
+        }
+
+        // Send message to the user and await for his response with his character main name
         try {
             await member.send('Hey, I would like to ask you for your main Character name. Please respond with your main Character name.')
         } catch (error) {
