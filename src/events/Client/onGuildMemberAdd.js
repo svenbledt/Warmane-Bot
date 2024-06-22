@@ -4,6 +4,7 @@ const Event = require("../../structure/Event");
 function ensureGuildSettings(guildSettings) {
     const defaultSettings = {
         welcomeMessage: false,
+        welcomeChannel: "",
         CharNameAsk: false,
         BlockList: true,
         // Add any other default settings here
@@ -113,9 +114,14 @@ module.exports = new Event({
 
         if (welcomeMessageEnabled) {
             // welcomeMessage is enabled, proceed with the logic
-            const welcomeChannel = member.guild.channels.cache.find(
-                (channel) => channel.name === "welcome"
-            );
+            let welcomeChannel = guildSettings.welcomeChannel;
+            if (!welcomeChannel || welcomeChannel === "") {
+                welcomeChannel = member.guild.channels.cache.find(
+                    (channel) => channel.name === "welcome"
+                );
+            } else {
+                welcomeChannel = member.guild.channels.cache.get(welcomeChannel);
+            }
             if (!welcomeChannel) return;
 
             const embed = {

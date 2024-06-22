@@ -29,19 +29,14 @@ function ensureGuildSettings(guildSettings) {
 
 module.exports = new ApplicationCommand({
     command: {
-        name: "settings",
-        description: "Toggle settings for the server.",
+        name: "set-welcome-channel",
+        description: "Sets the welcome channel.",
         type: 1, options: [
             {
-                name: 'toggle',
-                description: 'Select the realm of the character.',
-                type: ApplicationCommandOptionType.String,
+                name: 'channel',
+                description: 'Select the channel to set as welcome channel.',
+                type: ApplicationCommandOptionType.Channel,
                 required: true,
-                choices: [
-                    {name: 'WelcomeMessage', value: 'welcomeMessage'},
-                    {name: 'CharNameAsk', value: 'CharNameAsk'},
-                    {name: 'BlockList', value: 'BlockList'},
-                ]
             }
         ],
     },
@@ -52,18 +47,10 @@ module.exports = new ApplicationCommand({
      * @param {ChatInputCommandInteraction} interaction
      */,
     run: async (client, interaction) => {
-        const settingName = interaction.options.getString('toggle');
+        const channel = interaction.options.getChannel('channel');
         let settings = client.database.get("settings") || [];
-
-        if (!interaction.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
-            await interaction.reply({
-                content: `You don't have the required permissions to use this command.`,
-                ephemeral: true,
-            });
-            return;
-        }
-
         let guildSettings = settings.find(setting => setting.guild === interaction.guild.id);
+
         if (!guildSettings) {
             guildSettings = {guild: interaction.guild.id};
             settings.push(guildSettings);
@@ -73,24 +60,16 @@ module.exports = new ApplicationCommand({
             client.database.set("settings", settings);
         }
 
-        if (guildSettings[settingName]) {
-            guildSettings[settingName] = false;
-            await interaction.reply({
-                content: `The setting ${settingName} has been disabled.`,
-                ephemeral: true,
-            });
-        } else {
-            guildSettings[settingName] = true;
-            await interaction.reply({
-                content: `The setting ${settingName} has been enabled.`,
-                ephemeral: true,
-            });
-        }
+        guildSettings.welcomeChannel = channel.id;
 
+        await interaction.reply({
+            content: `The welcome channel has been set to <#${channel.id}>.`,
+            ephemeral: true,
+        });
         try {
             client.database.set("settings", settings);
         } catch (error) {
-            console.error(`Failed to save the settings to the database due to: ${error.message}.`);
+            console.error(`Failed to set the welcome channel due to: ${error.message}.`);
         }
     },
 }).toJSON();
