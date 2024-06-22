@@ -2,6 +2,7 @@ const {EmbedBuilder, ChatInputCommandInteraction, ApplicationCommandOptionType} 
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const config = require("../../config");
+const itemsDB = require("../../itemsdb.json");
 
 module.exports = new ApplicationCommand({
     command: {
@@ -42,6 +43,28 @@ module.exports = new ApplicationCommand({
         fetch(`${config.users.url}/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
             .then(response => response.json())
             .then(data => {
+
+                const items = data.equipment.map(item => item.item);
+
+                // Initialize total gearscore
+                let totalGearScore = 0;
+
+                // Iterate over the items
+                for (let item of items) {
+                    // Find the item in your local database
+                    const localItem = itemsDB.items.find(localItem => localItem.itemID === Number(item));
+
+                    // If the item is found, add its gearscore to the total
+                    if (localItem) {
+                        totalGearScore += localItem.GearScore;
+                    }
+                }
+
+                // Convert the total gearscore to a string
+                const totalGearScoreString = totalGearScore.toString();
+
+                // Now you can use 'totalGearScoreString' wherever you need it
+
                 // Find the character in the data
                 if (data.name === charNameFormatted) {
                     const character = {
@@ -73,7 +96,7 @@ module.exports = new ApplicationCommand({
                     // check character race and gender to set thumbnail icon
                     switch (character.race) {
                         case 'Human':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.humanFemale;
                                     break;
@@ -81,8 +104,9 @@ module.exports = new ApplicationCommand({
                                     character.portrait = config.base.humanMale;
                                     break;
                             }
+                            break;
                         case 'Orc':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.orcFemale;
                                     break;
@@ -90,8 +114,9 @@ module.exports = new ApplicationCommand({
                                     character.portrait = config.base.orcMale;
                                     break;
                             }
+                            break;
                         case 'Dwarf':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.dwarfFemale;
                                     break;
@@ -99,17 +124,19 @@ module.exports = new ApplicationCommand({
                                     character.portrait = config.base.dwarfMale;
                                     break;
                             }
+                            break;
                         case 'Night Elf':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
-                                    character.portrait = config.base.nightelfFemale;
+                                    character.portrait = config.base.nightElfFemale;
                                     break;
                                 case 'Male':
-                                    character.portrait = config.base.nightelfMale;
+                                    character.portrait = config.base.nightElfMale;
                                     break;
                             }
+                            break;
                         case 'Undead':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.undeadFemale;
                                     break;
@@ -117,8 +144,9 @@ module.exports = new ApplicationCommand({
                                     character.portrait = config.base.undeadMale;
                                     break;
                             }
+                            break;
                         case 'Tauren':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.taurenFemale;
                                     break;
@@ -126,8 +154,9 @@ module.exports = new ApplicationCommand({
                                     character.portrait = config.base.taurenMale;
                                     break;
                             }
+                            break;
                         case 'Gnome':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.gnomeFemale;
                                     break;
@@ -135,8 +164,9 @@ module.exports = new ApplicationCommand({
                                     character.portrait = config.base.gnomeMale;
                                     break;
                             }
+                            break;
                         case 'Troll':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.trollFemale;
                                     break;
@@ -144,17 +174,19 @@ module.exports = new ApplicationCommand({
                                     character.portrait = config.base.trollMale;
                                     break;
                             }
+                            break;
                         case 'Blood Elf':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
-                                    character.portrait = config.base.bloodelfFemale;
+                                    character.portrait = config.base.bloodElfFemale;
                                     break;
                                 case 'Male':
-                                    character.portrait = config.base.bloodelfMale;
+                                    character.portrait = config.base.bloodElfMale;
                                     break;
                             }
+                            break;
                         case 'Draenei':
-                            switch(character.gender){
+                            switch (character.gender) {
                                 case 'Female':
                                     character.portrait = config.base.draeneiFemale;
                                     break;
@@ -217,6 +249,7 @@ module.exports = new ApplicationCommand({
                                 {name: 'Guild', value: character.guild, inline: true},
                                 {name: 'Achievement Points', value: character.achievementpoints, inline: true},
                                 {name: 'Talents', value: character.talents.join(', '), inline: true},
+                                {name: 'GearScore', value: totalGearScoreString, inline: true},
                             )
                             .setThumbnail(character.portrait)
                             .setTimestamp(new Date())
