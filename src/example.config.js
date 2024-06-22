@@ -29,6 +29,7 @@ const config = {
     development: {
         enabled: true, // If true, the bot will register all application commands to a specific guild (not globally).
         guildId: "1121534671667339324",
+        reportChannel: "1241923872270581760",
     },
     commands: {
         prefix: "?", // For message commands, prefix is required. This can be changed by a database.
