@@ -63,12 +63,7 @@ module.exports = new ApplicationCommand({
                     .setDisabled(embeds.length === 1), // Disable if only one page
             );
         // Send the first embed and the buttons
-        let message = await interaction.reply({
-            embeds: [embeds[0]],
-            components: [row],
-            fetchReply: true,
-            ephemeral: true
-        });
+        let message = await interaction.reply({embeds: [embeds[0]], components: [row], fetchReply: true});
         // Create a collector to listen for button clicks
         const filter = i => i.customId === 'previous' || i.customId === 'next';
         const collector = message.createMessageComponentCollector({filter, time: 60000});
@@ -85,14 +80,14 @@ module.exports = new ApplicationCommand({
                 currentPage = currentPage + 1 < embeds.length ? ++currentPage : 0;
             }
             // Update the message to show the new page
-            await interaction.update({embeds: [embeds[currentPage]], ephemeral: true});
+            await interaction.update({embeds: [embeds[currentPage]]});
         });
         collector.on('end', async () => {
             // Delete the original message
             await message.delete();
 
             // Send a new message with the same content but without the buttons
-            await interaction.channel.send({embeds: [embeds[currentPage]], ephemeral: true});
+            await interaction.channel.send({embeds: [embeds[currentPage]]});
         });
     },
 }).toJSON();
