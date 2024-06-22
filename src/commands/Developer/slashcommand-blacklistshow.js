@@ -34,8 +34,9 @@ module.exports = new ApplicationCommand({
             .setTitle("Blacklisted Users") // Set the title
             .setColor("#C41E3A"); // Set the color to red
         obj.forEach((member) => { // Loop through each blacklisted user
-            embed.addFields({name: "User ID", value: `<@${member.id}>`, inline:true}); // Add a field with the user ID
-            embed.addFields({name: "Reason", value: member.reason, inline:true}); // Add a field with the reason
+            embed.addFields({name: "User ID", value: `<@${member.id}>`, inline: true}); // Add a field with the user ID
+            embed.addFields({name: "Reason", value: member.reason, inline: true}); // Add a field with the reason
+            embed.addFields({name: "\u200B", value: "\u200B"});// add a blank field to separate the users
         });
         try {
             interaction.reply({embeds: [embed], ephemeral: true}); // Send the embed as a reply
