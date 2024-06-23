@@ -2,7 +2,11 @@ const {EmbedBuilder, ChatInputCommandInteraction, ApplicationCommandOptionType} 
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const config = require("../../config");
+const cheerio = require('cheerio');
+const axios = require('axios');
+const https = require('https'); // or https if the URL is https
 const itemsDB = require("../../itemsdb.json");
+
 
 module.exports = new ApplicationCommand({
     command: {
@@ -40,9 +44,11 @@ module.exports = new ApplicationCommand({
         // fetching json data from the API
         const charName = interaction.options.getString('character', true);
         const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
-        fetch(`${config.users.url}/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
+        let gemmed = [];
+        let enchanted = [];
+        fetch(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
             .then(response => response.json())
-            .then(data => {
+            .then(async data => {
 
                 const items = data.equipment.map(item => item.item);
 
@@ -80,8 +86,6 @@ module.exports = new ApplicationCommand({
                 // Convert the total gearscore to a string
                 const totalGearScoreString = totalGearScore.toString();
 
-                // Now you can use 'totalGearScoreString' wherever you need it
-
                 // Find the character in the data
                 if (data.name === charNameFormatted) {
                     const character = {
@@ -93,9 +97,9 @@ module.exports = new ApplicationCommand({
                         gender: data.gender,
                         race: data.race,
                         class: data.class,
-                        honorablekills: data.honorablekills,
+                        honorableKills: data.honorablekills,
                         guild: data.guild,
-                        achievementpoints: data.achievementpoints,
+                        achievementPoints: data.achievementpoints,
                         talents: data.talents.map(talent => talent.tree),
                         professions: data.professions
                     };
@@ -103,6 +107,86 @@ module.exports = new ApplicationCommand({
                     // Check if the character has a guild
                     if (!character.guild) {
                         character.guild = "None";
+                    }
+
+                    function getParams(params) {
+                        params = params.split("&");
+                        let paramsMap = {};
+                        params.forEach(function (p) {
+                            let v = p.split("=");
+                            paramsMap[v[0]] = decodeURIComponent(v[1]);
+                        });
+                        return paramsMap;
+                    }
+
+                    // Initialize missingGems and missingEnchants arrays
+                    let missingGems = [];
+                    let missingEnchants = [];
+                    const itemNames = ["Head", "Neck", "Shoulders", "Cloak", "Chest", "Shirt", "Tabard", "Bracer", "Gloves", "Belt", "Legs", "Boots", "Ring #1", "Ring #2", "Trinket #1", "Trinket #2", "Main-hand", "Off-hand", "Ranged"];
+                    const bannedItems = [1, 5, 6, 9, 14, 15];
+
+
+                    // Start the HTTP request
+                    try {
+                        const response = await axios.get(`https://armory.warmane.com/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`);
+                        const body = response.data;
+                        const $ = cheerio.load(body);
+                        let itemIDs = [];
+                        let actualItems = [];
+                        let i = 0;
+                        let characterClass = $(".level-race-class").text().toLowerCase();
+                        // map professions to array from data
+                        let professions = character.professions.map(profession => profession.name);
+                        $(".item-model a").each(function () {
+                            let rel = $(this).attr("rel");
+                            if (rel) {
+                                let params = getParams(rel);
+                                let amount = params["gems"] ? params["gems"].split(":").filter(x => x !== '0').length : 0;
+
+                                itemIDs.push({
+                                    "itemID": Number(params["item"])
+                                });
+
+                                actualItems.push({
+                                    "itemID": Number(params["item"]),
+                                    "gems": amount,
+                                    "type": itemNames[i]
+                                });
+                                if (!bannedItems.includes(i)) {
+                                    let isEnchanted = rel.indexOf("ench") !== -1;
+
+                                    if (!isEnchanted) {
+                                        if (itemNames[i] === "Ranged" && (character.class === "Hunter" || character.class === "Warrior")) {
+                                            missingEnchants.push(itemNames[i]);
+                                        } else if ((itemNames[i] === "Ring #1" || itemNames[i] === "Ring #2") && professions.includes("Enchanting")) {
+                                            missingEnchants.push(itemNames[i]);
+                                        } else if (itemNames[i] === "Off-hand" && !["mage", "warlock", "druid", "priest"].some(cls => character.class === cls)) {
+                                            missingEnchants.push(itemNames[i]);
+                                        } else if (!["Ranged", "Ring #1", "Ring #2"].includes(itemNames[i])) {
+                                            missingEnchants.push(itemNames[i]);
+                                        }
+                                    }
+                                }
+                                i++;
+                            }
+                        });
+
+                        let items = itemsDB.items.filter(item => itemIDs.some(id => id.itemID === item.itemID));
+
+                        items.forEach(item => {
+                            let foundItem = actualItems.filter(x => x.itemID === item.itemID)[0];
+                            if (foundItem.type === "Belt") {
+                                if ((item.gems + 1) !== foundItem.gems) {
+                                    missingGems.push(foundItem.type);
+                                }
+                            } else {
+                                if (item.gems !== foundItem.gems) {
+                                    missingGems.push(foundItem.type);
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        console.error(error);
                     }
 
                     // Switch based on characters Faction icon
@@ -272,9 +356,9 @@ module.exports = new ApplicationCommand({
                             {name: 'Gender', value: character.gender, inline: true},
                             {name: 'Race', value: character.race, inline: true},
                             {name: 'Class', value: character.class, inline: true},
-                            {name: 'Honorable Kills', value: character.honorablekills, inline: true},
+                            {name: 'Honorable Kills', value: character.honorableKills, inline: true},
                             {name: 'Guild', value: character.guild, inline: true},
-                            {name: 'Achievement Points', value: character.achievementpoints, inline: true},
+                            {name: 'Achievement Points', value: character.achievementPoints, inline: true},
                             {name: 'Talents', value: character.talents.join(', '), inline: true},
                             {name: 'GearScore', value: totalGearScoreString, inline: true},
                         ];
@@ -289,7 +373,7 @@ module.exports = new ApplicationCommand({
                         // Check if the character has professions
                         if (character.professions && character.professions.length > 0) {
                             const professions = character.professions.map(profession => `${profession.name}: ${profession.skill}`).join('\n');
-                                embed.addFields({name: 'Professions', value: professions, inline: true});
+                            embed.addFields({name: 'Professions', value: professions, inline: true});
                         }
 
                         // Check if the character has pvp teams
@@ -297,6 +381,14 @@ module.exports = new ApplicationCommand({
                             const pvpteams = data.pvpteams.map(team => `${team.type}: ${team.name} (Rating: ${team.rating}, Rank: ${team.rank})`).join('\n');
                             embed.addFields({name: 'PvP Teams', value: pvpteams, inline: true});
                         }
+
+                        // Check if the character has missing gems
+                        const gems = missingGems.join('\n');
+                        embed.addFields({name: 'Missing Gems', value: gems || "None"});
+
+                        // Check if the character has missing enchants
+                        const enchants = missingEnchants.join('\n');
+                        embed.addFields({name: 'Missing Enchants', value: enchants || "None"});
 
                         interaction.reply({embeds: [embed], ephemeral: true});
                     } else {
