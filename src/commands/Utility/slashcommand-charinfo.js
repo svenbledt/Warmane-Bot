@@ -41,34 +41,36 @@ module.exports = new ApplicationCommand({
      * @param {ChatInputCommandInteraction} interaction
      */
     run: async (client, interaction) => {
-        // fetching json data from the API
         const charName = interaction.options.getString('character', true);
         const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
         let gemmed = [];
         let enchanted = [];
-        fetch(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
-            .then(response => response.json())
-            .then(async data => {
 
+        // Use Promise.all to fetch data concurrently
+        const fetchCharacterData = fetch(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
+            .then(response => response.json());
+
+        const fetchArmoryData = axios.get(`${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`)
+            .then(response => response.data);
+
+        Promise.all([fetchCharacterData, fetchArmoryData])
+            .then(async ([data, body]) => {
                 const items = data.equipment.map(item => item.item);
 
-                // Initialize total gearscore and weapons array
+                // Use a Map for faster lookups
+                const itemsMap = new Map(itemsDB.items.map(item => [item.itemID, item]));
+
                 let totalGearScore = 0;
                 let weapons = [];
 
-                // Iterate over the items
                 for (let item of items) {
-                    // Find the item in your local database
-                    const localItem = itemsDB.items.find(localItem => localItem.itemID === Number(item));
+                    // Look up items in constant time
+                    const localItem = itemsMap.get(Number(item));
 
-                    // If the item is found
                     if (localItem) {
-                        // Check the class and subclass of the item
                         if (localItem.class === 2 && (localItem.subclass === 1 || localItem.subclass === 5 || localItem.subclass === 8)) {
-                            // If the item is a weapon, add its gearscore to the weapons array
                             weapons.push(localItem.GearScore);
                         } else {
-                            // Otherwise, add its gearscore to the total
                             totalGearScore += localItem.GearScore;
                         }
                     }
@@ -128,7 +130,7 @@ module.exports = new ApplicationCommand({
 
                     // Start the HTTP request
                     try {
-                        const response = await axios.get(`https://armory.warmane.com/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`);
+                        const response = await axios.get(`${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`);
                         const body = response.data;
                         const $ = cheerio.load(body);
                         let itemIDs = [];
