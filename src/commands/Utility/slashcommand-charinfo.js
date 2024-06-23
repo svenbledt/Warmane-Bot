@@ -4,9 +4,11 @@ const ApplicationCommand = require("../../structure/ApplicationCommand");
 const config = require("../../config");
 const cheerio = require('cheerio');
 const axios = require('axios');
-const https = require('https'); // or https if the URL is https
+const rateLimit = require('axios-rate-limit');
 const itemsDB = require("../../itemsdb.json");
 
+// Define an axios instance with rate limit applied
+const https = rateLimit(axios.create(), { maxRequests: 2, perMilliseconds: 2000 });
 
 module.exports = new ApplicationCommand({
     command: {
@@ -34,6 +36,7 @@ module.exports = new ApplicationCommand({
     },
     options: {
         cooldown: 10000,
+        botDevelopers: true,
     },
     /**
      *
@@ -46,7 +49,7 @@ module.exports = new ApplicationCommand({
 
         // First, check if the character exists
         try {
-            const response = await axios.get(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`);
+            const response = await https.get(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`);
             const characterData = response.data;
 
             // If the character does not exist, return an error message
@@ -65,14 +68,20 @@ module.exports = new ApplicationCommand({
         }
 
         // Use Promise.all to fetch data concurrently
-        const fetchCharacterData = fetch(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
-            .then(response => response.json());
+        const fetchCharacterData = https.get(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
+            .then(response => response.data);
 
-        const fetchArmoryData = axios.get(`${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`)
+        const fetchArmoryData = https.get(`${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`)
             .then(response => response.data);
 
         Promise.all([fetchCharacterData, fetchArmoryData])
             .then(async ([data, body]) => {
+                if (data.error) {
+                    return interaction.reply({
+                        content: `An error occurred while fetching the character data. Try it again later. Response: ${data.error}`,
+                        ephemeral: true
+                    });
+                }
                 const items = data.equipment.map(item => item.item);
 
                 // Use a Map for faster lookups
@@ -148,7 +157,7 @@ module.exports = new ApplicationCommand({
 
                     // Start the HTTP request
                     try {
-                        const response = await axios.get(`${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`);
+                        const response = await https.get(`${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`);
                         const body = response.data;
                         const $ = cheerio.load(body);
                         let itemIDs = [];
