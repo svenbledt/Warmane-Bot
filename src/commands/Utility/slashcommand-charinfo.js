@@ -46,18 +46,35 @@ module.exports = new ApplicationCommand({
 
                 const items = data.equipment.map(item => item.item);
 
-                // Initialize total gearscore
+                // Initialize total gearscore and weapons array
                 let totalGearScore = 0;
+                let weapons = [];
 
                 // Iterate over the items
                 for (let item of items) {
                     // Find the item in your local database
                     const localItem = itemsDB.items.find(localItem => localItem.itemID === Number(item));
 
-                    // If the item is found, add its gearscore to the total
+                    // If the item is found
                     if (localItem) {
-                        totalGearScore += localItem.GearScore;
+                        // Check the class and subclass of the item
+                        if (localItem.class === 2 && (localItem.subclass === 1 || localItem.subclass === 5 || localItem.subclass === 8)) {
+                            // If the item is a weapon, add its gearscore to the weapons array
+                            weapons.push(localItem.GearScore);
+                        } else {
+                            // Otherwise, add its gearscore to the total
+                            totalGearScore += localItem.GearScore;
+                        }
                     }
+                }
+
+                // Handle the weapons array
+                if (weapons.length === 2) {
+                    // If there are two weapons, add the average of their gearscores to the total
+                    totalGearScore += Math.floor((weapons[0] + weapons[1]) / 2);
+                } else if (weapons.length === 1) {
+                    // If there is one weapon, add its gearscore to the total
+                    totalGearScore += weapons[0];
                 }
 
                 // Convert the total gearscore to a string
@@ -82,6 +99,11 @@ module.exports = new ApplicationCommand({
                         talents: data.talents.map(talent => talent.tree),
                         professions: data.professions
                     };
+
+                    // Check if the character has a guild
+                    if (!character.guild) {
+                        character.guild = "None";
+                    }
 
                     // Switch based on characters Faction icon
                     switch (character.faction) {
@@ -236,29 +258,38 @@ module.exports = new ApplicationCommand({
                             .setColor(character.color || '#8B0000')
                             .setTitle('Character Information')
                             .setDescription(`Information about ${charNameFormatted}`)
-                            .addFields(
-                                {name: 'Character', value: character.name, inline: true},
-                                {name: 'Realm', value: character.realm, inline: true},
-                                {name: 'Online', value: character.online ? 'Yes' : 'No', inline: true},
-                                {name: 'Level', value: character.level, inline: true},
-                                {name: 'Faction', value: character.faction, inline: true},
-                                {name: 'Gender', value: character.gender, inline: true},
-                                {name: 'Race', value: character.race, inline: true},
-                                {name: 'Class', value: character.class, inline: true},
-                                {name: 'Honorable Kills', value: character.honorablekills, inline: true},
-                                {name: 'Guild', value: character.guild, inline: true},
-                                {name: 'Achievement Points', value: character.achievementpoints, inline: true},
-                                {name: 'Talents', value: character.talents.join(', '), inline: true},
-                                {name: 'GearScore', value: totalGearScoreString, inline: true},
-                            )
                             .setThumbnail(character.portrait)
                             .setTimestamp(new Date())
                             .setFooter({text: interaction.guild.name, iconURL: character.icon});
 
+                        // Add fields to the embed
+                        const fields = [
+                            {name: 'Character', value: character.name, inline: true},
+                            {name: 'Realm', value: character.realm, inline: true},
+                            {name: 'Online', value: character.online ? 'Yes' : 'No', inline: true},
+                            {name: 'Level', value: character.level, inline: true},
+                            {name: 'Faction', value: character.faction, inline: true},
+                            {name: 'Gender', value: character.gender, inline: true},
+                            {name: 'Race', value: character.race, inline: true},
+                            {name: 'Class', value: character.class, inline: true},
+                            {name: 'Honorable Kills', value: character.honorablekills, inline: true},
+                            {name: 'Guild', value: character.guild, inline: true},
+                            {name: 'Achievement Points', value: character.achievementpoints, inline: true},
+                            {name: 'Talents', value: character.talents.join(', '), inline: true},
+                            {name: 'GearScore', value: totalGearScoreString, inline: true},
+                        ];
+
+                        // Only add fields with non-empty values
+                        fields.forEach(field => {
+                            if (field.value) {
+                                embed.addFields(field);
+                            }
+                        });
+
                         // Check if the character has professions
                         if (character.professions && character.professions.length > 0) {
                             const professions = character.professions.map(profession => `${profession.name}: ${profession.skill}`).join('\n');
-                            embed.addFields({name: 'Professions', value: professions, inline: true});
+                                embed.addFields({name: 'Professions', value: professions, inline: true});
                         }
 
                         // Check if the character has pvp teams
