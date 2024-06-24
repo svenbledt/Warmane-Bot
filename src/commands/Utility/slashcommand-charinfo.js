@@ -43,26 +43,8 @@ module.exports = new ApplicationCommand({
     run: async (client, interaction) => {
         const charName = interaction.options.getString('character', true);
         const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
-
-        // First, check if the character exists
-        try {
-            const response = await axios.get(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`);
-            const characterData = response.data;
-
-            // If the character does not exist, return an error message
-            if (!characterData || !characterData.name) {
-                return interaction.reply({
-                    content: `The character ${charNameFormatted} does not exist.`,
-                    ephemeral: true
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            return interaction.reply({
-                content: `An error occurred while fetching the character data.`,
-                ephemeral: true
-            });
-        }
+        let gemmed = [];
+        let enchanted = [];
 
         // Use Promise.all to fetch data concurrently
         const fetchCharacterData = fetch(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
@@ -411,6 +393,12 @@ module.exports = new ApplicationCommand({
                         embed.addFields({name: 'Missing Enchants', value: enchants || "None"});
 
                         interaction.reply({embeds: [embed], ephemeral: true});
+                    } else {
+                        // If the character is not found, send a message indicating that the character is not a member of RSA Legends
+                        interaction.reply({
+                            content: `The character ${charNameFormatted} doesnt exist.`,
+                            ephemeral: true
+                        });
                     }
                 }
             })
