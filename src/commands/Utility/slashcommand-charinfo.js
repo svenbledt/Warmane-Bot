@@ -8,7 +8,7 @@ const rateLimit = require('axios-rate-limit');
 const itemsDB = require("../../itemsdb.json");
 
 // Define an axios instance with rate limit applied
-const https = rateLimit(axios.create(), { maxRequests: 2, perMilliseconds: 2000 });
+const https = rateLimit(axios.create(), {maxRequests: 1, perMilliseconds: 4000});
 
 module.exports = new ApplicationCommand({
     command: {
@@ -67,6 +67,12 @@ module.exports = new ApplicationCommand({
             });
         }
 
+        // Immediately reply to the interaction with a loading state
+        await interaction.deferReply({
+            content: "We're looking for your data. Please be patient.",
+            ephemeral: true
+        });
+
         // Use Promise.all to fetch data concurrently
         const fetchCharacterData = https.get(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`)
             .then(response => response.data);
@@ -77,7 +83,7 @@ module.exports = new ApplicationCommand({
         Promise.all([fetchCharacterData, fetchArmoryData])
             .then(async ([data, body]) => {
                 if (data.error) {
-                    return interaction.reply({
+                    return await interaction.editReply({
                         content: `An error occurred while fetching the character data. Try it again later. Response: ${data.error}`,
                         ephemeral: true
                     });
@@ -419,7 +425,7 @@ module.exports = new ApplicationCommand({
                         const enchants = missingEnchants.join('\n');
                         embed.addFields({name: 'Missing Enchants', value: enchants || "None"});
 
-                        interaction.reply({embeds: [embed], ephemeral: true});
+                        await interaction.editReply({embeds: [embed], ephemeral: true});
                     }
                 }
             })
