@@ -40,7 +40,7 @@ module.exports = new ApplicationCommand({
             const embed = new EmbedBuilder()
                 .setTitle("Blacklisted Users")
                 .setColor("#C41E3A")
-                .setThumbnail("https://i.imgur.com/p55vXmV.png")
+                .setThumbnail("https://i.imgur.com/VlVw8JK.png")
                 .setFooter({text:`Page ${embeds.length + 1} of ${Math.ceil(obj.length / 25)}`, iconURL: client.user.displayAvatarURL()});
             current.forEach((member) => {
                 embed.addFields({
