@@ -39,7 +39,9 @@ module.exports = new ApplicationCommand({
             const current = obj.slice(i, i + 25);
             const embed = new EmbedBuilder()
                 .setTitle("Blacklisted Users")
-                .setColor("#C41E3A");
+                .setColor("#C41E3A")
+                .setThumbnail("https://i.imgur.com/p55vXmV.png")
+                .setFooter({text:`Page ${embeds.length + 1} of ${Math.ceil(obj.length / 25)}`, iconURL: client.user.displayAvatarURL()});
             current.forEach((member) => {
                 embed.addFields({
                     name: "Blacklisted User",
