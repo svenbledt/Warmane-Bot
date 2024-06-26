@@ -69,7 +69,7 @@ module.exports = new Event({
             // CharNameAsk is enabled, proceed with the logic
             try {
                 await member.send(
-                    `Hey, I would like to ask you for your main Character name. Please respond with your main Character name for the Server ${member.guild.name}`
+                    `Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server ${member.guild.name}.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)`
                 );
             } catch (error) {
                 console.error(`Failed to send a DM to ${member.user.tag}.`);
@@ -87,7 +87,7 @@ module.exports = new Event({
                 response = response.replace(/[^a-zA-Z ]/g, "");
                 if (response.trim() === "" || response.length > 16) {
                     member.dmChannel.send(
-                        "Your response cannot be empty or too long. Please provide a valid response."
+                        "Your response cannot be empty or too long.\nPlease provide a valid response."
                     );
                 } else {
                     member

@@ -24,9 +24,8 @@ class DiscordBot extends Client {
     login_attempts = 0;
     login_timestamp = 0;
     statusMessages = [
-        { name: 'Selling members data', type: 4 },
-        { name: 'Watching your dm\'s', type: 4 },
-        { name: 'Sending useful information', type: 4 }
+        { name: 'Checking character data', type: 4 },
+        { name: 'Doing some requests on Warmane', type: 4 }
     ];
 
     commands_handler = new CommandsHandler(this);
