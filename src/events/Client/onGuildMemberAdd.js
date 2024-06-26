@@ -69,7 +69,7 @@ module.exports = new Event({
             // CharNameAsk is enabled, proceed with the logic
             try {
                 await member.send(
-                    `Hey, I would like to ask you for your main Character name. Please respond with your main Character name for the Guild ${member.guild.name}`
+                    `Hey, I would like to ask you for your main Character name. Please respond with your main Character name for the Server ${member.guild.name}`
                 );
             } catch (error) {
                 console.error(`Failed to send a DM to ${member.user.tag}.`);
