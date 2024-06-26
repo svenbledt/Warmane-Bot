@@ -12,10 +12,10 @@ const https = rateLimit(axios.create(), {maxRequests: 1, perMilliseconds: 4000})
 
 module.exports = new ApplicationCommand({
     command: {
-        name: 'charinfo', description: 'Gives some information about a member of the Guild.', type: 1, options: [
+        name: 'charinfo', description: 'Gives some information about any character on Warmane.', type: 1, options: [
             {
                 name: 'character',
-                description: 'Gives information about a member of the Guild.',
+                description: 'Select the character u want Information from.',
                 type: ApplicationCommandOptionType.String,
                 required: true,
             },
