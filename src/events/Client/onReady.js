@@ -21,41 +21,43 @@ function ensureGuildSettings(guildSettings) {
     return updated;
 }
 
-module.exports = new Event({
-    event: 'ready', once: true, run: (__client__, client) => {
-        let settings = client.database.get("settings") || [];
+function updateGuildSettings(client) {
+    let settings = client.database.get("settings") || [];
 
-        success('Logged in as ' + client.user.displayName + ', took ' + ((Date.now() - __client__.login_timestamp) / 1000) + "s.")
+    // Fetch all guilds the bot is currently in and store their IDs in a set
+    const currentGuildIds = new Set(client.guilds.cache.keys());
 
-        // Fetch all guilds the bot is currently in and store their IDs in a set
-        const currentGuildIds = new Set(client.guilds.cache.keys());
+    // Filter the settings array to only include entries for guilds the bot is currently in
+    settings = settings.filter(setting => currentGuildIds.has(setting.guild));
 
-        // Filter the settings array to only include entries for guilds the bot is currently in
-        settings = settings.filter(setting => currentGuildIds.has(setting.guild));
-
-        // For each guild the bot is currently in, ensure it has a settings entry
-        for (const guildId of currentGuildIds) {
-            let guildSettings = settings.find(setting => setting.guild === guildId);
-            if (!guildSettings) {
-                guildSettings = {guild: guildId};
-                settings.push(guildSettings);
-            }
-
-            // Ensure the guild settings have all necessary entries
-            if (ensureGuildSettings(guildSettings)) {
-                client.database.set("settings", settings);
-            }
+    // For each guild the bot is currently in, ensure it has a settings entry
+    for (const guildId of currentGuildIds) {
+        let guildSettings = settings.find(setting => setting.guild === guildId);
+        if (!guildSettings) {
+            guildSettings = {guild: guildId};
+            settings.push(guildSettings);
         }
 
-        // Save the updated settings back to the database
-        client.database.set("settings", settings);
+        // Ensure the guild settings have all necessary entries
+        if (ensureGuildSettings(guildSettings)) {
+            client.database.set("settings", settings);
+        }
+    }
 
-        // Update server and user counts immediately after bot has connected
-        client.updateServerAndUserCounts();
+    // Save the updated settings back to the database
+    client.database.set("settings", settings);
+}
+
+module.exports = new Event({
+    event: 'ready', once: true, run: (__client__, client) => {
+        success('Logged in as ' + client.user.displayName + ', took ' + ((Date.now() - __client__.login_timestamp) / 1000) + "s.")
+
+        // Update guild settings immediately after bot has connected
+        updateGuildSettings(client);
 
         // Schedule the task to run every 2 hours
         setInterval(() => {
-            client.updateServerAndUserCounts();
+            updateGuildSettings(client);
         }, 2 * 60 * 60 * 1000); // 2 hours in milliseconds
     }
 }).toJSON();
