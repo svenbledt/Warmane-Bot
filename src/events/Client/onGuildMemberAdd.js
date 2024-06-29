@@ -6,8 +6,7 @@ function ensureGuildSettings(guildSettings) {
         welcomeMessage: false,
         welcomeChannel: "",
         CharNameAsk: false,
-        BlockList: true,
-        // Add any other default settings here
+        BlockList: true, // Add any other default settings here
     };
 
     let updated = false;
@@ -23,9 +22,7 @@ function ensureGuildSettings(guildSettings) {
 }
 
 module.exports = new Event({
-    event: "guildMemberAdd",
-    once: false,
-    run: async (client, member) => {
+    event: "guildMemberAdd", once: false, run: async (client, member) => {
         // check if the joined ID is blacklisted
         let obj = client.database.get("blacklisted") || [];
         let settings = client.database.get("settings") || [];
@@ -46,9 +43,7 @@ module.exports = new Event({
         if (BlockListEnabled) {
             if (obj.includes(member.id)) {
                 try {
-                    await member.send(
-                        "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff."
-                    );
+                    await member.send("You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff.");
                 } catch (error) {
                     console.error(`Failed to send a DM to ${member.tag}.`);
                     return;
@@ -57,9 +52,7 @@ module.exports = new Event({
                     await member.kick("Blacklisted user.");
                     success(`Kicked ${member.user.tag} due to being blacklisted.`);
                 } catch (error) {
-                    console.error(
-                        `Failed to kick ${member.user.tag} due to: ${error.message}.`
-                    );
+                    console.error(`Failed to kick ${member.user.tag} due to: ${error.message}.`);
                 }
                 return;
             }
@@ -68,9 +61,7 @@ module.exports = new Event({
         if (charNameAskEnabled) {
             // CharNameAsk is enabled, proceed with the logic
             try {
-                await member.send(
-                    `Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server ${member.guild.name}.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)`
-                );
+                await member.send(`Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server ${member.guild.name}.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)`);
             } catch (error) {
                 console.error(`Failed to send a DM to ${member.user.tag}.`);
                 return;
@@ -78,35 +69,24 @@ module.exports = new Event({
             // wait for the users response to the DM and change his nickname
             const filter = (m) => m.author.id === member.user.id;
             const collector = member.dmChannel.createMessageCollector({
-                filter,
-                time: 60000,
+                filter, time: 60000,
             });
             collector.on("collect", async (collected) => {
                 let response = collected.content;
                 // Replace special characters and numbers
                 response = response.replace(/[^a-zA-Z ]/g, "");
                 if (response.trim() === "" || response.length > 16) {
-                    member.dmChannel.send(
-                        "Your response cannot be empty or too long.\nPlease provide a valid response."
-                    );
+                    member.dmChannel.send("Your response cannot be empty or too long.\nPlease provide a valid response.");
                 } else {
                     member
                         .setNickname(response)
                         .then(() => {
-                            console.log(
-                                `Changed ${member.user.tag} main character to ${response}.`
-                            );
-                            member.dmChannel.send(
-                                `Your main Characters name has been successfully changed to ${response} for the Guild ${member.guild.name}.`
-                            );
+                            console.log(`Changed ${member.user.tag} main character to ${response}.`);
+                            member.dmChannel.send(`Your main Characters name has been successfully changed to ${response} for the Guild ${member.guild.name}.`);
                         })
                         .catch((error) => {
-                            console.error(
-                                `Failed to change ${member.user.tag} main character to ${response} due to: ${error.message}.`
-                            );
-                            member.dmChannel.send(
-                                `Failed to change your main Characters name due to: ${error.message}`
-                            );
+                            console.error(`Failed to change ${member.user.tag} main character to ${response} due to: ${error.message}.`);
+                            member.dmChannel.send(`Failed to change your main Characters name due to: ${error.message}`);
                         });
                 }
             });
@@ -116,9 +96,7 @@ module.exports = new Event({
             // welcomeMessage is enabled, proceed with the logic
             let welcomeChannel = guildSettings.welcomeChannel;
             if (!welcomeChannel || welcomeChannel === "") {
-                welcomeChannel = member.guild.channels.cache.find(
-                    (channel) => channel.name === "welcome"
-                );
+                welcomeChannel = member.guild.channels.cache.find((channel) => channel.name === "welcome");
             } else {
                 welcomeChannel = member.guild.channels.cache.get(welcomeChannel);
             }
@@ -130,8 +108,7 @@ module.exports = new Event({
                 color: 10038562,
                 timestamp: new Date(),
                 footer: {
-                    text: member.guild.name,
-                    icon_url: client.user.displayAvatarURL(),
+                    text: member.guild.name, icon_url: client.user.displayAvatarURL(),
                 },
                 thumbnail: {
                     url: member.user.displayAvatarURL(),
