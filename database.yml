@@ -11,8 +11,16 @@ settings:
     CharNameAsk: true
     BlockList: true
     welcomeChannel: '1242902565520146552'
+    guildName: RSA Legends
   - guild: '1254444159985651712'
     welcomeMessage: true
-    welcomeChannel: '1254444160765919245'
+    welcomeChannel: '1257409141694005368'
     CharNameAsk: false
     BlockList: true
+    guildName: Warmane Tool
+  - guild: '298051398103334912'
+    welcomeMessage: false
+    welcomeChannel: ''
+    CharNameAsk: true
+    BlockList: true
+    guildName: The Exalted Pugs
