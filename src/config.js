@@ -26,7 +26,7 @@ const config = {
         draeneiFemale: "https://i.imgur.com/isDVJYZ.png", // The Draenei
     }, development: {
         enabled: true, // If true, the bot will register all application commands to a specific guild (not globally).
-        guildId: "1254444159985651712", reportChannel: "1257409168265187428",
+        guildId: "1254444159985651712", reportChannel: "1257409168265187428", inviteChannel: "1257459204948627638",
     }, commands: {
         prefix: "?", // For message commands, prefix is required. This can be changed by a database.
         message_commands: true, // If true, the bot will allow users to use message (or prefix) commands.
