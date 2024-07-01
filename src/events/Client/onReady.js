@@ -22,27 +22,28 @@ function ensureGuildSettings(guildSettings) {
 function updateGuildSettings(client) {
     let settings = client.database.get("settings") || [];
 
-    // Fetch all guilds the bot is currently in and store their IDs in a set
     const currentGuildIds = new Set(client.guilds.cache.keys());
 
-    // Filter the settings array to only include entries for guilds the bot is currently in
     settings = settings.filter(setting => currentGuildIds.has(setting.guild));
 
-    // For each guild the bot is currently in, ensure it has a settings entry
     for (const guildId of currentGuildIds) {
         let guildSettings = settings.find(setting => setting.guild === guildId);
+        const guildName = client.guilds.cache.get(guildId).name; // Hole den Gildennamen
+
         if (!guildSettings) {
-            guildSettings = {guild: guildId};
+            // Erstelle eine neue Einstellung mit dem Gildennamen an erster Stelle
+            guildSettings = {guild: guildId, guildName: guildName};
             settings.push(guildSettings);
+        } else {
+            // Aktualisiere den Gildennamen, falls er sich geändert hat
+            guildSettings.guildName = guildName;
         }
 
-        // Ensure the guild settings have all necessary entries
         if (ensureGuildSettings(guildSettings)) {
             client.database.set("settings", settings);
         }
     }
 
-    // Save the updated settings back to the database
     client.database.set("settings", settings);
 }
 
