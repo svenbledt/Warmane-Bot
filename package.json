@@ -4,7 +4,7 @@
   "description": "A Discord bot commands, components and events handler based on discord.js v14 and fully written in JavaScript.",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node ./src/test.js",
     "start": "node ."
   },
   "keywords": [],
