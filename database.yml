@@ -1,0 +1,18 @@
+blacklisted:
+  - id: '1227802414086619219'
+    reason: Ninjalooting in raid - Exaton
+  - id: '618324359102332929'
+    reason: Ninjalooting
+  - id: '793965220254580757'
+    reason: Flaiming on normal mechanics and be mean to ppl.
+settings:
+  - guild: '1121534671667339324'
+    welcomeMessage: true
+    CharNameAsk: true
+    BlockList: true
+    welcomeChannel: '1242902565520146552'
+  - guild: '1254444159985651712'
+    welcomeMessage: true
+    welcomeChannel: '1254444160765919245'
+    CharNameAsk: false
+    BlockList: true
