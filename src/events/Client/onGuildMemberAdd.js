@@ -40,6 +40,11 @@ module.exports = new Event({
         let welcomeMessageEnabled = guildSettings.welcomeMessage;
         let BlockListEnabled = guildSettings.BlockList;
 
+        // If the member is a bot, return and do not send any messages
+        if (member.user.bot) {
+            return;
+        }
+
         if (BlockListEnabled) {
             if (obj.includes(member.id)) {
                 try {
