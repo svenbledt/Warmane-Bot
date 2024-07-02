@@ -31,7 +31,7 @@ module.exports = new ApplicationCommand({
     const embed = new EmbedBuilder()
       .setTitle("Servertime")
       .setDescription(`The current servertime is: ${time}`)
-      .setColor("RANDOM")
+      .setColor("#8B0000")
       .setTimestamp()
       .setFooter({
         text: "Requested by: " + interaction.user.tag,
