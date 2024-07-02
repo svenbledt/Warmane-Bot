@@ -134,7 +134,7 @@ module.exports = new Event({
 
       const embed = {
         title: `Welcome to ${member.guild.name}!`,
-        description: `Welcome ${member} to our server! \n\nPlease make sure to check your DM's and tell us your main Character name.\nIf you have any questions, feel free to ask in a Public Guild channel.`,
+        description: `Welcome ${member} to our server! \n\nPlease make sure to check your DM's and tell us your main Character name.\nIf you have any questions, feel free to ask in a Public channel.`,
         color: 10038562,
         timestamp: new Date(),
         footer: {
