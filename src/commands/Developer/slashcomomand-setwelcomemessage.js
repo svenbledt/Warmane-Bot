@@ -84,7 +84,14 @@ module.exports = new ApplicationCommand({
 
     // Get the welcome message from the interaction options
     const welcomeMessageDM = interaction.options.getString("text");
-
+    if (!guildSettings.welcomeMessage) {
+      // if the welcome message is not enabled, dont continue
+      await interaction.reply({
+        content: "The welcome message is not enabled.",
+        ephemeral: true,
+      });
+      return;
+    }
     // Update the welcome message in the guild settings
     guildSettings.welcomeMessageDM = welcomeMessageDM;
 
