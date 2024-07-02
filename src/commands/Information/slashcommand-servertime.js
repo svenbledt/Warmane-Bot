@@ -23,10 +23,10 @@ module.exports = new ApplicationCommand({
    * @param {ChatInputCommandInteraction} interaction
    */
   run: async (client, interaction) => {
-    // print the actual time of Serbia to the interaction channel
+    // print the actual time of Iceland to the interaction channel
     const date = new Date();
     const time = date.toLocaleTimeString("en-US", {
-      timeZone: "Europe/Belgrade",
+      timeZone: "Atlantic/Reykjavik",
     });
     const embed = new EmbedBuilder()
       .setTitle("Servertime")
