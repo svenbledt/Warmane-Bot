@@ -12,15 +12,39 @@ settings:
     BlockList: true
     welcomeChannel: '1242902565520146552'
     guildName: RSA Legends
+    welcomeMessageDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
   - guild: '1254444159985651712'
     welcomeMessage: true
     welcomeChannel: '1257409141694005368'
     CharNameAsk: false
     BlockList: true
     guildName: Warmane Tool
+    welcomeMessageDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
   - guild: '298051398103334912'
     welcomeMessage: false
     welcomeChannel: ''
     CharNameAsk: true
     BlockList: true
     guildName: The Exalted Pugs
+    welcomeMessageDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)

@@ -88,10 +88,11 @@ module.exports = new Event({
                         await member.setNickname(response);
                         console.log(`Changed ${member.user.tag} to ${response}.`);
                         await member.dmChannel.send(`Your name has been successfully changed to ${response} for the Guild ${member.guild.name}.`);
-                        collector.stop('valid-response');
+                        collector.stop('valid-response'); // This line ensures the collector stops after a successful operation
                     } catch (error) {
                         console.error(`Failed to change ${member.user.tag} to ${response} due to: ${error.message}.`);
                         await member.dmChannel.send(`Failed to change your name due to: ${error.message}`);
+                        // Do not stop the collector here to allow for further attempts
                     }
                 }
             });
