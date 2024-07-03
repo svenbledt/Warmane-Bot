@@ -1,6 +1,5 @@
 const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
-const { ActivityType } = require("discord.js");
 const config = require("../../config");
 
 function ensureGuildSettings(guildSettings) {
