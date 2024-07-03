@@ -56,10 +56,11 @@ function updateGuildSettings(client) {
 
 function updateStatus(client) {
   const guilds = client.guilds.cache.size;
-  const users = client.guilds.cache.reduce(
-    (acc, guild) => acc + guild.memberCount,
-    0
-  );
+  const users = client.guilds.cache.reduce((acc, guild) => {
+    // Filter out bot members and then sum up the member count
+    const nonBotMembersCount = guild.members.cache.filter(member => !member.user.bot).size;
+    return acc + nonBotMembersCount;
+  }, 0);
   client.user.setPresence({
     activities: [
       {
