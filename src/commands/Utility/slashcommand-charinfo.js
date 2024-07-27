@@ -207,6 +207,8 @@ module.exports = new ApplicationCommand({
                                     missingEnchants.push(itemNames[i]);
                                 } else if (itemNames[i] === "Off-hand" && !["mage", "warlock", "druid", "priest"].some(cls => character.class === cls)) {
                                     missingEnchants.push(itemNames[i]);
+                                } else if ((itemNames[i] === "Gloves" || itemNames[i] === "Boots") && !professions.includes("Engineering")) {
+                                    missingEnchants.push(itemNames[i]);
                                 } else if (!["Ranged", "Ring #1", "Ring #2"].includes(itemNames[i])) {
                                     missingEnchants.push(itemNames[i]);
                                 }
