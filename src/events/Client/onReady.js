@@ -53,13 +53,22 @@ function updateGuildSettings(client) {
   client.database.set("settings", settings);
 }
 
-function updateStatus(client) {
+async function updateStatus(client) {
   const guilds = client.guilds.cache.size;
-  const users = client.guilds.cache.reduce((acc, guild) => {
-    // Filter out bot members and then sum up the member count
-    const nonBotMembersCount = guild.members.cache.filter(member => !member.user.bot).size;
-    return acc + nonBotMembersCount;
-  }, 0);
+  let users = 0;
+
+  for (const guild of client.guilds.cache.values()) {
+    try {
+      // Fetch all members of the guild
+      await guild.members.fetch();
+      // Count non-bot members
+      const nonBotMembersCount = guild.members.cache.filter(member => !member.user.bot).size;
+      users += nonBotMembersCount;
+    } catch (error) {
+      console.error(`Failed to fetch members for guild ${guild.id}:`, error);
+    }
+  }
+
   client.user.setPresence({
     activities: [
       {
