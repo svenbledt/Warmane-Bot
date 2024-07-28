@@ -120,7 +120,7 @@ module.exports = new ApplicationCommand({
         }
 
         try {
-            await interaction.channel.send({
+            const pollMessage = await interaction.channel.send({
                 poll: {
                     question: filteredQuestion,
                     duration: duration,
@@ -129,6 +129,10 @@ module.exports = new ApplicationCommand({
                     layoutType: PollLayoutType.Default
                 }
             });
+
+            // Pin the poll message to the channel
+            await pollMessage.pin();
+
         } catch (error) {
             console.error(`Failed to send a poll to the channel: ${error.message}`);
             await interaction.reply({
@@ -139,7 +143,7 @@ module.exports = new ApplicationCommand({
         }
 
         await interaction.reply({
-            content: `Poll created!`,
+            content: `Your Poll has been created and pinned!`,
             ephemeral: true
         });
     }
