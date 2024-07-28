@@ -10,7 +10,8 @@ module.exports = new ApplicationCommand({
         options: []
     },
     options: {
-        botDevelopers: true
+        botDevelopers: false,
+        cooldown: 5000,
     },
     /**
      *
