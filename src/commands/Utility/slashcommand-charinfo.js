@@ -381,11 +381,12 @@ module.exports = new ApplicationCommand({
                 }
 
                 if (character) {
+                    const armoryLink = `${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`;
                     // If the character is found, create an embed with the information
                     const embed = new EmbedBuilder()
                         .setColor(character.color || '#8B0000')
                         .setTitle('Character Information')
-                        .setDescription(`Information about ${charNameFormatted}`)
+                        .setDescription(`Information about ${charNameFormatted} - [Armory](${armoryLink})`)
                         .setThumbnail(character.portrait)
                         .setTimestamp(new Date())
                         .setFooter({text: interaction.guild.name, iconURL: character.icon});
