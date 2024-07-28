@@ -69,7 +69,7 @@ module.exports = new ApplicationCommand({
         // Immediately reply to the interaction with a loading state
         await interaction.deferReply({
             content: "We're looking for your data. Please be patient.",
-            ephemeral: true
+            ephemeral: false
         });
 
         // Define a function to make the request
@@ -435,7 +435,7 @@ module.exports = new ApplicationCommand({
                     const enchants = missingEnchants.join('\n');
                     embed.addFields({name: 'Missing Enchants', value: enchants || "None"});
 
-                    await interaction.editReply({embeds: [embed], ephemeral: true});
+                    await interaction.editReply({embeds: [embed], ephemeral: false});
                 }
             }
         }).catch(error => console.error('Error:', error));
