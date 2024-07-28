@@ -48,3 +48,17 @@ settings:
 
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
+  - guild: '1264569587413028864'
+    guildName: Trauma
+    welcomeMessage: false
+    welcomeChannel: ''
+    CharNameAsk: false
+    BlockList: true
+    welcomeMessageDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)

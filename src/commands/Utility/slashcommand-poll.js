@@ -49,7 +49,7 @@ module.exports = new ApplicationCommand({
                 type: ApplicationCommandOptionType.String,
             },
             {
-                name: 'Multi-Choice',
+                name: 'multi-choice',
                 description: 'Allow users to select multiple answers.',
                 type: ApplicationCommandOptionType.Boolean,
             }
@@ -79,20 +79,28 @@ module.exports = new ApplicationCommand({
         const answer2 = interaction.options.getString('answer2', false);
         const answer3 = interaction.options.getString('answer3', false);
         const answer4 = interaction.options.getString('answer4', false);
-        const multiChoice = interaction.options.getBoolean('Multi-Choice', false);
+        const multiChoice = interaction.options.getBoolean('multi-choice', false);
+
+        if (!question) {
+            await interaction.reply({
+                content: `Poll question is missing.`,
+                ephemeral: true
+            });
+            return;
+        }
 
         const answers = [
-            { label: answer1, emoji: '🔴' },
-            { label: answer2, emoji: '🔵' },
-            { label: answer3, emoji: '🟢' },
-            { label: answer4, emoji: '🟡' }
+            { text: answer1, emoji: '🔴' },
+            { text: answer2, emoji: '🔵' },
+            { text: answer3, emoji: '🟢' },
+            { text: answer4, emoji: '🟡' }
         ];
 
         // Check if any answer exceeds 55 characters
         for (const answer of answers) {
-            if (answer.label && answer.label.length > 55) {
+            if (answer.text && answer.text.length > 55) {
                 await interaction.reply({
-                    content: `One of the answers exceeds the 55 character limit: "${answer.label}"`,
+                    content: `One of the answers exceeds the 55 character limit: "${answer.text}"`,
                     ephemeral: true
                 });
                 return;
@@ -100,12 +108,20 @@ module.exports = new ApplicationCommand({
         }
 
         // Filter out empty answers
-        const filteredAnswers = answers.filter(answer => answer.label);
+        const filteredAnswers = answers.filter(answer => answer.text);
+        const filteredQuestion = { text: question, emoji: '❓', attachment: null };
+        if (filteredAnswers.length < 2) {
+            await interaction.reply({
+                content: `At least two answers are required.`,
+                ephemeral: true
+            });
+            return;
+        }
 
         try {
             await interaction.channel.send({
                 poll: {
-                    question: question,
+                    question: filteredQuestion,
                     duration: duration,
                     answers: filteredAnswers,
                     multiChoice: multiChoice,
@@ -113,9 +129,9 @@ module.exports = new ApplicationCommand({
                 }
             });
         } catch (error) {
-            console.error(`Failed to send a poll to the channel.`);
+            console.error(`Failed to send a poll to the channel: ${error.message}`);
             await interaction.reply({
-                content: `Failed to send a poll to the channel.`,
+                content: `Failed to send a poll to the channel: ${error.message}`,
                 ephemeral: true
             });
             return;
