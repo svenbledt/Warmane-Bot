@@ -54,10 +54,6 @@ module.exports = new ApplicationCommand({
         let invisible = interaction.options.getBoolean('invisible', false);
         const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
 
-        if (invisible === null || invisible === undefined) {
-            invisible = true;
-        }
-
         // First, check if the character exists
         try {
             const response = await https.get(`${config.users.url}/api/character/${charNameFormatted}/${realm}/summary`);
