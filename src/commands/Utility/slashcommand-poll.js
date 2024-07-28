@@ -52,6 +52,11 @@ module.exports = new ApplicationCommand({
                 name: 'multi-choice',
                 description: 'Allow users to select multiple answers.',
                 type: ApplicationCommandOptionType.Boolean,
+            },
+            {
+                name: 'pin',
+                description: 'Pin the poll message to the channel.',
+                type: ApplicationCommandOptionType.Boolean,
             }
         ]
     },
@@ -81,6 +86,7 @@ module.exports = new ApplicationCommand({
         const answer3 = interaction.options.getString('answer3', false);
         const answer4 = interaction.options.getString('answer4', false);
         const multiChoice = interaction.options.getBoolean('multi-choice', false);
+        const pin = interaction.options.getBoolean('pin', false);
 
         if (!question) {
             await interaction.reply({
@@ -91,10 +97,10 @@ module.exports = new ApplicationCommand({
         }
 
         const answers = [
-            { text: answer1, emoji: '🔴' },
-            { text: answer2, emoji: '🔵' },
-            { text: answer3, emoji: '🟢' },
-            { text: answer4, emoji: '🟡' }
+            {text: answer1, emoji: '🔴'},
+            {text: answer2, emoji: '🔵'},
+            {text: answer3, emoji: '🟢'},
+            {text: answer4, emoji: '🟡'}
         ];
 
         // Check if any answer exceeds 55 characters
@@ -110,7 +116,7 @@ module.exports = new ApplicationCommand({
 
         // Filter out empty answers
         const filteredAnswers = answers.filter(answer => answer.text);
-        const filteredQuestion = { text: question, emoji: '❓', attachment: null };
+        const filteredQuestion = {text: question, emoji: '❓', attachment: null};
         if (filteredAnswers.length < 2) {
             await interaction.reply({
                 content: `At least two answers are required.`,
@@ -131,7 +137,9 @@ module.exports = new ApplicationCommand({
             });
 
             // Pin the poll message to the channel
-            await pollMessage.pin();
+            if (pin) {
+                await pollMessage.pin();
+            }
 
         } catch (error) {
             console.error(`Failed to send a poll to the channel: ${error.message}`);
