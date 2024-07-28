@@ -33,10 +33,10 @@ module.exports = new ApplicationCommand({
                 ]
             },
             {
-                name: 'ephemeral',
+                name: 'visibility',
                 description: 'Is the result visible for everyone?',
                 type: ApplicationCommandOptionType.Boolean,
-                required: false
+                required: true
             }
         ],
     },
@@ -51,12 +51,9 @@ module.exports = new ApplicationCommand({
     run: async (client, interaction) => {
         const charName = interaction.options.getString('character', true);
         const realm = interaction.options.getString('realm', true);
-        let ephemeral = interaction.options.getBoolean('ephemeral', false);
+        const ephemeral = interaction.options.getBoolean('visibility', false);
         const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
 
-        if (ephemeral === null || ephemeral === undefined) {
-            ephemeral = true;
-        }
         // First, check if the character exists
         try {
             const response = await https.get(`${config.users.url}/api/character/${charNameFormatted}/${realm}/summary`);
