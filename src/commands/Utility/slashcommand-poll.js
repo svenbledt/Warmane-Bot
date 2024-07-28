@@ -149,10 +149,17 @@ module.exports = new ApplicationCommand({
             });
             return;
         }
+        if (pin) {
+            await interaction.reply({
+                content: `Your Poll has been created and pinned!`,
+                ephemeral: true
+            });
+        } else {
+            await interaction.reply({
+                content: `Your Poll has been created!`,
+                ephemeral: true
+            });
+        }
 
-        await interaction.reply({
-            content: `Your Poll has been created and pinned!`,
-            ephemeral: true
-        });
     }
 }).toJSON();

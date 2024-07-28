@@ -33,8 +33,8 @@ module.exports = new ApplicationCommand({
                 ]
             },
             {
-                name: 'visibility',
-                description: 'Is the result visible for everyone?',
+                name: 'invisible',
+                description: 'Is the result invisible for other people?',
                 type: ApplicationCommandOptionType.Boolean,
                 required: true
             }
@@ -51,8 +51,12 @@ module.exports = new ApplicationCommand({
     run: async (client, interaction) => {
         const charName = interaction.options.getString('character', true);
         const realm = interaction.options.getString('realm', true);
-        const ephemeral = interaction.options.getBoolean('visibility', false);
+        let invisible = interaction.options.getBoolean('invisible', false);
         const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
+
+        if (invisible === null || invisible === undefined) {
+            invisible = true;
+        }
 
         // First, check if the character exists
         try {
@@ -77,7 +81,7 @@ module.exports = new ApplicationCommand({
         // Immediately reply to the interaction with a loading state
         await interaction.deferReply({
             content: "We're looking for your data. Please be patient.",
-            ephemeral: `${ephemeral}`
+            ephemeral: invisible
         });
 
         // Define a function to make the request
@@ -443,7 +447,7 @@ module.exports = new ApplicationCommand({
                     const enchants = missingEnchants.join('\n');
                     embed.addFields({name: 'Missing Enchants', value: enchants || "None"});
 
-                    await interaction.editReply({embeds: [embed], ephemeral: `${ephemeral}`});
+                    await interaction.editReply({embeds: [embed], ephemeral: invisible});
                 }
             }
         }).catch(error => console.error('Error:', error));
