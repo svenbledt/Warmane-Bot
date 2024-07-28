@@ -31,6 +31,12 @@ module.exports = new ApplicationCommand({
                     {name: 'Frostwolf', value: 'Frostwolf'},
                     {name: 'Blackrock', value: 'Blackrock'},
                 ]
+            },
+            {
+                name: 'ephemeral',
+                description: 'Is the result visible for everyone?',
+                type: ApplicationCommandOptionType.Boolean,
+                required: false
             }
         ],
     },
@@ -44,11 +50,16 @@ module.exports = new ApplicationCommand({
      */
     run: async (client, interaction) => {
         const charName = interaction.options.getString('character', true);
+        const realm = interaction.options.getString('realm', true);
+        let ephemeral = interaction.options.getBoolean('ephemeral', false);
         const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
 
+        if (ephemeral === null || ephemeral === undefined) {
+            ephemeral = true;
+        }
         // First, check if the character exists
         try {
-            const response = await https.get(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`);
+            const response = await https.get(`${config.users.url}/api/character/${charNameFormatted}/${realm}/summary`);
             const characterData = response.data;
 
             // If the character does not exist, return an error message
@@ -69,7 +80,7 @@ module.exports = new ApplicationCommand({
         // Immediately reply to the interaction with a loading state
         await interaction.deferReply({
             content: "We're looking for your data. Please be patient.",
-            ephemeral: false
+            ephemeral: `${ephemeral}`
         });
 
         // Define a function to make the request
@@ -89,9 +100,9 @@ module.exports = new ApplicationCommand({
         }
 
         // Use the function to make the requests
-        const fetchCharacterData = makeRequest(`${config.users.url}/api/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/summary`);
+        const fetchCharacterData = makeRequest(`${config.users.url}/api/character/${charNameFormatted}/${realm}/summary`);
 
-        const fetchArmoryData = makeRequest(`${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`);
+        const fetchArmoryData = makeRequest(`${config.users.url}/character/${charNameFormatted}/${realm}/`);
 
         Promise.all([fetchCharacterData, fetchArmoryData]).then(async ([data, body]) => {
             // If the character does not exist, return an error message
@@ -381,7 +392,7 @@ module.exports = new ApplicationCommand({
                 }
 
                 if (character) {
-                    const armoryLink = `${config.users.url}/character/${charNameFormatted}/${interaction.options.getString('realm', true)}/`;
+                    const armoryLink = `${config.users.url}/character/${charNameFormatted}/${realm}/`;
                     // If the character is found, create an embed with the information
                     const embed = new EmbedBuilder()
                         .setColor(character.color || '#8B0000')
@@ -435,7 +446,7 @@ module.exports = new ApplicationCommand({
                     const enchants = missingEnchants.join('\n');
                     embed.addFields({name: 'Missing Enchants', value: enchants || "None"});
 
-                    await interaction.editReply({embeds: [embed], ephemeral: false});
+                    await interaction.editReply({embeds: [embed], ephemeral: `${ephemeral}`});
                 }
             }
         }).catch(error => console.error('Error:', error));
