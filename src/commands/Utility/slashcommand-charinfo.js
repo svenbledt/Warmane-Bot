@@ -209,11 +209,12 @@ module.exports = new ApplicationCommand({
                             let isEnchanted = rel.indexOf("ench") !== -1;
 
                             if (!isEnchanted) {
-                                if (itemNames[i] === "Ranged" && (character.class === "Hunter" || character.class === "Warrior")) {
+                                // Ensure all class comparisons are case-insensitive
+                                if (itemNames[i] === "Ranged" && (character.class.toLowerCase() === "hunter")) {
                                     missingEnchants.push(itemNames[i]);
                                 } else if ((itemNames[i] === "Ring #1" || itemNames[i] === "Ring #2") && professions.includes("Enchanting")) {
                                     missingEnchants.push(itemNames[i]);
-                                } else if (itemNames[i] === "Off-hand" && !["mage", "warlock", "druid", "priest"].some(cls => character.class === cls)) {
+                                } else if (itemNames[i] === "Off-hand" && !["mage", "warlock", "druid", "priest"].some(cls => cls.toLowerCase() === character.class.toLowerCase())) {
                                     missingEnchants.push(itemNames[i]);
                                 } else if ((itemNames[i] === "Gloves" || itemNames[i] === "Boots") && !professions.includes("Engineering")) {
                                     missingEnchants.push(itemNames[i]);
@@ -354,36 +355,36 @@ module.exports = new ApplicationCommand({
                         }
                 }
 
-                // set color based on class
-                switch (character.class) {
-                    case 'Death Knight':
+                // Set color based on class
+                switch (character.class.toLowerCase()) {
+                    case 'death knight':
                         character.color = '#C41E3A';
                         break;
-                    case 'Druid':
+                    case 'druid':
                         character.color = '#FF7C0A';
                         break;
-                    case 'Hunter':
+                    case 'hunter':
                         character.color = '#AAD372';
                         break;
-                    case 'Mage':
+                    case 'mage':
                         character.color = '#3FC7EB';
                         break;
-                    case 'Paladin':
+                    case 'paladin':
                         character.color = '#F48CBA';
                         break;
-                    case 'Priest':
+                    case 'priest':
                         character.color = '#FFFFFF';
                         break;
-                    case 'Rogue':
+                    case 'rogue':
                         character.color = '#FFF468';
                         break;
-                    case 'Shaman':
+                    case 'shaman':
                         character.color = '#0070DD';
                         break;
-                    case 'Warlock':
+                    case 'warlock':
                         character.color = '#8788EE';
                         break;
-                    case 'Warrior':
+                    case 'warrior':
                         character.color = '#C69B6D';
                         break;
                 }
