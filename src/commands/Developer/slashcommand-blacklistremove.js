@@ -1,4 +1,5 @@
 const {
+    MessageFlags,
     ChatInputCommandInteraction,
     ApplicationCommandOptionType,
 } = require("discord.js");
@@ -30,7 +31,7 @@ module.exports = new ApplicationCommand({
             if (!obj.some(user => user.id === removeId)) {
                 await interaction.reply({
                     content: "The user is not in the blacklist.",
-                    ephemeral: true,
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -41,13 +42,13 @@ module.exports = new ApplicationCommand({
 
             await interaction.reply({
                 content: "I have removed the user from the blacklist.",
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
         } else {
             await interaction.reply({
                 content:
                     "You must provide an ID to remove from the blacklist.",
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
         }
     },

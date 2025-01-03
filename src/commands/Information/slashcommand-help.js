@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction } = require("discord.js");
+const { MessageFlags, ChatInputCommandInteraction } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
@@ -25,7 +25,7 @@ module.exports = new ApplicationCommand({
         .filter((cmd) => cmd.command.name !== "help" && cmd.command.name !== "Ask for Charname")
         .map((cmd) => "`/" + cmd.command.name + "`")
         .join(", ")}`,
-      ephemeral: true,
+      flags: [MessageFlags.Ephemeral],
     });
   },
 }).toJSON();

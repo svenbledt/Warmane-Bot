@@ -1,4 +1,4 @@
-const { Message } = require("discord.js");
+const { MessageFlags, Message } = require("discord.js");
 const MessageCommand = require("../../structure/MessageCommand");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const config = require("../../config");
@@ -18,7 +18,7 @@ const handleApplicationCommandOptions = async (interaction, options, command) =>
         if (interaction.user.id !== config.users.ownerId) {
             await interaction.reply({
                 content: config.messages.NOT_BOT_OWNER,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
 
             return false;
@@ -29,7 +29,7 @@ const handleApplicationCommandOptions = async (interaction, options, command) =>
         if (config.users?.developers?.length > 0 && !config.users?.developers?.includes(interaction.user.id)) {
             await interaction.reply({
                 content: config.messages.NOT_BOT_DEVELOPER,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
 
             return false;
@@ -40,7 +40,7 @@ const handleApplicationCommandOptions = async (interaction, options, command) =>
         if (interaction.user.id !== interaction.guild.ownerId) {
             await interaction.reply({
                 content: config.messages.NOT_GUILD_OWNER,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
 
             return false;
@@ -74,7 +74,7 @@ const handleApplicationCommandOptions = async (interaction, options, command) =>
             if (data.some((cmd) => cmd === interaction.commandName)) {
                 await interaction.reply({
                     content: config.messages.GUILD_COOLDOWN.replace(/%cooldown%/g, options.cooldown / 1000),
-                    ephemeral: true
+                    flags: [MessageFlags.Ephemeral]
                 });
 
                 return false;

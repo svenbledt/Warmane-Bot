@@ -1,4 +1,4 @@
-const { PermissionsBitField, ChannelType } = require("discord.js");
+const { MessageFlags, PermissionsBitField, ChannelType } = require("discord.js");
 const DiscordBot = require("../DiscordBot");
 const config = require("../../config");
 const MessageCommand = require("../../structure/MessageCommand");
@@ -49,7 +49,7 @@ class CommandsListener {
                 if (command.command?.permissions && !message.member.permissions.has(PermissionsBitField.resolve(command.command.permissions))) {
                     await message.reply({
                         content: config.messages.MISSING_PERMISSIONS,
-                        ephemeral: true
+                        flags: [MessageFlags.Ephemeral]
                     });
 
                     return;

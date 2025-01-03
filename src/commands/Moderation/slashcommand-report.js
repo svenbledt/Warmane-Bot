@@ -1,4 +1,4 @@
-const {ChatInputCommandInteraction, ApplicationCommandOptionType, PermissionsBitField} = require("discord.js");
+const {MessageFlags, ChatInputCommandInteraction, ApplicationCommandOptionType, PermissionsBitField} = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
@@ -24,7 +24,7 @@ module.exports = new ApplicationCommand({
         if (!interaction.member.permissions.has([PermissionsBitField.Flags.KickMembers, PermissionsBitField.Flags.BanMembers])) {
             await interaction.reply({
                 content: `You don't have the required permissions to use this command.`,
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
             return;
         }

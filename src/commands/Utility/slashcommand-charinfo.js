@@ -1,4 +1,4 @@
-const {EmbedBuilder, ChatInputCommandInteraction, ApplicationCommandOptionType} = require("discord.js");
+const { MessageFlags, EmbedBuilder, ChatInputCommandInteraction, ApplicationCommandOptionType} = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const config = require("../../config");
@@ -63,21 +63,21 @@ module.exports = new ApplicationCommand({
             if (!characterData || !characterData.name) {
                 return interaction.reply({
                     content: `The character ${charNameFormatted} does not exist.`,
-                    ephemeral: true
+                    flags: [MessageFlags.Ephemeral]
                 });
             }
         } catch (error) {
             console.error('Error:', error);
             return interaction.reply({
                 content: `An error occurred while fetching the character data.`,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
         }
 
         // Immediately reply to the interaction with a loading state
         await interaction.deferReply({
             content: "We're looking for your data. Please be patient.",
-            ephemeral: invisible
+            flags: invisible ? [MessageFlags.Ephemeral] : []
         });
 
         // Define a function to make the request
@@ -106,7 +106,7 @@ module.exports = new ApplicationCommand({
             if (!data || !data.name) {
                 return interaction.editReply({
                     content: `The character ${charNameFormatted} does not exist.`,
-                    ephemeral: true
+                    flags: [MessageFlags.Ephemeral]
                 });
             }
             const items = data.equipment.map(item => item.item);
@@ -390,7 +390,7 @@ module.exports = new ApplicationCommand({
                 }
 
                 if (character) {
-                    const armoryLink = `${config.users.url}/character/${charNameFormatted}/${realm}/`;
+                    const armoryLink = `${config.users.url}character/${charNameFormatted}/${realm}/`;
                     // If the character is found, create an embed with the information
                     const embed = new EmbedBuilder()
                         .setColor(character.color || '#8B0000')
@@ -444,7 +444,7 @@ module.exports = new ApplicationCommand({
                     const enchants = missingEnchants.join('\n');
                     embed.addFields({name: 'Missing Enchants', value: enchants || "None"});
 
-                    await interaction.editReply({embeds: [embed], ephemeral: invisible});
+                    await interaction.editReply({embeds: [embed], flags: invisible ? [MessageFlags.Ephemeral] : []});
                 }
             }
         }).catch(error => console.error('Error:', error));

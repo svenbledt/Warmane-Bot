@@ -1,4 +1,5 @@
 const {
+    MessageFlags,
     ChatInputCommandInteraction,
     ApplicationCommandOptionType,
     EmbedBuilder,
@@ -28,7 +29,7 @@ module.exports = new ApplicationCommand({
         if (obj.length === 0) {
             await interaction.reply({
                 content: `There are no blacklisted users.`,
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
             return;
         }
@@ -73,7 +74,7 @@ module.exports = new ApplicationCommand({
         collector.on('collect', async (interaction) => {
             // Ensure the interaction is from the same user
             if (interaction.user.id !== message.user.id) {
-                return interaction.reply({content: 'These buttons are not for you!', ephemeral: true});
+                return interaction.reply({content: 'These buttons are not for you!', flags: [MessageFlags.Ephemeral]});
             }
             // Update the current page number based on the button that was clicked
             if (interaction.customId === 'previous') {

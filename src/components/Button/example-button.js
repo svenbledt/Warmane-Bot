@@ -1,4 +1,4 @@
-const { ButtonInteraction } = require("discord.js");
+const { MessageFlags, ButtonInteraction } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const Component = require("../../structure/Component");
 
@@ -14,7 +14,7 @@ module.exports = new Component({
 
         await interaction.reply({
             content: 'Replied from a Button interaction!',
-            ephemeral: true
+            flags: [MessageFlags.Ephemeral]
         });
 
     }

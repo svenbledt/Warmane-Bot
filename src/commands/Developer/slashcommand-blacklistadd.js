@@ -1,4 +1,5 @@
 const {
+    MessageFlags,
     ChatInputCommandInteraction,
     ApplicationCommandOptionType,
 } = require("discord.js");
@@ -50,7 +51,7 @@ module.exports = new ApplicationCommand({
             if (obj.some(user => user.id === addId)) {
                 await interaction.reply({
                     content: "The user is already in the blacklist.",
-                    ephemeral: true,
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -65,7 +66,7 @@ module.exports = new ApplicationCommand({
                     console.error(`Failed to send a DM to ${member.tag}.`);
                     await interaction.reply({
                         content: `Failed to send a DM to ${member.tag}.`,
-                        ephemeral: true,
+                        flags: [MessageFlags.Ephemeral],
                     });
                     return;
                 }
@@ -73,7 +74,7 @@ module.exports = new ApplicationCommand({
                 try {
                     await interaction.reply({
                         content: "I have blacklisted the user.",
-                        ephemeral: true,
+                        flags: [MessageFlags.Ephemeral],
                     });
                 } catch (error) {
                     console.error(`Failed to reply to the interaction.`);
@@ -90,7 +91,7 @@ module.exports = new ApplicationCommand({
                 await interaction.reply({
                     content:
                         "The provided ID does not correspond to a member of the guild. I have added the ID to the blacklist.",
-                    ephemeral: true,
+                    flags: [MessageFlags.Ephemeral],
                 });
             }
 
@@ -100,7 +101,7 @@ module.exports = new ApplicationCommand({
             await interaction.reply({
                 content:
                     "You must provide a user ID to blacklist.",
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
         }
     },

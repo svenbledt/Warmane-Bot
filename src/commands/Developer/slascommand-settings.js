@@ -1,4 +1,5 @@
 const {
+  MessageFlags,
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
   PermissionsBitField,
@@ -12,7 +13,7 @@ function ensureGuildSettings(guildSettings) {
     welcomeChannel: "",
     CharNameAsk: false,
     BlockList: true,
-    welcomeMessageDM:
+    charNameAskDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
     lastOwnerDM: {},
       // Add any other default settings here
@@ -65,7 +66,7 @@ module.exports = new ApplicationCommand({
     ) {
       await interaction.reply({
         content: `You don't have the required permissions to use this command.`,
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
@@ -86,13 +87,13 @@ module.exports = new ApplicationCommand({
       guildSettings[settingName] = false;
       await interaction.reply({
         content: `The setting ${settingName} has been disabled.`,
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
     } else {
       guildSettings[settingName] = true;
       await interaction.reply({
         content: `The setting ${settingName} has been enabled.`,
-        ephemeral: true,
+        flags: [MessageFlags.Ephemeral],
       });
     }
 

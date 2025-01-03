@@ -1,4 +1,4 @@
-const {ModalSubmitInteraction, EmbedBuilder} = require("discord.js");
+const {MessageFlags, ModalSubmitInteraction, EmbedBuilder} = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const Component = require("../../structure/Component");
 const config = require("../../config");
@@ -20,7 +20,7 @@ module.exports = new Component({
         // Tell the interaction user that the report has been submitted.
         await interaction.reply({
             content: 'Your report has been submitted. Thank you for helping us keep the server safe.',
-            ephemeral: true
+            flags: [MessageFlags.Ephemeral]
         });
 
         // Send the report to the Server's Moderation channel.

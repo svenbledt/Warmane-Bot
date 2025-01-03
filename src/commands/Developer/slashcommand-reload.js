@@ -1,4 +1,4 @@
-const {ChatInputCommandInteraction, AttachmentBuilder} = require("discord.js");
+const {MessageFlags, ChatInputCommandInteraction, AttachmentBuilder} = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const config = require("../../config");
@@ -19,7 +19,7 @@ module.exports = new ApplicationCommand({
      * @param {ChatInputCommandInteraction} interaction
      */
     run: async (client, interaction) => {
-        await interaction.deferReply({ephemeral: true});
+        await interaction.deferReply({flags: [MessageFlags.Ephemeral]});
 
         try {
             client.commands_handler.reload();
@@ -28,7 +28,7 @@ module.exports = new ApplicationCommand({
 
             await interaction.editReply({
                 content: 'Successfully reloaded application commands and message commands.',
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
         } catch (err) {
             await interaction.editReply({
@@ -36,7 +36,7 @@ module.exports = new ApplicationCommand({
                 files: [
                     new AttachmentBuilder(Buffer.from(`${err}`, 'utf-8'), {name: 'output.ts'})
                 ],
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
         }
         ;

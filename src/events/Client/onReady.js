@@ -10,10 +10,10 @@ function ensureGuildSettings(guildSettings) {
     welcomeChannel: "",
     CharNameAsk: false,
     BlockList: true,
-    welcomeMessageDM:
+    charNameAskDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
     lastOwnerDM: {},
-      // Add any other default settings here
+    // Add any other default settings here
   };
 
   let updated = false;
@@ -28,7 +28,7 @@ function ensureGuildSettings(guildSettings) {
   return updated;
 }
 
-function updateGuildSettings(client) {
+async function updateGuildSettings(client) {
   let settings = client.database.get("settings") || [];
 
   const currentGuildIds = new Set(client.guilds.cache.keys());
@@ -65,7 +65,9 @@ async function updateStatus(client) {
       // Fetch all members of the guild
       await guild.members.fetch();
       // Count non-bot members
-      const nonBotMembersCount = guild.members.cache.filter(member => !member.user.bot).size;
+      const nonBotMembersCount = guild.members.cache.filter(
+        (member) => !member.user.bot
+      ).size;
       users += nonBotMembersCount;
     } catch (error) {
       console.error(`Failed to fetch members for guild ${guild.id}:`, error);
@@ -119,36 +121,42 @@ async function generateAndSendInvites(client) {
           `Invite link for guild ${guild.name}: ${invite.url}`
         );
       } catch (error) {
-        if (error.code === 50013) { // Missing Permissions error
+        if (error.code === 50013) {
+          // Missing Permissions error
           try {
             const owner = await guild.fetchOwner();
             const now = Date.now();
-            
+
             // Get settings from database
             let settings = client.database.get("settings") || [];
-            let guildSettings = settings.find(setting => setting.guild === guild.id);
+            let guildSettings = settings.find(
+              (setting) => setting.guild === guild.id
+            );
 
             // Check if owner was DMed recently
             const lastDMTime = guildSettings?.lastOwnerDM?.[owner.id] || 0;
-            const cooldownExpired = (now - lastDMTime) > (COOLDOWN_HOURS * 60 * 60 * 1000);
+            const cooldownExpired =
+              now - lastDMTime > COOLDOWN_HOURS * 60 * 60 * 1000;
 
             if (cooldownExpired) {
-              console.log(`DMing owner of ${guild.name}`)
+              console.log(`DMing owner of ${guild.name}`);
               await owner.send(
                 `Hello! I'm missing permissions in your guild "${guild.name}". I need permissions to manage invites. Please update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
               );
               await inviteChannel.send(
                 `We missed permissions on Guild ${guild.name}! We informed the owner and will try again in ${COOLDOWN_HOURS} hours.`
-              )
+              );
               // Update the lastOwnerDM time in settings
               if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
               guildSettings.lastOwnerDM[owner.id] = now;
               client.database.set("settings", settings);
             }
           } catch (dmError) {
-            console.log(`Couldn't DM owner of ${guild.name}: ${dmError.message}`);
+            console.log(
+              `Couldn't DM owner of ${guild.name}: ${dmError.message}`
+            );
           }
-          return
+          return;
         }
         // Re-throw other errors
         throw error;
@@ -162,7 +170,17 @@ async function generateAndSendInvites(client) {
 module.exports = new Event({
   event: "ready",
   once: true,
-  run: (__client__, client) => {
+  run: async (__client__, client) => {
+    // Wait for 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    // Update guild settings immediately after bot has connected
+    await updateGuildSettings(client);
+    await updateStatus(client);
+
+    // Generate and send invites
+    await generateAndSendInvites(client);
+
     success(
       "Logged in as " +
         client.user.displayName +
@@ -170,13 +188,6 @@ module.exports = new Event({
         (Date.now() - __client__.login_timestamp) / 1000 +
         "s."
     );
-
-    // Update guild settings immediately after bot has connected
-    updateGuildSettings(client);
-    updateStatus(client);
-
-    // Generate and send invites
-    generateAndSendInvites(client);
 
     // Schedule the task to run every 24 hours
     setInterval(() => {

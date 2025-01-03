@@ -1,7 +1,7 @@
 const DiscordBot = require("../DiscordBot");
 const config = require("../../config");
 const { error } = require("../../utils/Console");
-
+const { MessageFlags } = require("discord.js");
 class ComponentsListener {
     /**
      * 
@@ -13,7 +13,7 @@ class ComponentsListener {
                 if (component.options?.public === false && interaction.user.id !== interaction.message.interaction.user.id) {
                     await interaction.reply({
                         content: config.messages.COMPONENT_NOT_PUBLIC,
-                        ephemeral: true
+                        flags: [MessageFlags.Ephemeral]
                     });
 
                     return false;

@@ -1,4 +1,4 @@
-const {UserContextMenuCommandInteraction, PermissionsBitField} = require("discord.js");
+const {MessageFlags, UserContextMenuCommandInteraction, PermissionsBitField} = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
@@ -20,7 +20,7 @@ module.exports = new ApplicationCommand({
         if (!interaction.targetMember.permissions.has([PermissionsBitField.Flags.Administrator])) {
             await interaction.reply({
                 content: `You don't have the required permissions to use this command.`,
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
             return;
         }
@@ -38,14 +38,14 @@ module.exports = new ApplicationCommand({
         } catch (error) {
             console.error(`Failed to send a DM to ${member.tag}.`);
             await interaction.reply({
-                content: `Failed to send a DM to ${member.tag}.`, ephemeral: true
+                content: `Failed to send a DM to ${member.tag}.`, flags: [MessageFlags.Ephemeral]
             });
             return;
         }
         // Reply to the interaction
         try {
             await interaction.reply({
-                content: 'I have asked the user for his Character name.', ephemeral: true
+                content: 'I have asked the user for his Character name.', flags: [MessageFlags.Ephemeral]
             });
         } catch (error) {
             console.error(`Failed to reply to the interaction.`);

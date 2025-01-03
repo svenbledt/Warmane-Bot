@@ -1,4 +1,5 @@
 const {
+    MessageFlags,
     ChatInputCommandInteraction,
     ApplicationCommandOptionType,
     PermissionsBitField,
@@ -74,7 +75,7 @@ module.exports = new ApplicationCommand({
         if (!interaction.member.permissions.has([PermissionsBitField.Flags.KickMembers, PermissionsBitField.Flags.BanMembers])) {
             await interaction.reply({
                 content: `You don't have the required permissions to use this command.`,
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
             return;
         }
@@ -91,7 +92,7 @@ module.exports = new ApplicationCommand({
         if (!question) {
             await interaction.reply({
                 content: `Poll question is missing.`,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
             return;
         }
@@ -108,7 +109,7 @@ module.exports = new ApplicationCommand({
             if (answer.text && answer.text.length > 55) {
                 await interaction.reply({
                     content: `One of the answers exceeds the 55 character limit: "${answer.text}"`,
-                    ephemeral: true
+                    flags: [MessageFlags.Ephemeral]
                 });
                 return;
             }
@@ -120,7 +121,7 @@ module.exports = new ApplicationCommand({
         if (filteredAnswers.length < 2) {
             await interaction.reply({
                 content: `At least two answers are required.`,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
             return;
         }
@@ -145,19 +146,19 @@ module.exports = new ApplicationCommand({
             console.error(`Failed to send a poll to the channel: ${error.message}`);
             await interaction.reply({
                 content: `Failed to send a poll to the channel: ${error.message}`,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
             return;
         }
         if (pin) {
             await interaction.reply({
                 content: `Your Poll has been created and pinned!`,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
         } else {
             await interaction.reply({
                 content: `Your Poll has been created!`,
-                ephemeral: true
+                flags: [MessageFlags.Ephemeral]
             });
         }
 

@@ -1,4 +1,5 @@
 const {
+    MessageFlags,
     ChatInputCommandInteraction,
     ApplicationCommandOptionType,
     PermissionsBitField,
@@ -12,7 +13,7 @@ function ensureGuildSettings(guildSettings) {
       welcomeChannel: "",
       CharNameAsk: false,
       BlockList: true,
-      welcomeMessageDM:
+      charNameAskDM:
         "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
       lastOwnerDM: {},
         // Add any other default settings here
@@ -67,7 +68,7 @@ module.exports = new ApplicationCommand({
 
         await interaction.reply({
             content: `The welcome channel has been set to <#${channel.id}>.`,
-            ephemeral: true,
+            flags: [MessageFlags.Ephemeral],
         });
         try {
             client.database.set("settings", settings);

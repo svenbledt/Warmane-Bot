@@ -7,7 +7,7 @@ function ensureGuildSettings(guildSettings) {
       welcomeChannel: "",
       CharNameAsk: false,
       BlockList: true,
-      welcomeMessageDM:
+      charNameAskDM:
         "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
       lastOwnerDM: {},
         // Add any other default settings here
@@ -43,7 +43,7 @@ module.exports = new Event({
         let charNameAskEnabled = guildSettings.CharNameAsk;
         let welcomeMessageEnabled = guildSettings.welcomeMessage;
         let BlockListEnabled = guildSettings.BlockList;
-        let welcomeMessageDM = guildSettings.welcomeMessageDM;
+        let charNameAskDM = guildSettings.charNameAskDM;
 
         // If the member is a bot, return and do not send any messages
         if (member.user.bot) {
@@ -71,7 +71,7 @@ module.exports = new Event({
         if (charNameAskEnabled) {
             // CharNameAsk is enabled, proceed with the logic
             try {
-                await member.send(welcomeMessageDM);
+                await member.send(charNameAskDM);
             } catch (error) {
                 console.error(`Failed to send a DM to ${member.user.tag}.`);
                 return;
@@ -119,7 +119,7 @@ module.exports = new Event({
 
             const embed = {
                 title: `Welcome to ${member.guild.name}!`,
-                description: `Welcome ${member} to our server! \n\nPlease make sure to check your DM's and tell us your main Character name.\nIf you have any questions, feel free to ask in a Public channel.`,
+                description: `Welcome ${member} to our server!\n\nIf you have any questions, feel free to ask in a Public channel.`,
                 color: 10038562,
                 timestamp: new Date(),
                 footer: {
