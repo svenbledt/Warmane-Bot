@@ -4,4 +4,3 @@ node_modules
 terminal.log
 backup-commands
 .idea
-database.yml
