@@ -14,7 +14,8 @@ function ensureGuildSettings(guildSettings) {
     BlockList: true,
     welcomeMessageDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
-    // Add any other default settings here
+    lastOwnerDM: {},
+      // Add any other default settings here
   };
 
   let updated = false;

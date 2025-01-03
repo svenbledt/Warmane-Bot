@@ -2,6 +2,8 @@ const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const config = require("../../config");
 
+const COOLDOWN_HOURS = 24;
+
 function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
     welcomeMessage: false,
@@ -10,7 +12,8 @@ function ensureGuildSettings(guildSettings) {
     BlockList: true,
     welcomeMessageDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
-    // Add any other default settings here
+    lastOwnerDM: {},
+      // Add any other default settings here
   };
 
   let updated = false;
@@ -117,12 +120,28 @@ async function generateAndSendInvites(client) {
         );
       } catch (error) {
         if (error.code === 50013) { // Missing Permissions error
-          // Try to DM the guild owner
           try {
             const owner = await guild.fetchOwner();
-            await owner.send(
-              `Hello! I'm missing permissions in your guild "${guild.name}". for Support purposes i need to have the permission to manage invites.\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
-            );
+            const now = Date.now();
+            
+            // Get settings from database
+            let settings = client.database.get("settings") || [];
+            let guildSettings = settings.find(setting => setting.guild === guild.id);
+
+            // Check if owner was DMed recently
+            const lastDMTime = guildSettings?.lastOwnerDM?.[owner.id] || 0;
+            const cooldownExpired = (now - lastDMTime) > (COOLDOWN_HOURS * 60 * 60 * 1000);
+
+            if (cooldownExpired) {
+              await owner.send(
+                `Hello! I'm missing permissions in your guild "${guild.name}". I need permissions to manage invites. Please update my permissions or consider removing me from the server if I'm not needed.`
+              );
+
+              // Update the lastOwnerDM time in settings
+              if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
+              guildSettings.lastOwnerDM[owner.id] = now;
+              client.database.set("settings", settings);
+            }
           } catch (dmError) {
             console.log(`Couldn't DM owner of ${guild.name}: ${dmError.message}`);
           }

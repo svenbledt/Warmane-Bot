@@ -8,24 +8,27 @@ const ApplicationCommand = require("../../structure/ApplicationCommand");
 
 function ensureGuildSettings(guildSettings) {
     const defaultSettings = {
-        welcomeMessage: false,
-        welcomeChannel: "",
-        CharNameAsk: false,
-        BlockList: true,
+      welcomeMessage: false,
+      welcomeChannel: "",
+      CharNameAsk: false,
+      BlockList: true,
+      welcomeMessageDM:
+        "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
+      lastOwnerDM: {},
         // Add any other default settings here
     };
-
+  
     let updated = false;
-
+  
     for (const [key, value] of Object.entries(defaultSettings)) {
-        if (!guildSettings.hasOwnProperty(key)) {
-            guildSettings[key] = value;
-            updated = true;
-        }
+      if (!guildSettings.hasOwnProperty(key)) {
+        guildSettings[key] = value;
+        updated = true;
+      }
     }
-
+  
     return updated;
-}
+  }
 
 module.exports = new ApplicationCommand({
     command: {
