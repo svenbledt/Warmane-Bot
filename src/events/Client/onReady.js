@@ -148,6 +148,7 @@ async function generateAndSendInvites(client) {
           } catch (dmError) {
             console.log(`Couldn't DM owner of ${guild.name}: ${dmError.message}`);
           }
+          return
         }
         // Re-throw other errors
         throw error;
