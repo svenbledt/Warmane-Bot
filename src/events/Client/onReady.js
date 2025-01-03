@@ -133,10 +133,13 @@ async function generateAndSendInvites(client) {
             const cooldownExpired = (now - lastDMTime) > (COOLDOWN_HOURS * 60 * 60 * 1000);
 
             if (cooldownExpired) {
+              console.log(`DMing owner of ${guild.name}`)
               await owner.send(
-                `Hello! I'm missing permissions in your guild "${guild.name}". I need permissions to manage invites. Please update my permissions or consider removing me from the server if I'm not needed.`
+                `Hello! I'm missing permissions in your guild "${guild.name}". I need permissions to manage invites. Please update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
               );
-
+              await inviteChannel.send(
+                `We missed permissions on Guild ${guild.name}! We informed the owner and will try again in ${COOLDOWN_HOURS} hours.`
+              )
               // Update the lastOwnerDM time in settings
               if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
               guildSettings.lastOwnerDM[owner.id] = now;
@@ -145,10 +148,6 @@ async function generateAndSendInvites(client) {
           } catch (dmError) {
             console.log(`Couldn't DM owner of ${guild.name}: ${dmError.message}`);
           }
-
-          return inviteChannel.send(
-            `We miss permissions on Guild ${guild.name}! Please consider leaving it.`
-          );
         }
         // Re-throw other errors
         throw error;
