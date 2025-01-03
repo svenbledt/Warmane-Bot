@@ -11,12 +11,12 @@
   "author": "svenbledt",
   "license": "GPL-3.0",
   "dependencies": {
-    "axios": "^1.7.2",
+    "axios": "^1.7.9",
     "axios-rate-limit": "^1.4.0",
-    "cheerio": "^1.0.0-rc.12",
+    "cheerio": "^1.0.0",
     "colors": "^1.4.0",
-    "discord.js": "^14.15.3",
-    "dotenv": "^16.4.5",
+    "discord.js": "^14.17.2",
+    "dotenv": "^16.4.7",
     "quick-yaml.db": "^1.2.2"
   }
 }

@@ -131,7 +131,7 @@ module.exports = new ApplicationCommand({
                     question: filteredQuestion,
                     duration: duration,
                     answers: filteredAnswers,
-                    multiChoice: multiChoice,
+                    allowMultiselect: multiChoice,
                     layoutType: PollLayoutType.Default
                 }
             });
