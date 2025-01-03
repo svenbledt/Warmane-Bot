@@ -10,19 +10,23 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.x]
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v4
+    
+    - uses: pnpm/action-setup@v2
       with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm run test
+        version: 8
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+        
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      
+    - name: Run tests
+      run: pnpm test

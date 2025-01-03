@@ -94,26 +94,46 @@ async function generateAndSendInvites(client) {
 
   const promises = client.guilds.cache.map(async (guild) => {
     if (guild.systemChannel) {
-      // Fetch all invites from the guild
-      const invites = await guild.invites.fetch();
+      try {
+        // Fetch all invites from the guild
+        const invites = await guild.invites.fetch();
 
-      // Filter out the invites created by the bot and delete them
-      const botInvites = invites.filter(
-        (invite) => invite.inviter.id === client.user.id
-      );
-      for (const invite of botInvites.values()) {
-        await invite.delete();
+        // Filter out the invites created by the bot and delete them
+        const botInvites = invites.filter(
+          (invite) => invite.inviter.id === client.user.id
+        );
+        for (const invite of botInvites.values()) {
+          await invite.delete();
+        }
+
+        // Create a new invite
+        let invite = await guild.systemChannel.createInvite({
+          maxAge: 0,
+          maxUses: 1,
+        });
+
+        return inviteChannel.send(
+          `Invite link for guild ${guild.name}: ${invite.url}`
+        );
+      } catch (error) {
+        if (error.code === 50013) { // Missing Permissions error
+          // Try to DM the guild owner
+          try {
+            const owner = await guild.fetchOwner();
+            await owner.send(
+              `Hello! I'm missing permissions in your guild "${guild.name}". for Support purposes i need to have the permission to manage invites.\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
+            );
+          } catch (dmError) {
+            console.log(`Couldn't DM owner of ${guild.name}: ${dmError.message}`);
+          }
+
+          return inviteChannel.send(
+            `We miss permissions on Guild ${guild.name}! Please consider leaving it.`
+          );
+        }
+        // Re-throw other errors
+        throw error;
       }
-
-      // Create a new invite
-      let invite = await guild.systemChannel.createInvite({
-        maxAge: 0, // 0 means the invite does not expire
-        maxUses: 1, // the invite can be used only once
-      });
-
-      return inviteChannel.send(
-        `Invite link for guild ${guild.name}: ${invite.url}`
-      );
     }
   });
 
@@ -151,6 +171,6 @@ module.exports = new Event({
 
     setInterval(() => {
       updateStatus(client);
-    }, 4000); // 5 minutes in milliseconds
+    }, 300000); // 5 minutes in milliseconds
   },
 }).toJSON();
