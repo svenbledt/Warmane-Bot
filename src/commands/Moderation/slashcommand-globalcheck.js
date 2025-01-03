@@ -91,7 +91,8 @@ module.exports = new ApplicationCommand({
                     .setDisabled(embeds.length === 1), // Disable if only one page
             );
         // Send the first embed and the buttons
-        let message = await interaction.reply({embeds: [embeds[0]], components: [row], fetchReply: true});
+        await interaction.reply({embeds: [embeds[0]], components: [row]});
+        let message = await interaction.fetchReply();
         // Create a collector to listen for button clicks
         const filter = i => i.customId === 'previous' || i.customId === 'next';
         const collector = message.createMessageComponentCollector({filter, time: 60000});

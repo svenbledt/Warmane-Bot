@@ -3,8 +3,6 @@ blacklisted:
     reason: Ninjalooting in raid - Exaton
   - id: '618324359102332929'
     reason: Ninjalooting
-  - id: '793965220254580757'
-    reason: Flaiming on normal mechanics and be mean to ppl.
 settings:
   - guild: '1121534671667339324'
     welcomeMessage: true

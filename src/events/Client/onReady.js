@@ -103,12 +103,18 @@ async function generateAndSendInvites(client) {
         // Fetch all invites from the guild
         const invites = await guild.invites.fetch();
 
-        // Filter out the invites created by the bot and delete them
+        // Add null check for inviter
         const botInvites = invites.filter(
-          (invite) => invite.inviter.id === client.user.id
+          (invite) => invite.inviter && invite.inviter.id === client.user.id
         );
+
+        // Delete bot's previous invites
         for (const invite of botInvites.values()) {
-          await invite.delete();
+          try {
+            await invite.delete();
+          } catch (error) {
+            console.error(`Failed to delete invite in ${guild.name}:`, error);
+          }
         }
 
         // Create a new invite
