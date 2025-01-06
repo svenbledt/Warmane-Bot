@@ -94,21 +94,6 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
-  - guild: '642223801031065611'
-    guildName: Dirty Money Syndicate
-    welcomeMessage: false
-    welcomeChannel: ''
-    CharNameAsk: false
-    BlockList: true
-    charNameAskDM: >-
-      Hey, I would like to ask you for your main Character name.
-
-      Please respond with your main Character name for the Server.
-
-
-      (Your response will not be stored by this Application and is only used for
-      the Guilds nickname)
-    lastOwnerDM: {}
   - guild: '675405604436705281'
     guildName: S Ꮒ Ꭷ ฬ T Ꭵ Ꮇ Ꮛ S
     welcomeMessage: false
@@ -244,7 +229,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM:
-      '487773810616172547': 1735915348536
+      '487773810616172547': 1736189351442
   - guild: '1290529693665202208'
     guildName: TRES IDIOTAS
     welcomeMessage: false
@@ -260,4 +245,19 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM:
-      '299209989174722560': 1735915855723
+      '299209989174722560': 1736185303422
+  - guild: '471186202150699013'
+    guildName: ArmYt's server
+    welcomeMessage: false
+    welcomeChannel: ''
+    CharNameAsk: false
+    BlockList: true
+    charNameAskDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
+    lastOwnerDM: {}

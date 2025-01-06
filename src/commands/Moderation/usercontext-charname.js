@@ -17,7 +17,7 @@ module.exports = new ApplicationCommand({
      */
     run: async (client, interaction) => {
         const member = interaction.targetMember;
-        if (!interaction.targetMember.permissions.has([PermissionsBitField.Flags.Administrator])) {
+        if (!interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers])) {
             await interaction.reply({
                 content: `You don't have the required permissions to use this command.`,
                 flags: [MessageFlags.Ephemeral],
