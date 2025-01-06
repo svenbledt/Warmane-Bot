@@ -68,7 +68,7 @@ settings:
     guildName: The Flat Azeroth Society
     welcomeMessage: false
     welcomeChannel: ''
-    CharNameAsk: false
+    CharNameAsk: true
     BlockList: true
     charNameAskDM: >-
       Hey, I would like to ask you for your main Character name.
@@ -250,6 +250,20 @@ settings:
     guildName: ArmYt's server
     welcomeMessage: false
     welcomeChannel: ''
+    CharNameAsk: false
+    BlockList: true
+    charNameAskDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
+    lastOwnerDM: {}
+  - guild: '1325935461436489900'
+    welcomeMessage: false
+    welcomeChannel: '1325935461960646758'
     CharNameAsk: false
     BlockList: true
     charNameAskDM: >-

@@ -8,7 +8,6 @@ module.exports = new ApplicationCommand({
     description: 'Replies with a list of available application commands.',
     type: 1,
     options: [],
-    ephemeral: true
   },
   options: {
     cooldown: 10000

@@ -56,20 +56,32 @@ module.exports = new ApplicationCommand({
    * @param {DiscordBot} client
    * @param {ChatInputCommandInteraction} interaction
    */ run: async (client, interaction) => {
+    if (!interaction.member) {
+        await interaction.reply({
+            content: 'Could not verify member permissions.',
+            flags: [MessageFlags.Ephemeral],
+        });
+        return;
+    }
+
+    if (!interaction.member.permissions) {
+        await interaction.reply({
+            content: 'Could not verify member permissions.',
+            flags: [MessageFlags.Ephemeral],
+        });
+        return;
+    }
+
+    if (!interaction.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
+        await interaction.reply({
+            content: 'You need to be an administrator to use this command.',
+            flags: [MessageFlags.Ephemeral],
+        });
+        return;
+    }
+
     const settingName = interaction.options.getString("toggle");
     let settings = client.database.get("settings") || [];
-
-    if (
-      !interaction.member.permissions.has([
-        PermissionsBitField.Flags.Administrator,
-      ])
-    ) {
-      await interaction.reply({
-        content: `You don't have the required permissions to use this command.`,
-        flags: [MessageFlags.Ephemeral],
-      });
-      return;
-    }
 
     let guildSettings = settings.find(
       (setting) => setting.guild === interaction.guild.id
