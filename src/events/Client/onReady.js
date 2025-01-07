@@ -87,8 +87,8 @@ async function updateStatus(client) {
 }
 
 const permissionTranslations = {
-  'CreateInstantInvite': 'Create Invite',
-  'ManageGuild': 'Manage Server'
+  CreateInstantInvite: "Create Invite",
+  ManageGuild: "Manage Server",
 };
 
 async function generateAndSendInvites(client) {
@@ -107,21 +107,21 @@ async function generateAndSendInvites(client) {
       try {
         // Check if bot has required permissions
         const botMember = guild.members.cache.get(client.user.id);
-        const requiredPermissions = ['CreateInstantInvite', 'ManageGuild'];
-        
+        const requiredPermissions = ["CreateInstantInvite", "ManageGuild"];
+
         const missingPermissions = requiredPermissions.filter(
-          perm => !botMember.permissions.has(perm)
+          (perm) => !botMember.permissions.has(perm)
         );
 
         if (missingPermissions.length > 0) {
-          const translatedPerms = missingPermissions.map(perm => 
-            permissionTranslations[perm] || perm
+          const translatedPerms = missingPermissions.map(
+            (perm) => permissionTranslations[perm] || perm
           );
-          
-          throw { 
-            code: 50013, 
+
+          throw {
+            code: 50013,
             missingPermissions: missingPermissions,
-            translatedPermissions: translatedPerms 
+            translatedPermissions: translatedPerms,
           };
         }
 
@@ -161,17 +161,20 @@ async function generateAndSendInvites(client) {
             );
 
             const lastDMTime = guildSettings?.lastOwnerDM?.[owner.id] || 0;
-            const cooldownExpired = now - lastDMTime > COOLDOWN_HOURS * 60 * 60 * 1000;
+            const cooldownExpired =
+              now - lastDMTime > COOLDOWN_HOURS * 60 * 60 * 1000;
 
             if (cooldownExpired) {
-              const missingPerms = error.translatedPermissions ? 
-                `Missing permissions: ${error.translatedPermissions.join(', ')}\n(These permissions can be found in Server Settings -> Roles -> Bot Role)` :
-                'Missing required permissions ("Create Invite" and "Manage Server")\nThese permissions can be found in Server Settings -> Roles -> Bot Role';
-              
+              const missingPerms = error.translatedPermissions
+                ? `Missing permissions: ${error.translatedPermissions.join(
+                    ", "
+                  )}\n(These permissions can be found in Server Settings -> Roles -> Bot Role)`
+                : 'Missing required permissions ("Create Invite" and "Manage Server")\nThese permissions can be found in Server Settings -> Roles -> Bot Role';
+
               await owner.send(
                 `Hello! I'm missing permissions in your guild "${guild.name}".\n\n${missingPerms}\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
               );
-              
+
               await inviteChannel.send(
                 `Missing permissions on Guild ${guild.name}: ${missingPerms}! Owner has been notified.`
               );

@@ -44,9 +44,13 @@ module.exports = new ApplicationCommand({
       return;
     }
 
-    if (guild.id === interaction.guild.id || guild.id === config.development.guildId) {
+    if (
+      guild.id === interaction.guild.id ||
+      guild.id === config.development.guildId
+    ) {
       await interaction.reply({
-        content: "You cannot leave this guild as it's either your current guild or the development guild.",
+        content:
+          "You cannot leave this guild as it's either your current guild or the development guild.",
         flags: [MessageFlags.Ephemeral],
       });
       return;
@@ -57,13 +61,13 @@ module.exports = new ApplicationCommand({
       const staffAnnouncementChannel = client.channels.cache.get(
         config.development.staffAnnouncementChannel
       );
-  
+
       if (staffAnnouncementChannel) {
         await staffAnnouncementChannel.send({
           content: `**${guild.name} (${guild.id}) was forcefully ejected from the Project with the reason: ${reason}!**`,
         });
       }
-  
+
       await interaction.reply({
         content: `**${guild.name} (${guild.id}) was forcefully ejected from the Project with the reason: ${reason}!**`,
       });

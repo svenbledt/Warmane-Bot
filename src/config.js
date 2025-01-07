@@ -45,10 +45,7 @@ const config = {
   },
   users: {
     ownerId: "209319089930240004", // The bot owner ID, which is you.
-    developers: [
-      "209319089930240004",
-      "992028601308422326",
-    ], // The bot developers, remember to include your account ID with the other account IDs.
+    developers: ["209319089930240004", "992028601308422326"], // The bot developers, remember to include your account ID with the other account IDs.
     url: "https://armory.warmane.com/", // The character URL for the API.
   },
   messages: {

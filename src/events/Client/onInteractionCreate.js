@@ -10,7 +10,7 @@ module.exports = new Event({
     if (!interaction.isAutocomplete()) return;
 
     if (!client.commands) {
-      console.error('Commands collection is not initialized');
+      console.error("Commands collection is not initialized");
       return await interaction.respond([]);
     }
 

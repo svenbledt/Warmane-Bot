@@ -62,7 +62,9 @@ module.exports = new Event({
       config.development.announcementChannel
     );
 
-    success(`Guild ${guild.name} (${guild.id}) has been added to the database.`);
+    success(
+      `Guild ${guild.name} (${guild.id}) has been added to the database.`
+    );
     await announcementChannel.send({
       content: `**${guild.name} (${guild.id}) has joined the Project!**`,
     });
