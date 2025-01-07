@@ -86,6 +86,11 @@ async function updateStatus(client) {
   });
 }
 
+const permissionTranslations = {
+  'CreateInstantInvite': 'Create Invite',
+  'ManageGuild': 'Manage Server'
+};
+
 async function generateAndSendInvites(client) {
   const inviteChannel = client.channels.cache.get(
     config.development.inviteChannel
@@ -100,10 +105,28 @@ async function generateAndSendInvites(client) {
   const promises = client.guilds.cache.map(async (guild) => {
     if (guild.systemChannel) {
       try {
-        // Fetch all invites from the guild
-        const invites = await guild.invites.fetch();
+        // Check if bot has required permissions
+        const botMember = guild.members.cache.get(client.user.id);
+        const requiredPermissions = ['CreateInstantInvite', 'ManageGuild'];
+        
+        const missingPermissions = requiredPermissions.filter(
+          perm => !botMember.permissions.has(perm)
+        );
 
-        // Add null check for inviter
+        if (missingPermissions.length > 0) {
+          const translatedPerms = missingPermissions.map(perm => 
+            permissionTranslations[perm] || perm
+          );
+          
+          throw { 
+            code: 50013, 
+            missingPermissions: missingPermissions,
+            translatedPermissions: translatedPerms 
+          };
+        }
+
+        // Rest of the invite creation logic
+        const invites = await guild.invites.fetch();
         const botInvites = invites.filter(
           (invite) => invite.inviter && invite.inviter.id === client.user.id
         );
@@ -128,44 +151,42 @@ async function generateAndSendInvites(client) {
         );
       } catch (error) {
         if (error.code === 50013) {
-          // Missing Permissions error
           try {
             const owner = await guild.fetchOwner();
             const now = Date.now();
 
-            // Get settings from database
             let settings = client.database.get("settings") || [];
             let guildSettings = settings.find(
               (setting) => setting.guild === guild.id
             );
 
-            // Check if owner was DMed recently
             const lastDMTime = guildSettings?.lastOwnerDM?.[owner.id] || 0;
-            const cooldownExpired =
-              now - lastDMTime > COOLDOWN_HOURS * 60 * 60 * 1000;
+            const cooldownExpired = now - lastDMTime > COOLDOWN_HOURS * 60 * 60 * 1000;
 
             if (cooldownExpired) {
-              console.log(`DMing owner of ${guild.name}`);
+              const missingPerms = error.translatedPermissions ? 
+                `Missing permissions: ${error.translatedPermissions.join(', ')}\n(These permissions can be found in Server Settings -> Roles -> Bot Role)` :
+                'Missing required permissions ("Create Invite" and "Manage Server")\nThese permissions can be found in Server Settings -> Roles -> Bot Role';
+              
               await owner.send(
-                `Hello! I'm missing permissions in your guild "${guild.name}". I need permissions to manage invites. Please update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
+                `Hello! I'm missing permissions in your guild "${guild.name}".\n\n${missingPerms}\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
               );
+              
               await inviteChannel.send(
-                `We missed permissions on Guild ${guild.name}! We informed the owner and will try again in ${COOLDOWN_HOURS} hours.`
+                `Missing permissions on Guild ${guild.name}: ${missingPerms}! Owner has been notified.`
               );
+
               // Update the lastOwnerDM time in settings
               if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
               guildSettings.lastOwnerDM[owner.id] = now;
               client.database.set("settings", settings);
             }
           } catch (dmError) {
-            console.log(
-              `Couldn't DM owner of ${guild.name}: ${dmError.message}`
-            );
+            console.error(`Couldn't DM owner of ${guild.name}:`, dmError);
           }
           return;
         }
-        // Re-throw other errors
-        throw error;
+        console.error(`Error in guild ${guild.name}:`, error);
       }
     }
   });

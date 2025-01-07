@@ -66,7 +66,12 @@ class DiscordBot extends Client {
       this.commands_handler.load();
       this.components_handler.load();
       this.events_handler.load();
-
+      this.commands = new Collection();
+      warn(
+        "Attempting to delete application commands... (this might take a while!)"
+      );
+      await this.commands_handler.deleteApplicationCommands(config.development);
+      success("Successfully deleted application commands.");
       warn(
         "Attempting to register application commands... (this might take a while!)"
       );

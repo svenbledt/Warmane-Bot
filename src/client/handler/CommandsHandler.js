@@ -72,6 +72,16 @@ class CommandsHandler {
 
         this.load();
     }
+
+    deleteApplicationCommands = async (development, restOptions = null) => {
+        const rest = new REST(restOptions ? restOptions : { version: '10' }).setToken(this.client.token);
+
+        if (development.enabled) {
+            await rest.put(Routes.applicationGuildCommands(this.client.user.id, development.guildId), { body: [] });
+        } else {
+            await rest.put(Routes.applicationGuildCommands(this.client.user.id, development.guildId), { body: [] });
+        }
+    }
     
     /**
      * @param {{ enabled: boolean, guildId: string }} development

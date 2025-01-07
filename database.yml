@@ -78,7 +78,8 @@ settings:
 
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
-    lastOwnerDM: {}
+    lastOwnerDM:
+      '432161293227524116': 1736217136266
   - guild: '605146558777917461'
     guildName: zzz
     welcomeMessage: false
@@ -96,21 +97,6 @@ settings:
     lastOwnerDM: {}
   - guild: '675405604436705281'
     guildName: S Ꮒ Ꭷ ฬ T Ꭵ Ꮇ Ꮛ S
-    welcomeMessage: false
-    welcomeChannel: ''
-    CharNameAsk: false
-    BlockList: true
-    charNameAskDM: >-
-      Hey, I would like to ask you for your main Character name.
-
-      Please respond with your main Character name for the Server.
-
-
-      (Your response will not be stored by this Application and is only used for
-      the Guilds nickname)
-    lastOwnerDM: {}
-  - guild: '888208015050821642'
-    guildName: test1
     welcomeMessage: false
     welcomeChannel: ''
     CharNameAsk: false
@@ -250,20 +236,6 @@ settings:
     guildName: ArmYt's server
     welcomeMessage: false
     welcomeChannel: ''
-    CharNameAsk: false
-    BlockList: true
-    charNameAskDM: >-
-      Hey, I would like to ask you for your main Character name.
-
-      Please respond with your main Character name for the Server.
-
-
-      (Your response will not be stored by this Application and is only used for
-      the Guilds nickname)
-    lastOwnerDM: {}
-  - guild: '1325935461436489900'
-    welcomeMessage: false
-    welcomeChannel: '1325935461960646758'
     CharNameAsk: false
     BlockList: true
     charNameAskDM: >-
