@@ -1,6 +1,7 @@
 const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const { MessageFlags } = require("discord.js");
+const config = require("../../config");
 
 module.exports = new Event({
   event: "interactionCreate",
@@ -14,6 +15,9 @@ module.exports = new Event({
     }
 
     if (interaction.commandName === "guild-leave") {
+      if (!config.users.developers.includes(interaction.user.id)) {
+        return await interaction.respond([]);
+      }
       const focusedValue = interaction.options.getFocused().toLowerCase();
       const choices = interaction.client.guilds.cache
         .map((guild) => ({
