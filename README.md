@@ -12,3 +12,5 @@ A Discord bot that handles Warmane's API and provides useful information for pla
 ## ToDo
 
 - Let ppl adjust the message when they someone joins the discord.
+
+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

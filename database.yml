@@ -200,22 +200,6 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
-  - guild: '1269521061532270633'
-    guildName: El Den't
-    welcomeMessage: false
-    welcomeChannel: ''
-    CharNameAsk: false
-    BlockList: true
-    charNameAskDM: >-
-      Hey, I would like to ask you for your main Character name.
-
-      Please respond with your main Character name for the Server.
-
-
-      (Your response will not be stored by this Application and is only used for
-      the Guilds nickname)
-    lastOwnerDM:
-      '487773810616172547': 1736189351442
   - guild: '1290529693665202208'
     guildName: TRES IDIOTAS
     welcomeMessage: false

@@ -473,7 +473,7 @@ module.exports = new ApplicationCommand({
               .setThumbnail(character.portrait)
               .setTimestamp(new Date())
               .setFooter({
-                text: interaction.guild.name,
+                text: interaction.guild?.name ?? "Warmane Tool",
                 iconURL: character.icon,
               });
 
