@@ -11,6 +11,7 @@ module.exports = new ApplicationCommand({
     name: "blacklist-add",
     description: "Add someone to the Global blacklist.",
     type: 1,
+    contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "id",

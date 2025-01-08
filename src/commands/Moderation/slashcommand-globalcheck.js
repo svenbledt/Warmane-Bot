@@ -17,6 +17,7 @@ module.exports = new ApplicationCommand({
     description:
       "Checks the current members of the guild for global blacklist entry's.",
     type: 1,
+    contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
   },
   options: {
     cooldown: 10000,

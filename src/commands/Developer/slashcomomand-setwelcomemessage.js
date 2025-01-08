@@ -35,6 +35,7 @@ module.exports = new ApplicationCommand({
     name: "set-welcome-message-dm",
     description: "Sets the welcome message for DMs.",
     type: 1,
+    contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "text",

@@ -13,6 +13,7 @@ module.exports = new ApplicationCommand({
     name: "poll",
     description: "Create a poll with the given options",
     type: 1,
+    contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "question",

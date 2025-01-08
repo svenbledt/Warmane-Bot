@@ -12,6 +12,7 @@ module.exports = new ApplicationCommand({
     name: "report",
     description: "Report a user for breaking the rules on Warmane.",
     type: 1,
+    contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [],
   },
   options: {

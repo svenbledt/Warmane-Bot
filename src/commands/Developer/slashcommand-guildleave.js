@@ -12,6 +12,7 @@ module.exports = new ApplicationCommand({
     name: "guild-leave",
     description: "Leave a specific guild.",
     type: 1,
+    contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "guild",

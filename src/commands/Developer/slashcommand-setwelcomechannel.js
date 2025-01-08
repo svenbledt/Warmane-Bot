@@ -36,6 +36,7 @@ module.exports = new ApplicationCommand({
     name: "set-welcome-channel",
     description: "Sets the welcome channel.",
     type: 1,
+    contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "channel",

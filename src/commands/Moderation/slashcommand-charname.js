@@ -12,6 +12,7 @@ module.exports = new ApplicationCommand({
     name: "charname",
     description: "Ask's someone for his Character name.",
     type: 1,
+    contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "user",

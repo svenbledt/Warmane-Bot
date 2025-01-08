@@ -7,6 +7,7 @@ module.exports = new ApplicationCommand({
     name: "help",
     description: "Replies with a list of available application commands.",
     type: 1,
+    contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [],
   },
   options: {

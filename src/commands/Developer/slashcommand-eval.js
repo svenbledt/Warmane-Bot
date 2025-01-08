@@ -12,6 +12,7 @@ module.exports = new ApplicationCommand({
     name: "eval",
     description: "Execute a JavaScript code.",
     type: 1,
+    contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "code",

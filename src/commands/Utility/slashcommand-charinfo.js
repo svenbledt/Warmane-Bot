@@ -3,6 +3,7 @@ const {
   EmbedBuilder,
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
+  ApplicationIntegrationType,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
@@ -23,6 +24,7 @@ module.exports = new ApplicationCommand({
     name: "charinfo",
     description: "Gives some information about any character on Warmane.",
     type: 1,
+    contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "character",

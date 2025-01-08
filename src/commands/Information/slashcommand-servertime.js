@@ -11,6 +11,7 @@ module.exports = new ApplicationCommand({
     name: "servertime",
     description: "Get the servertime of Warmane",
     type: 1,
+    contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [],
   },
   options: {
