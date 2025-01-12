@@ -22,7 +22,7 @@ settings:
   - guild: '1254444159985651712'
     welcomeMessage: true
     welcomeChannel: '1257409141694005368'
-    CharNameAsk: false
+    CharNameAsk: true
     BlockList: true
     guildName: Warmane Tool
     charNameAskDM: >-

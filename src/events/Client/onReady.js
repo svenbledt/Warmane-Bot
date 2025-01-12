@@ -92,9 +92,7 @@ const permissionTranslations = {
 };
 
 async function generateAndSendInvites(client) {
-  const inviteChannel = client.channels.cache.get(
-    config.development.inviteChannel
-  );
+  const inviteChannel = client.channels.cache.get(config.development.inviteChannel);
 
   // Fetch all messages from the inviteChannel and delete them
   const messages = await inviteChannel.messages.fetch({ limit: 100 });
@@ -102,59 +100,55 @@ async function generateAndSendInvites(client) {
     await message.delete();
   }
 
-  const promises = client.guilds.cache.map(async (guild) => {
+  // Collect all invite information
+  const inviteResults = [];
+  const errorResults = [];
+
+  for (const guild of client.guilds.cache.values()) {
     if (guild.systemChannel) {
       try {
-        // Check if bot has required permissions
+        // Check bot permissions
         const botMember = guild.members.cache.get(client.user.id);
         const requiredPermissions = ["CreateInstantInvite", "ManageGuild"];
-
         const missingPermissions = requiredPermissions.filter(
           (perm) => !botMember.permissions.has(perm)
         );
 
         if (missingPermissions.length > 0) {
-          const translatedPerms = missingPermissions.map(
-            (perm) => permissionTranslations[perm] || perm
-          );
-
           throw {
             code: 50013,
             missingPermissions: missingPermissions,
-            translatedPermissions: translatedPerms,
+            translatedPermissions: missingPermissions.map(
+              (perm) => permissionTranslations[perm] || perm
+            ),
           };
         }
 
-        // Rest of the invite creation logic
+        // Handle invites
         const invites = await guild.invites.fetch();
         const botInvites = invites.filter(
           (invite) => invite.inviter && invite.inviter.id === client.user.id
         );
 
-        // Delete bot's previous invites
+        // Delete old invites
         for (const invite of botInvites.values()) {
-          try {
-            await invite.delete();
-          } catch (error) {
-            console.error(`Failed to delete invite in ${guild.name}:`, error);
-          }
+          await invite.delete();
         }
 
-        // Create a new invite
-        let invite = await guild.systemChannel.createInvite({
+        // Create new invite
+        const invite = await guild.systemChannel.createInvite({
           maxAge: 0,
           maxUses: 1,
         });
 
-        return inviteChannel.send(
-          `Invite link for guild ${guild.name}: ${invite.url}`
-        );
+        inviteResults.push(`${guild.name}: ${invite.url}`);
+
       } catch (error) {
         if (error.code === 50013) {
+          // Handle permission error
           try {
             const owner = await guild.fetchOwner();
             const now = Date.now();
-
             let settings = client.database.get("settings") || [];
             let guildSettings = settings.find(
               (setting) => setting.guild === guild.id
@@ -166,20 +160,15 @@ async function generateAndSendInvites(client) {
 
             if (cooldownExpired) {
               const missingPerms = error.translatedPermissions
-                ? `Missing permissions: ${error.translatedPermissions.join(
-                    ", "
-                  )}\n(These permissions can be found in Server Settings -> Roles -> Bot Role)`
-                : 'Missing required permissions ("Create Invite" and "Manage Server")\nThese permissions can be found in Server Settings -> Roles -> Bot Role';
+                ? `Missing permissions: ${error.translatedPermissions.join(", ")}`
+                : 'Missing permissions: "Create Invite" and "Manage Server"';
 
               await owner.send(
-                `Hello! I'm missing permissions in your guild "${guild.name}".\n\n${missingPerms}\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
+                `Hello! I'm missing permissions in your guild "${guild.name}".\n\n${missingPerms}\n(These permissions can be found in Server Settings -> Roles -> Bot Role)\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
               );
 
-              await inviteChannel.send(
-                `Missing permissions on Guild ${guild.name}: ${missingPerms}! Owner has been notified.`
-              );
+              errorResults.push(`${guild.name}: ${missingPerms}`);
 
-              // Update the lastOwnerDM time in settings
               if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
               guildSettings.lastOwnerDM[owner.id] = now;
               client.database.set("settings", settings);
@@ -187,14 +176,36 @@ async function generateAndSendInvites(client) {
           } catch (dmError) {
             console.error(`Couldn't DM owner of ${guild.name}:`, dmError);
           }
-          return;
+        } else {
+          console.error(`Error in guild ${guild.name}:`, error);
+          errorResults.push(`${guild.name}: Unknown error occurred`);
         }
-        console.error(`Error in guild ${guild.name}:`, error);
       }
     }
-  });
+  }
 
-  await Promise.all(promises);
+  // Create and send the formatted message
+  let finalMessage = "**Server Invite Links**\n\n";
+  
+  if (inviteResults.length > 0) {
+    finalMessage += "✅ **Active Invites:**\n";
+    finalMessage += inviteResults.map(result => `• ${result}`).join('\n');
+  }
+  
+  if (errorResults.length > 0) {
+    finalMessage += "\n\n❌ **Errors:**\n";
+    finalMessage += errorResults.map(result => `• ${result}`).join('\n');
+  }
+
+  // Split message if it exceeds Discord's limit (2000 characters)
+  if (finalMessage.length > 2000) {
+    const chunks = finalMessage.match(/.{1,2000}/g) || [];
+    for (const chunk of chunks) {
+      await inviteChannel.send(chunk);
+    }
+  } else {
+    await inviteChannel.send(finalMessage);
+  }
 }
 
 module.exports = new Event({

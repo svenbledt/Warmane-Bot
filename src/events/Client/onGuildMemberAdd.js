@@ -58,7 +58,7 @@ module.exports = new Event({
       if (obj.includes(member.id)) {
         try {
           await member.send(
-            "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff."
+            "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff. Or appeal at https://discord.gg/YDqBQU43Ht"
           );
         } catch (error) {
           console.error(`Failed to send a DM to ${member.tag}.`);
@@ -77,53 +77,70 @@ module.exports = new Event({
     }
 
     if (charNameAskEnabled) {
-      // CharNameAsk is enabled, proceed with the logic
       try {
-        await member.send(charNameAskDM);
-      } catch (error) {
-        console.error(`Failed to send a DM to ${member.user.tag}.`);
-        return;
-      }
-      // wait for the users response to the DM and change his nickname
-      const filter = (m) => m.author.id === member.user.id;
-      const collector = member.dmChannel.createMessageCollector({
-        filter,
-        time: 60000,
-      });
+        const dmChannel = await member.createDM();
+        await dmChannel.send(charNameAskDM);
+        
+        const filter = (m) => m.author.id === member.user.id;
+        const collector = dmChannel.createMessageCollector({
+          filter,
+          time: 60000,
+        });
 
-      collector.on("collect", async (collected) => {
-        let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
-        if (response === "" || response.length > 16) {
-          await member.dmChannel.send(
-            "Your response cannot be empty or too long.\nPlease provide a valid response."
-          );
-        } else {
-          try {
-            await member.setNickname(response);
-            console.log(`Changed ${member.user.tag} to ${response}.`);
-            await member.dmChannel.send(
-              `Your name has been successfully changed to ${response} for the Guild ${member.guild.name}.`
+        collector.on("collect", async (collected) => {
+          let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
+          if (response === "" || response.length > 16) {
+            await dmChannel.send(
+              "Your response cannot be empty or too long.\nPlease provide a valid response."
             );
-            collector.stop("valid-response"); // This line ensures the collector stops after a successful operation
-          } catch (error) {
-            console.error(
-              `Failed to change ${member.user.tag} to ${response} due to: ${error.message}.`
-            );
-            await member.dmChannel.send(
-              `Failed to change your name due to: ${error.message}`
-            );
-            // Do not stop the collector here to allow for further attempts
+          } else {
+            try {
+              await member.setNickname(response);
+              console.log(`Changed ${member.user.tag} to ${response}.`);
+              await dmChannel.send(
+                `Your name has been successfully changed to ${response} for the Guild ${member.guild.name}.`
+              );
+              collector.stop("valid-response"); // This line ensures the collector stops after a successful operation
+            } catch (error) {
+              console.error(
+                `Failed to change ${member.user.tag} to ${response} due to: ${error.message}.`
+              );
+              await dmChannel.send(
+                `Failed to change your name due to: ${error.message}`
+              );
+              // Do not stop the collector here to allow for further attempts
+            }
           }
-        }
-      });
+        });
 
-      collector.on("end", (collected, reason) => {
-        if (reason !== "valid-response") {
-          member.dmChannel.send(
-            "Time's up! Contact a staff of the server if you like to change your name again."
+        collector.on("end", async (collected, reason) => {
+          try {
+            if (reason !== "valid-response") {
+              await dmChannel.send(
+                "Time's up! Contact a staff of the server if you like to change your name again."
+              );
+            }
+          } catch (error) {
+            console.error(`Failed to send end message to ${member.user.tag}: ${error.message}`);
+          }
+        });
+
+      } catch (error) {
+        console.error(`Failed to interact with ${member.user.tag}: ${error.message}`);
+        // Optionally notify a mod channel about the failed DM
+        try {
+          const modChannel = member.guild.channels.cache.find(
+            channel => channel.name === "mod-logs"
           );
+          if (modChannel) {
+            await modChannel.send(
+              `Failed to send character name request to ${member.user.tag}. They likely have DMs disabled.`
+            );
+          }
+        } catch (err) {
+          console.error("Failed to send mod notification:", err);
         }
-      });
+      }
     }
 
     if (welcomeMessageEnabled) {
