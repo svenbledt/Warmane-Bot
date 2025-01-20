@@ -5,6 +5,7 @@ const {
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const LanguageManager = require('../../utils/LanguageManager');
 
 module.exports = new ApplicationCommand({
   command: {
@@ -21,34 +22,33 @@ module.exports = new ApplicationCommand({
    */
   run: async (client, interaction) => {
     const member = interaction.targetMember;
-    if (
-      !interaction.member.permissions.has([
-        PermissionsBitField.Flags.BanMembers,
-      ])
-    ) {
+    // You can get the guild's preferred language from settings, defaulting to 'en'
+    const settings = client.database.get("settings") || [];
+    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const lang = guildSettings?.language || 'en';
+
+    if (!interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers])) {
       await interaction.reply({
-        content: `You don't have the required permissions to use this command.`,
+        content: LanguageManager.getText('commands.charname.no_permission', lang),
         flags: [MessageFlags.Ephemeral],
       });
       return;
     }
+
     if (!member) {
       await interaction.reply({
-        content: `Invalid target!`,
+        content: LanguageManager.getText('commands.charname.invalid_target', lang),
       });
-
       return;
     }
 
     // Send message to the user and await for his response with his character main name
     try {
-      await member.send(
-        "Hey, I would like to ask you for your main Character name. Please respond with your main Character name."
-      );
+      await member.send(LanguageManager.getText('commands.charname.dm_initial', lang));
     } catch (error) {
       console.error(`Failed to send a DM to ${member.tag}.`);
       await interaction.reply({
-        content: `Failed to send a DM to ${member.tag}.`,
+        content: LanguageManager.getText('commands.charname.dm_failed', lang, { username: member.tag }),
         flags: [MessageFlags.Ephemeral],
       });
       return;
@@ -56,7 +56,7 @@ module.exports = new ApplicationCommand({
     // Reply to the interaction
     try {
       await interaction.reply({
-        content: "I have asked the user for his Character name.",
+        content: LanguageManager.getText('commands.charname.dm_sent', lang),
         flags: [MessageFlags.Ephemeral],
       });
     } catch (error) {
@@ -76,9 +76,7 @@ module.exports = new ApplicationCommand({
               // Replace special characters and numbers
               response = response.replace(/[^a-zA-Z ]/g, "");
               if (response.trim() === "") {
-                dmChannel.send(
-                  "Your response cannot be empty. Please provide a valid response."
-                );
+                dmChannel.send(LanguageManager.getText('commands.charname.empty_response', lang));
               } else {
                 member
                   .setNickname(response)
@@ -86,17 +84,13 @@ module.exports = new ApplicationCommand({
                     console.log(
                       `Changed ${member.user.tag} nickname to ${response}.`
                     );
-                    dmChannel.send(
-                      `Your main Characters name has been successfully changed to ${response}.`
-                    );
+                    dmChannel.send(LanguageManager.getText('commands.charname.nickname_success', lang, { nickname: response }));
                   })
                   .catch((error) => {
                     console.error(
                       `Failed to change ${member.user.tag} nickname to ${response}.`
                     );
-                    dmChannel.send(
-                      `Failed to change your main Characters name due to: ${error.message}`
-                    );
+                    dmChannel.send(LanguageManager.getText('commands.charname.nickname_failed', lang, { error: error.message }));
                   });
               }
             })
@@ -119,9 +113,7 @@ module.exports = new ApplicationCommand({
           // Replace special characters and numbers
           response = response.replace(/[^a-zA-Z ]/g, "");
           if (response.trim() === "") {
-            member.dmChannel.send(
-              "Your response cannot be empty. Please provide a valid response."
-            );
+            member.dmChannel.send(LanguageManager.getText('commands.charname.empty_response', lang));
           } else {
             member
               .setNickname(response)
@@ -129,17 +121,13 @@ module.exports = new ApplicationCommand({
                 console.log(
                   `Changed ${member.user.tag} nickname to ${response}.`
                 );
-                member.dmChannel.send(
-                  `Your main Characters name has been successfully changed to ${response}.`
-                );
+                member.dmChannel.send(LanguageManager.getText('commands.charname.nickname_success', lang, { nickname: response }));
               })
               .catch((error) => {
                 console.error(
                   `Failed to change ${member.user.tag} nickname to ${response}.`
                 );
-                member.dmChannel.send(
-                  `Failed to change your main Characters name due to: ${error.message}`
-                );
+                member.dmChannel.send(LanguageManager.getText('commands.charname.nickname_failed', lang, { error: error.message }));
               });
           }
         })

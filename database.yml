@@ -19,6 +19,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '1254444159985651712'
     welcomeMessage: true
     welcomeChannel: '1257409141694005368'
@@ -34,6 +35,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '298051398103334912'
     welcomeMessage: false
     welcomeChannel: ''
@@ -49,6 +51,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '512184428148031488'
     guildName: KAMIKAZZI
     welcomeMessage: false
@@ -64,6 +67,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '591867643066056704'
     guildName: The Flat Azeroth Society
     welcomeMessage: false
@@ -80,6 +84,7 @@ settings:
       the Guilds nickname)
     lastOwnerDM:
       '432161293227524116': 1736322239606
+    language: en
   - guild: '605146558777917461'
     guildName: zzz
     welcomeMessage: false
@@ -95,6 +100,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '675405604436705281'
     guildName: S Ꮒ Ꭷ ฬ T Ꭵ Ꮇ Ꮛ S
     welcomeMessage: false
@@ -110,6 +116,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '907417335223181342'
     guildName: 4uk's server
     welcomeMessage: false
@@ -125,6 +132,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '961639048248692747'
     guildName: The Window Lickers
     welcomeMessage: false
@@ -140,6 +148,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '983787277341823016'
     guildName: Divine Dragons
     welcomeMessage: false
@@ -155,6 +164,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '1026098702500249653'
     guildName: Ardenweald
     welcomeMessage: false
@@ -170,6 +180,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '1065996759932878959'
     guildName: High Table!
     welcomeMessage: false
@@ -185,6 +196,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '1201497400083226726'
     guildName: Lights Vengeance
     welcomeMessage: false
@@ -200,6 +212,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en
   - guild: '1290529693665202208'
     guildName: TRES IDIOTAS
     welcomeMessage: false
@@ -216,8 +229,25 @@ settings:
       the Guilds nickname)
     lastOwnerDM:
       '299209989174722560': 1736185303422
-  - guild: '471186202150699013'
-    guildName: ArmYt's server
+    language: en
+  - guild: '1330716535614079099'
+    guildName: My Manas Low BRB
+    welcomeMessage: false
+    welcomeChannel: '1330716536050028607'
+    CharNameAsk: true
+    BlockList: true
+    charNameAskDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
+    lastOwnerDM: {}
+    language: en
+  - guild: '1203421848663097414'
+    guildName: test
     welcomeMessage: false
     welcomeChannel: ''
     CharNameAsk: false
@@ -231,3 +261,4 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+    language: en

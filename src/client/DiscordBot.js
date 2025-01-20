@@ -7,6 +7,7 @@ const ComponentsHandler = require("./handler/ComponentsHandler");
 const ComponentsListener = require("./handler/ComponentsListener");
 const EventsHandler = require("./handler/EventsHandler");
 const { QuickYAML } = require("quick-yaml.db");
+const LanguageManager = require('../utils/LanguageManager');
 
 class DiscordBot extends Client {
   collection = {
@@ -52,6 +53,12 @@ class DiscordBot extends Client {
 
     new CommandsListener(this);
     new ComponentsListener(this);
+
+    LanguageManager.loadLanguage('en');
+    LanguageManager.loadLanguage('de');
+    LanguageManager.loadLanguage('ru');
+    LanguageManager.loadLanguage('fr');
+    LanguageManager.loadLanguage('es');
   }
 
   connect = async () => {

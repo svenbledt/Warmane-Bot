@@ -1,5 +1,6 @@
 const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
+const LanguageManager = require("../../utils/LanguageManager");
 
 function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
@@ -7,10 +8,10 @@ function ensureGuildSettings(guildSettings) {
     welcomeChannel: "",
     CharNameAsk: false,
     BlockList: true,
+    language: "en",
     charNameAskDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
     lastOwnerDM: {},
-    // Add any other default settings here
   };
 
   let updated = false;
@@ -29,12 +30,12 @@ module.exports = new Event({
   event: "guildMemberAdd",
   once: false,
   run: async (client, member) => {
-    // check if the joined ID is blacklisted
     let obj = client.database.get("blacklisted") || [];
     let settings = client.database.get("settings") || [];
     let guildSettings = settings.find(
       (setting) => setting.guild === member.guild.id
     );
+    
     if (!guildSettings) {
       guildSettings = { guild: member.guild.id };
       settings.push(guildSettings);
@@ -44,42 +45,37 @@ module.exports = new Event({
       client.database.set("settings", settings);
     }
 
-    let charNameAskEnabled = guildSettings.CharNameAsk;
-    let welcomeMessageEnabled = guildSettings.welcomeMessage;
-    let BlockListEnabled = guildSettings.BlockList;
-    let charNameAskDM = guildSettings.charNameAskDM;
+    const lang = guildSettings.language || "en";
+    const charNameAskEnabled = guildSettings.CharNameAsk;
+    const welcomeMessageEnabled = guildSettings.welcomeMessage;
+    const BlockListEnabled = guildSettings.BlockList;
 
-    // If the member is a bot, return and do not send any messages
-    if (member.user.bot) {
-      return;
-    }
+    if (member.user.bot) return;
 
-    if (BlockListEnabled) {
-      if (obj.includes(member.id)) {
-        try {
-          await member.send(
-            "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff. Or appeal at https://discord.gg/YDqBQU43Ht"
-          );
-        } catch (error) {
-          console.error(`Failed to send a DM to ${member.tag}.`);
-          return;
-        }
-        try {
-          await member.kick("Blacklisted user.");
-          success(`Kicked ${member.user.tag} due to being blacklisted.`);
-        } catch (error) {
-          console.error(
-            `Failed to kick ${member.user.tag} due to: ${error.message}.`
-          );
-        }
+    if (BlockListEnabled && obj.includes(member.id)) {
+      try {
+        await member.send(
+          LanguageManager.getText('events.guildMemberAdd.blacklisted', lang)
+        );
+      } catch (error) {
+        console.error(`Failed to send a DM to ${member.tag}.`);
         return;
       }
+      try {
+        await member.kick("Blacklisted user.");
+        success(`Kicked ${member.user.tag} due to being blacklisted.`);
+      } catch (error) {
+        console.error(
+          `Failed to kick ${member.user.tag} due to: ${error.message}.`
+        );
+      }
+      return;
     }
 
     if (charNameAskEnabled) {
       try {
         const dmChannel = await member.createDM();
-        await dmChannel.send(charNameAskDM);
+        await dmChannel.send(guildSettings.charNameAskDM);
         
         const filter = (m) => m.author.id === member.user.id;
         const collector = dmChannel.createMessageCollector({
@@ -91,24 +87,28 @@ module.exports = new Event({
           let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
           if (response === "" || response.length > 16) {
             await dmChannel.send(
-              "Your response cannot be empty or too long.\nPlease provide a valid response."
+              LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
             );
           } else {
             try {
               await member.setNickname(response);
               console.log(`Changed ${member.user.tag} to ${response}.`);
               await dmChannel.send(
-                `Your name has been successfully changed to ${response} for the Guild ${member.guild.name}.`
+                LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
+                  nickname: response,
+                  guildName: member.guild.name
+                })
               );
-              collector.stop("valid-response"); // This line ensures the collector stops after a successful operation
+              collector.stop("valid-response");
             } catch (error) {
               console.error(
                 `Failed to change ${member.user.tag} to ${response} due to: ${error.message}.`
               );
               await dmChannel.send(
-                `Failed to change your name due to: ${error.message}`
+                LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
+                  error: error.message
+                })
               );
-              // Do not stop the collector here to allow for further attempts
             }
           }
         });
@@ -117,7 +117,7 @@ module.exports = new Event({
           try {
             if (reason !== "valid-response") {
               await dmChannel.send(
-                "Time's up! Contact a staff of the server if you like to change your name again."
+                LanguageManager.getText('events.guildMemberAdd.timeout', lang)
               );
             }
           } catch (error) {
@@ -127,14 +127,15 @@ module.exports = new Event({
 
       } catch (error) {
         console.error(`Failed to interact with ${member.user.tag}: ${error.message}`);
-        // Optionally notify a mod channel about the failed DM
         try {
           const modChannel = member.guild.channels.cache.find(
             channel => channel.name === "mod-logs"
           );
           if (modChannel) {
             await modChannel.send(
-              `Failed to send character name request to ${member.user.tag}. They likely have DMs disabled.`
+              LanguageManager.getText('events.guildMemberAdd.mod_notification', lang, {
+                username: member.user.tag
+              })
             );
           }
         } catch (err) {
@@ -144,7 +145,6 @@ module.exports = new Event({
     }
 
     if (welcomeMessageEnabled) {
-      // welcomeMessage is enabled, proceed with the logic
       let welcomeChannel = guildSettings.welcomeChannel;
       if (!welcomeChannel || welcomeChannel === "") {
         welcomeChannel = member.guild.channels.cache.find(
@@ -156,8 +156,12 @@ module.exports = new Event({
       if (!welcomeChannel) return;
 
       const embed = {
-        title: `Welcome to ${member.guild.name}!`,
-        description: `Welcome ${member} to our server!\n\nIf you have any questions, feel free to ask in a Public channel.`,
+        title: LanguageManager.getText('events.guildMemberAdd.welcome_title', lang, {
+          guildName: member.guild.name
+        }),
+        description: LanguageManager.getText('events.guildMemberAdd.welcome_message', lang, {
+          member: member.toString()
+        }),
         color: 10038562,
         timestamp: new Date(),
         footer: {
