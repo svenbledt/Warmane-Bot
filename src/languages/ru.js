@@ -78,6 +78,13 @@ module.exports = {
         setwelcomemessage: {
             dm_not_enabled: "Приветственное личное сообщение не включено.",
             updated: "Приветственное сообщение обновлено."
+        },
+        servertime: {
+            embed: {
+                title: "Время сервера",
+                description: "Текущее время сервера: {time}",
+                footer: "Запрошено пользователем: {user}"
+            }
         }
     },
     events: {

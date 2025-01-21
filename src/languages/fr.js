@@ -78,6 +78,13 @@ module.exports = {
         setwelcomemessage: {
             dm_not_enabled: "Le message de bienvenue en MP n'est pas activé.",
             updated: "Le message de bienvenue a été mis à jour."
+        },
+        servertime: {
+            embed: {
+                title: "Heure du serveur",
+                description: "L'heure actuelle du serveur est: {time}",
+                footer: "Demandé par: {user}"
+            }
         }
     },
     events: {

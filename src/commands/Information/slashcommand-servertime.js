@@ -5,6 +5,7 @@ const {
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const LanguageManager = require("../../utils/LanguageManager");
 
 module.exports = new ApplicationCommand({
   command: {
@@ -23,20 +24,28 @@ module.exports = new ApplicationCommand({
    * @param {ChatInputCommandInteraction} interaction
    */
   run: async (client, interaction) => {
-    // print the actual time of Iceland to the interaction channel
+    // Get guild settings for language
+    const settings = client.database.get("settings") || [];
+    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const lang = guildSettings?.language || 'en';
+
     const date = new Date();
     const time = date.toLocaleTimeString("en-US", {
       timeZone: "Atlantic/Reykjavik",
     });
+
     const embed = new EmbedBuilder()
-      .setTitle("Servertime")
-      .setDescription(`The current servertime is: ${time}`)
+      .setTitle(LanguageManager.getText('commands.servertime.embed.title', lang))
+      .setDescription(LanguageManager.getText('commands.servertime.embed.description', lang, { time: time }))
       .setColor("#8B0000")
       .setTimestamp()
       .setFooter({
-        text: "Requested by: " + interaction.user.tag,
+        text: LanguageManager.getText('commands.servertime.embed.footer', lang, { 
+          user: interaction.user.tag 
+        }),
         iconURL: interaction.user.avatarURL(),
       });
+
     await interaction.reply({ embeds: [embed] });
   },
 }).toJSON();
