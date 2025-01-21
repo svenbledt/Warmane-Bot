@@ -85,6 +85,10 @@ module.exports = {
                 description: "Текущее время сервера: {time}",
                 footer: "Запрошено пользователем: {user}"
             }
+        },
+        setwelcomechannel: {
+            channel_set: "Канал приветствия установлен на {channel}.",
+            error: "Не удалось установить канал приветствия из-за: {error}"
         }
     },
     events: {

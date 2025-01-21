@@ -85,6 +85,10 @@ module.exports = {
                 description: "L'heure actuelle du serveur est: {time}",
                 footer: "Demandé par: {user}"
             }
+        },
+        setwelcomechannel: {
+            channel_set: "Le salon de bienvenue a été défini sur {channel}.",
+            error: "Impossible de définir le salon de bienvenue en raison de: {error}"
         }
     },
     events: {

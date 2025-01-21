@@ -6,6 +6,7 @@ const {
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const LanguageManager = require("../../utils/LanguageManager");
 
 function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
@@ -53,11 +54,24 @@ module.exports = new ApplicationCommand({
    * @param {DiscordBot} client
    * @param {ChatInputCommandInteraction} interaction
    */ run: async (client, interaction) => {
+
+    if (
+      !interaction.member.permissions.has([
+        PermissionsBitField.Flags.Administrator,
+      ])
+    ) {
+      await interaction.reply({
+        content: LanguageManager.getText('commands.global_strings.no_permission', lang),
+        flags: [MessageFlags.Ephemeral],
+      });
+      return;
+    }
+    // Get guild settings for language
+    const settings = client.database.get("settings") || [];
+    const guildSettings = settings.find(setting => setting.guild === interaction.guild.id);
+    const lang = guildSettings?.language || 'en';
+
     const channel = interaction.options.getChannel("channel");
-    let settings = client.database.get("settings") || [];
-    let guildSettings = settings.find(
-      (setting) => setting.guild === interaction.guild.id
-    );
 
     if (!guildSettings) {
       guildSettings = { guild: interaction.guild.id };
@@ -71,15 +85,22 @@ module.exports = new ApplicationCommand({
     guildSettings.welcomeChannel = channel.id;
 
     await interaction.reply({
-      content: `The welcome channel has been set to <#${channel.id}>.`,
+      content: LanguageManager.getText('commands.setwelcomechannel.channel_set', lang, {
+        channel: `<#${channel.id}>`
+      }),
       flags: [MessageFlags.Ephemeral],
     });
+
     try {
       client.database.set("settings", settings);
     } catch (error) {
-      console.error(
-        `Failed to set the welcome channel due to: ${error.message}.`
-      );
+      console.error(`Failed to set the welcome channel due to: ${error.message}.`);
+      await interaction.editReply({
+        content: LanguageManager.getText('commands.setwelcomechannel.error', lang, {
+          error: error.message
+        }),
+        flags: [MessageFlags.Ephemeral],
+      });
     }
   },
 }).toJSON();

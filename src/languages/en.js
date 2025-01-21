@@ -85,6 +85,10 @@ module.exports = {
                 description: "The current servertime is: {time}",
                 footer: "Requested by: {user}"
             }
+        },
+        setwelcomechannel: {
+            channel_set: "The welcome channel has been set to {channel}.",
+            error: "Failed to set the welcome channel due to: {error}"
         }
     },
     events: {
