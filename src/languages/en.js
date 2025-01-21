@@ -74,6 +74,10 @@ module.exports = {
                     teams: "PvP Teams ({type}): {name} (Rating: {rating}, Rank: {rank})"
                 }
             }
+        },
+        setwelcomemessage: {
+            dm_not_enabled: "The welcome DM is not enabled.",
+            updated: "The welcome message has been updated."
         }
     },
     events: {

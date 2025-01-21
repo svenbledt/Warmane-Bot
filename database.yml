@@ -26,16 +26,13 @@ settings:
     CharNameAsk: true
     BlockList: true
     guildName: Warmane Tool
-    charNameAskDM: >-
-      Hey, I would like to ask you for your main Character name.
+    charNameAskDM: |-
+      Hey, we kindly want to ask you how we should name you :)
 
-      Please respond with your main Character name for the Server.
-
-
-      (Your response will not be stored by this Application and is only used for
-      the Guilds nickname)
+      Please Respond with the name you want to be called.
+      The Response will not be stored on the database!
     lastOwnerDM: {}
-    language: de
+    language: en
   - guild: '298051398103334912'
     welcomeMessage: false
     welcomeChannel: ''

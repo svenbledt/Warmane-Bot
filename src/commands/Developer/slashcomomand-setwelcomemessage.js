@@ -2,9 +2,11 @@ const {
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
   PermissionsBitField,
+  MessageFlags,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const LanguageManager = require("../../utils/LanguageManager");
 
 function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
@@ -61,7 +63,7 @@ module.exports = new ApplicationCommand({
       ])
     ) {
       await interaction.reply({
-        content: `You don't have the required permissions to use this command.`,
+        content: LanguageManager.getText('commands.global_strings.no_permission', lang),
         flags: [MessageFlags.Ephemeral],
       });
       return;
@@ -72,6 +74,7 @@ module.exports = new ApplicationCommand({
     let guildSettings = settings.find(
       (setting) => setting.guild === interaction.guild.id
     );
+    const lang = guildSettings.language || "en";
 
     // If the guild settings do not exist, create them
     if (!guildSettings) {
@@ -86,11 +89,15 @@ module.exports = new ApplicationCommand({
     }
 
     // Get the welcome message from the interaction options
-    const charNameAskDM = interaction.options.getString("text");
+    let charNameAskDM = interaction.options.getString("text");
+    
+    // Replace literal "\n" with actual newlines
+    charNameAskDM = charNameAskDM.replace(/\\n/g, '\n');
+
     if (!guildSettings.CharNameAsk) {
       // if the welcome message is not enabled, dont continue
       await interaction.reply({
-        content: "The welcome DM is not enabled.",
+        content: LanguageManager.getText('commands.setwelcomemessage.dm_not_enabled', lang),
         flags: [MessageFlags.Ephemeral],
       });
       return;
@@ -103,7 +110,7 @@ module.exports = new ApplicationCommand({
 
     // Reply to the interaction to confirm the update
     await interaction.reply({
-      content: "The welcome message has been updated.",
+      content: LanguageManager.getText('commands.setwelcomemessage.updated', lang),
       flags: [MessageFlags.Ephemeral],
     });
   },

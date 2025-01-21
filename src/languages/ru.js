@@ -74,6 +74,10 @@ module.exports = {
                     teams: "PvP команды ({type}): {name} (Рейтинг: {rating}, Ранг: {rank})"
                 }
             }
+        },
+        setwelcomemessage: {
+            dm_not_enabled: "Приветственное личное сообщение не включено.",
+            updated: "Приветственное сообщение обновлено."
         }
     },
     events: {

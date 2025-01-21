@@ -74,6 +74,10 @@ module.exports = {
                     teams: "Équipes JcJ ({type}): {name} (Cote: {rating}, Rang: {rank})"
                 }
             }
+        },
+        setwelcomemessage: {
+            dm_not_enabled: "Le message de bienvenue en MP n'est pas activé.",
+            updated: "Le message de bienvenue a été mis à jour."
         }
     },
     events: {

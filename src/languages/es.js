@@ -74,6 +74,10 @@ module.exports = {
                     teams: "Equipos JcJ ({type}): {name} (Clasificación: {rating}, Rango: {rank})"
                 }
             }
+        },
+        setwelcomemessage: {
+            dm_not_enabled: "El mensaje de bienvenida por MD no está activado.",
+            updated: "El mensaje de bienvenida ha sido actualizado."
         }
     },
     events: {
