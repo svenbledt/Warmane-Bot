@@ -16,20 +16,19 @@ module.exports = new ApplicationCommand({
     cooldown: 5000,
   },
   /**
-   *
    * @param {DiscordBot} client
    * @param {UserContextMenuCommandInteraction} interaction
    */
   run: async (client, interaction) => {
     const member = interaction.targetMember;
-    // You can get the guild's preferred language from settings, defaulting to 'en'
+    // Get guild settings for language and custom DM message
     const settings = client.database.get("settings") || [];
     const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
     const lang = guildSettings?.language || 'en';
 
     if (!interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers])) {
       await interaction.reply({
-        content: LanguageManager.getText('commands.charname.no_permission', lang),
+        content: LanguageManager.getText('commands.global_strings.no_permission', lang),
         flags: [MessageFlags.Ephemeral],
       });
       return;
@@ -37,103 +36,89 @@ module.exports = new ApplicationCommand({
 
     if (!member) {
       await interaction.reply({
-        content: LanguageManager.getText('commands.charname.invalid_target', lang),
+        content: LanguageManager.getText('commands.global_strings.invalid_target', lang),
+        flags: [MessageFlags.Ephemeral],
       });
       return;
     }
 
-    // Send message to the user and await for his response with his character main name
     try {
-      await member.send(LanguageManager.getText('commands.charname.dm_initial', lang));
+      // Use the custom DM message from database or fallback to default
+      const dmMessage = guildSettings?.charNameAskDM || 
+                       LanguageManager.getText('commands.charname.dm_initial', lang);
+      await member.send(dmMessage);
     } catch (error) {
-      console.error(`Failed to send a DM to ${member.tag}.`);
+      console.error(`Failed to send a DM to ${member.user.tag}.`);
       await interaction.reply({
-        content: LanguageManager.getText('commands.charname.dm_failed', lang, { username: member.tag }),
+        content: LanguageManager.getText('commands.global_strings.dm_failed', lang, {
+          username: member.user.tag
+        }),
         flags: [MessageFlags.Ephemeral],
       });
       return;
     }
-    // Reply to the interaction
-    try {
-      await interaction.reply({
-        content: LanguageManager.getText('commands.charname.dm_sent', lang),
-        flags: [MessageFlags.Ephemeral],
-      });
-    } catch (error) {
-      console.error(`Failed to reply to the interaction.`);
-      return;
-    }
-    // Await for users response to the DM and change his nickname
+
+    await interaction.reply({
+      content: LanguageManager.getText('commands.global_strings.dm_sent', lang, {
+        username: member.user.tag
+      }),
+      flags: [MessageFlags.Ephemeral],
+    });
+
     const filter = (m) => m.author.id === member.id;
-    if (!member.dmChannel) {
-      member
-        .createDM()
-        .then((dmChannel) => {
-          dmChannel
-            .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
-            .then((collected) => {
-              let response = collected.first().content;
-              // Replace special characters and numbers
-              response = response.replace(/[^a-zA-Z ]/g, "");
-              if (response.trim() === "") {
-                dmChannel.send(LanguageManager.getText('commands.charname.empty_response', lang));
-              } else {
-                member
-                  .setNickname(response)
-                  .then(() => {
-                    console.log(
-                      `Changed ${member.user.tag} nickname to ${response}.`
-                    );
-                    dmChannel.send(LanguageManager.getText('commands.charname.nickname_success', lang, { nickname: response }));
-                  })
-                  .catch((error) => {
-                    console.error(
-                      `Failed to change ${member.user.tag} nickname to ${response}.`
-                    );
-                    dmChannel.send(LanguageManager.getText('commands.charname.nickname_failed', lang, { error: error.message }));
-                  });
-              }
+    const handleResponse = async (collected) => {
+      let response = collected.first().content;
+      response = response.replace(/[^a-zA-Z ]/g, "");
+      
+      if (response.trim() === "") {
+        await member.dmChannel.send(
+          LanguageManager.getText('commands.charname.empty_response', lang)
+        );
+      } else {
+        try {
+          await member.setNickname(response);
+          console.log(`Changed ${member.user.tag} nickname to ${response}.`);
+          await member.dmChannel.send(
+            LanguageManager.getText('commands.charname.nickname_success', lang, {
+              nickname: response
             })
-            .catch((error) => {
-              console.error(
-                `Failed to get a response from ${member.user.tag}.`
-              );
-            });
-        })
-        .catch((error) => {
-          console.error(
-            `Failed to create a DM channel with ${member.user.tag}.`
           );
+        } catch (error) {
+          console.error(`Failed to change ${member.user.tag} nickname to ${response}.`);
+          await member.dmChannel.send(
+            LanguageManager.getText('commands.charname.nickname_failed', lang, {
+              error: error.message
+            })
+          );
+        }
+      }
+    };
+
+    if (!member.dmChannel) {
+      try {
+        const dmChannel = await member.createDM();
+        const collected = await dmChannel.awaitMessages({ 
+          filter, 
+          max: 1, 
+          time: 60000, 
+          errors: ["time"] 
         });
+        await handleResponse(collected);
+      } catch (error) {
+        console.error(`Failed to get a response from ${member.user.tag}.`);
+      }
     } else {
-      member.dmChannel
-        .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
-        .then((collected) => {
-          let response = collected.first().content;
-          // Replace special characters and numbers
-          response = response.replace(/[^a-zA-Z ]/g, "");
-          if (response.trim() === "") {
-            member.dmChannel.send(LanguageManager.getText('commands.charname.empty_response', lang));
-          } else {
-            member
-              .setNickname(response)
-              .then(() => {
-                console.log(
-                  `Changed ${member.user.tag} nickname to ${response}.`
-                );
-                member.dmChannel.send(LanguageManager.getText('commands.charname.nickname_success', lang, { nickname: response }));
-              })
-              .catch((error) => {
-                console.error(
-                  `Failed to change ${member.user.tag} nickname to ${response}.`
-                );
-                member.dmChannel.send(LanguageManager.getText('commands.charname.nickname_failed', lang, { error: error.message }));
-              });
-          }
-        })
-        .catch((error) => {
-          console.error(`Failed to get a response from ${member.user.tag}.`);
+      try {
+        const collected = await member.dmChannel.awaitMessages({ 
+          filter, 
+          max: 1, 
+          time: 60000, 
+          errors: ["time"] 
         });
+        await handleResponse(collected);
+      } catch (error) {
+        console.error(`Failed to get a response from ${member.user.tag}.`);
+      }
     }
   },
 }).toJSON();

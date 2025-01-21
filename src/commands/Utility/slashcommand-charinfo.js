@@ -12,6 +12,7 @@ const cheerio = require("cheerio");
 const axios = require("axios");
 const rateLimit = require("axios-rate-limit");
 const itemsDB = require("../../itemsdb.json");
+const LanguageManager = require("../../utils/LanguageManager");
 
 // Define an axios instance with rate limit applied
 const https = rateLimit(axios.create(), {
@@ -65,6 +66,10 @@ module.exports = new ApplicationCommand({
     const charName = interaction.options.getString("character", true);
     const realm = interaction.options.getString("realm", true);
     let invisible = interaction.options.getBoolean("invisible", false);
+    const settings = client.database.get("settings") || [];
+    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const lang = guildSettings?.language || 'en';
+
     const charNameFormatted =
       charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
 
@@ -78,21 +83,25 @@ module.exports = new ApplicationCommand({
       // If the character does not exist, return an error message
       if (!characterData || !characterData.name) {
         return interaction.reply({
-          content: `The character ${charNameFormatted} does not exist.`,
+          content: LanguageManager.getText('commands.charinfo.char_not_exist', lang, {
+            character: charNameFormatted
+          }),
           flags: [MessageFlags.Ephemeral],
         });
       }
     } catch (error) {
       console.error("Error:", error);
       return interaction.reply({
-        content: `An error occurred while fetching the character data.`,
+        content: LanguageManager.getText('commands.global_strings.error_occurred', lang, {
+          error: error.message
+        }),
         flags: [MessageFlags.Ephemeral],
       });
     }
 
     // Immediately reply to the interaction with a loading state
     await interaction.deferReply({
-      content: "We're looking for your data. Please be patient.",
+      content: LanguageManager.getText('commands.charinfo.loading', lang),
       flags: invisible ? [MessageFlags.Ephemeral] : [],
     });
 
@@ -127,7 +136,9 @@ module.exports = new ApplicationCommand({
         // If the character does not exist, return an error message
         if (!data || !data.name) {
           return interaction.editReply({
-            content: `The character ${charNameFormatted} does not exist.`,
+            content: LanguageManager.getText('commands.charinfo.char_not_exist', lang, {
+              character: charNameFormatted
+            }),
             flags: [MessageFlags.Ephemeral],
           });
         }
@@ -468,9 +479,12 @@ module.exports = new ApplicationCommand({
             // If the character is found, create an embed with the information
             const embed = new EmbedBuilder()
               .setColor(character.color || "#8B0000")
-              .setTitle("Character Information")
+              .setTitle(LanguageManager.getText('commands.charinfo.embed.title', lang))
               .setDescription(
-                `Information about ${charNameFormatted} - [Armory](${armoryLink})`
+                LanguageManager.getText('commands.charinfo.embed.description', lang, {
+                  character: charNameFormatted,
+                  url: armoryLink
+                })
               )
               .setThumbnail(character.portrait)
               .setTimestamp(new Date())
@@ -481,35 +495,35 @@ module.exports = new ApplicationCommand({
 
             // Add fields to the embed
             const fields = [
-              { name: "Character", value: character.name, inline: true },
-              { name: "Realm", value: character.realm, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.character', lang), value: character.name, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.realm', lang), value: character.realm, inline: true },
               {
-                name: "Online",
-                value: character.online ? "Yes" : "No",
+                name: LanguageManager.getText('commands.charinfo.embed.fields.online', lang),
+                value: character.online ? LanguageManager.getText('commands.charinfo.embed.fields.yes', lang) : LanguageManager.getText('commands.charinfo.embed.fields.no', lang),
                 inline: true,
               },
-              { name: "Level", value: character.level, inline: true },
-              { name: "Faction", value: character.faction, inline: true },
-              { name: "Gender", value: character.gender, inline: true },
-              { name: "Race", value: character.race, inline: true },
-              { name: "Class", value: character.class, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.level', lang), value: character.level, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.faction', lang), value: character.faction, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.gender', lang), value: character.gender, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.race', lang), value: character.race, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.class', lang), value: character.class, inline: true },
               {
-                name: "Honorable Kills",
+                name: LanguageManager.getText('commands.charinfo.embed.fields.honorable_kills', lang),
                 value: character.honorableKills,
                 inline: true,
               },
-              { name: "Guild", value: character.guild, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.guild', lang), value: character.guild, inline: true },
               {
-                name: "Achievement Points",
+                name: LanguageManager.getText('commands.charinfo.embed.fields.achievement_points', lang),
                 value: character.achievementPoints,
                 inline: true,
               },
               {
-                name: "Talents",
+                name: LanguageManager.getText('commands.charinfo.embed.fields.talents', lang),
                 value: character.talents.join(", "),
                 inline: true,
               },
-              { name: "GearScore", value: totalGearScoreString, inline: true },
+              { name: LanguageManager.getText('commands.charinfo.embed.fields.gearscore', lang), value: totalGearScoreString, inline: true },
             ];
 
             // Only add fields with non-empty values
@@ -525,7 +539,7 @@ module.exports = new ApplicationCommand({
                 .map((profession) => `${profession.name}: ${profession.skill}`)
                 .join("\n");
               embed.addFields({
-                name: "Professions",
+                name: LanguageManager.getText('commands.charinfo.embed.fields.professions', lang),
                 value: professions,
                 inline: true,
               });
@@ -536,11 +550,16 @@ module.exports = new ApplicationCommand({
               const pvpteams = data.pvpteams
                 .map(
                   (team) =>
-                    `${team.type}: ${team.name} (Rating: ${team.rating}, Rank: ${team.rank})`
+                    LanguageManager.getText('commands.charinfo.embed.fields.teams', lang, {
+                      type: team.type,
+                      name: team.name,
+                      rating: team.rating,
+                      rank: team.rank
+                    })
                 )
                 .join("\n");
               embed.addFields({
-                name: "PvP Teams",
+                name: LanguageManager.getText('commands.charinfo.embed.fields.pvp_teams', lang),
                 value: pvpteams,
                 inline: true,
               });
@@ -548,12 +567,12 @@ module.exports = new ApplicationCommand({
 
             // Check if the character has missing gems
             const gems = missingGems.join("\n");
-            embed.addFields({ name: "Missing Gems", value: gems || "None" });
+            embed.addFields({ name: LanguageManager.getText('commands.charinfo.embed.fields.missing_gems', lang), value: gems || "None" });
 
             // Check if the character has missing enchants
             const enchants = missingEnchants.join("\n");
             embed.addFields({
-              name: "Missing Enchants",
+              name: LanguageManager.getText('commands.charinfo.embed.fields.missing_enchants', lang),
               value: enchants || "None",
             });
 

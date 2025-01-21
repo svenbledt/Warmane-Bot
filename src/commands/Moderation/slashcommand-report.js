@@ -6,6 +6,7 @@ const {
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const LanguageManager = require("../../utils/LanguageManager");
 
 module.exports = new ApplicationCommand({
   command: {
@@ -25,8 +26,17 @@ module.exports = new ApplicationCommand({
    * @param {ChatInputCommandInteraction} interaction
    */
   run: async (client, interaction) => {
-    if (!interaction.guild)
-      return interaction.reply("This command can only be used in a server.");
+    // Get guild settings for language
+    const settings = client.database.get("settings") || [];
+    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const lang = guildSettings?.language || 'en';
+
+    if (!interaction.guild) {
+      return interaction.reply({
+        content: LanguageManager.getText('commands.global_strings.guild_only', lang),
+        flags: [MessageFlags.Ephemeral],
+      });
+    }
     // check if the user has ban permission on the guild
     if (
       !interaction.member.permissions.has([
@@ -35,14 +45,14 @@ module.exports = new ApplicationCommand({
       ])
     ) {
       await interaction.reply({
-        content: `You don't have the required permissions to use this command.`,
+        content: LanguageManager.getText('commands.global_strings.no_permission', lang),
         flags: [MessageFlags.Ephemeral],
       });
       return;
     }
     await interaction.showModal({
       custom_id: "report-modal-id",
-      title: "Report User",
+      title: LanguageManager.getText('commands.report.modal.title', lang),
       components: [
         {
           type: 1,
@@ -50,10 +60,10 @@ module.exports = new ApplicationCommand({
             {
               type: 4,
               custom_id: "report-modal-id-field-1",
-              label: "Username of reported user?",
+              label: LanguageManager.getText('commands.report.modal.username_label', lang),
               max_length: 15,
               min_length: 2,
-              placeholder: "Enter the username/discord id here!",
+              placeholder: LanguageManager.getText('commands.report.modal.username_placeholder', lang),
               style: 1,
               required: true,
             },
@@ -65,10 +75,10 @@ module.exports = new ApplicationCommand({
             {
               type: 4,
               custom_id: "report-modal-id-field-2",
-              label: "Reason",
+              label: LanguageManager.getText('commands.report.modal.reason_label', lang),
               max_length: 200,
               min_length: 10,
-              placeholder: "Enter the reason here!",
+              placeholder: LanguageManager.getText('commands.report.modal.reason_placeholder', lang),
               style: 2,
               required: true,
             },
@@ -80,10 +90,10 @@ module.exports = new ApplicationCommand({
             {
               type: 4,
               custom_id: "report-modal-id-field-3",
-              label: "Provide your evidence.",
+              label: LanguageManager.getText('commands.report.modal.evidence_label', lang),
               max_length: 45,
               min_length: 2,
-              placeholder: "https://imgur.com/blablabla!",
+              placeholder: LanguageManager.getText('commands.report.modal.evidence_placeholder', lang),
               style: 1,
               required: true,
             },

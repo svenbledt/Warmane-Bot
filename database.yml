@@ -35,7 +35,7 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
-    language: en
+    language: de
   - guild: '298051398103334912'
     welcomeMessage: false
     welcomeChannel: ''
@@ -262,3 +262,19 @@ settings:
       the Guilds nickname)
     lastOwnerDM: {}
     language: en
+  - guild: '1325151914827976794'
+    guildName: Caverna
+    welcomeMessage: false
+    welcomeChannel: ''
+    CharNameAsk: false
+    BlockList: true
+    language: en
+    charNameAskDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
+    lastOwnerDM: {}

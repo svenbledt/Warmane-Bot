@@ -11,72 +11,53 @@ const LanguageManager = require("../../utils/LanguageManager");
 module.exports = new ApplicationCommand({
   command: {
     name: "language",
-    description: "Set the bot's language for this server",
+    description: "Change the language of the bot for this server.",
     type: 1,
     contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "language",
-        description: "Choose the language",
-        type: 3, // STRING type
+        description: "Select the language you want to use.",
+        type: ApplicationCommandOptionType.String,
         required: true,
         choices: [
-          {
-            name: "English",
-            value: "en",
-          },
-          {
-            name: "Deutsch",
-            value: "de",
-          },
-          {
-            name: "Русский",
-            value: "ru",
-          },
-          {
-            name: "Français",
-            value: "fr",
-          },
-          {
-            name: "Español",
-            value: "es",
-          },
+          { name: "English", value: "en" },
+          { name: "Deutsch", value: "de" },
+          { name: "Русский", value: "ru" },
+          { name: "Français", value: "fr" },
+          { name: "Español", value: "es" },
         ],
       },
     ],
   },
-  options: {},
+  options: {
+    cooldown: 5000,
+  },
   run: async (client, interaction) => {
-    const newLanguage = interaction.options.getString("language");
-    let settings = client.database.get("settings") || [];
-    let guildSettings = settings.find(
-      (setting) => setting.guild === interaction.guildId
-    );
+    // Get current guild settings
+    const settings = client.database.get("settings") || [];
+    const currentLang = settings.find(setting => setting.guild === interaction.guildId)?.language || 'en';
 
-    // Get current language for error message
-    const currentLang = guildSettings?.language || "en";
-
-    if (
-      !interaction.member.permissions.has([
-        PermissionsBitField.Flags.BanMembers,
-      ])
-    ) {
+    if (!interaction.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
       await interaction.reply({
-        content: LanguageManager.getText('commands.language.no_permission', currentLang),
+        content: LanguageManager.getText('commands.global_strings.no_permission', currentLang),
         flags: [MessageFlags.Ephemeral],
       });
       return;
     }
 
-    if (!guildSettings) {
-      guildSettings = {
+    const newLanguage = interaction.options.getString("language", true);
+    
+    // Update or create guild settings
+    const guildIndex = settings.findIndex(setting => setting.guild === interaction.guildId);
+    if (guildIndex !== -1) {
+      settings[guildIndex].language = newLanguage;
+    } else {
+      settings.push({
         guild: interaction.guildId,
-        language: "en",
-      };
-      settings.push(guildSettings);
+        language: newLanguage
+      });
     }
-
-    guildSettings.language = newLanguage;
     client.database.set("settings", settings);
 
     const languageNames = {
@@ -87,7 +68,6 @@ module.exports = new ApplicationCommand({
       es: "Español",
     };
 
-    // Use the new language for success message
     await interaction.reply({
       content: LanguageManager.getText('commands.language.success', newLanguage, {
         language: languageNames[newLanguage]
