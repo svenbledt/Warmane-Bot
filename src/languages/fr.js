@@ -89,6 +89,18 @@ module.exports = {
         setwelcomechannel: {
             channel_set: "Le salon de bienvenue a été défini sur {channel}.",
             error: "Impossible de définir le salon de bienvenue en raison de: {error}"
+        },
+        help: {
+            EMBED: {
+                TITLE: "Commandes Disponibles",
+                DESCRIPTION: "Voici une liste de toutes les commandes disponibles et leurs descriptions :",
+                FOOTER: "Demandé par {USER_TAG}"
+            },
+            NO_DESCRIPTION: "Aucune description disponible",
+            BUTTONS: {
+                PREVIOUS: "Précédent",
+                NEXT: "Suivant"
+            }
         }
     },
     events: {

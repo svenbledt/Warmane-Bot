@@ -89,6 +89,18 @@ module.exports = {
         setwelcomechannel: {
             channel_set: "Канал приветствия установлен на {channel}.",
             error: "Не удалось установить канал приветствия из-за: {error}"
+        },
+        help: {
+            EMBED: {
+                TITLE: "Доступные команды",
+                DESCRIPTION: "Вот список всех доступных команд и их описаний:",
+                FOOTER: "Запрошено пользователем {USER_TAG}"
+            },
+            NO_DESCRIPTION: "Описание отсутствует",
+            BUTTONS: {
+                PREVIOUS: "Назад",
+                NEXT: "Вперед"
+            }
         }
     },
     events: {

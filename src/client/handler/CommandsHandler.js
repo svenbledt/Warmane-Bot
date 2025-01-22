@@ -22,10 +22,11 @@ class CommandsHandler {
         (f) => f.endsWith(".js")
       )) {
         try {
+          const filePath = `../../commands/${directory}/${file}`;
           /**
            * @type {ApplicationCommand['data'] | MessageCommand['data']}
            */
-          const module = require("../../commands/" + directory + "/" + file);
+          const module = require(filePath);
 
           if (!module) continue;
 
@@ -34,6 +35,9 @@ class CommandsHandler {
               error("Unable to load the message command " + file);
               continue;
             }
+
+            module.category = directory;
+            module.filePath = filePath;
 
             this.client.collection.message_commands.set(
               module.command.name,
@@ -58,6 +62,9 @@ class CommandsHandler {
               error("Unable to load the application command " + file);
               continue;
             }
+
+            module.category = directory;
+            module.filePath = filePath;
 
             this.client.collection.application_commands.set(
               module.command.name,

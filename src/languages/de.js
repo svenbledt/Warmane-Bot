@@ -89,6 +89,18 @@ module.exports = {
         setwelcomechannel: {
             channel_set: "Der Willkommenskanal wurde auf {channel} gesetzt.",
             error: "Fehler beim Setzen des Willkommenskanals: {error}"
+        },
+        help: {
+            EMBED: {
+                TITLE: "Verfügbare Befehle",
+                DESCRIPTION: "Hier ist eine Liste aller verfügbaren Befehle und ihrer Beschreibungen:",
+                FOOTER: "Angefordert von {USER_TAG}"
+            },
+            NO_DESCRIPTION: "Keine Beschreibung verfügbar",
+            BUTTONS: {
+                PREVIOUS: "Zurück",
+                NEXT: "Weiter"
+            }
         }
     },
     events: {
