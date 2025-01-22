@@ -22,7 +22,18 @@ module.exports = {
             no_blacklisted_guild: "There are no blacklisted users in the guild.",
             not_for_you: "These buttons are not for you!",
             embed_title: "Blacklisted Users",
-            blacklisted_user: "ID: <@{userId}>\nReason: {reason}"
+            blacklisted_user: "ID: <@{userId}>\nReason: {reason}",
+            BUTTONS: {
+                KICK: "Kick them",
+                BAN: "Ban them",
+                NOTHING: "Do nothing"
+            },
+            ACTION_RESULTS: {
+                KICKED: "Successfully kicked %COUNT% members",
+                BANNED: "Successfully banned %COUNT% members",
+                NOTHING: "No action taken",
+                FAILED: "Failed to process %COUNT% members"
+            }
         },
         report: {
             modal: {

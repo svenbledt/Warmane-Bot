@@ -22,7 +22,18 @@ module.exports = {
             no_blacklisted_guild: "Es gibt keine Benutzer auf der schwarzen Liste in diesem Server.",
             not_for_you: "Diese Schaltflächen sind nicht für dich!",
             embed_title: "Benutzer auf der schwarzen Liste",
-            blacklisted_user: "ID: <@{userId}>\nGrund: {reason}"
+            blacklisted_user: "ID: <@{userId}>\nGrund: {reason}",
+            BUTTONS: {
+                KICK: "Kicken",
+                BAN: "Bannen",
+                NOTHING: "Nichts tun"
+            },
+            ACTION_RESULTS: {
+                KICKED: "%COUNT% Mitglieder erfolgreich gekickt",
+                BANNED: "%COUNT% Mitglieder erfolgreich gebannt",
+                NOTHING: "Keine Aktion durchgeführt",
+                FAILED: "Konnte %COUNT% Mitglieder nicht verarbeiten"
+            }
         },
         report: {
             modal: {

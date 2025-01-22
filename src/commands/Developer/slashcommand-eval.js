@@ -10,13 +10,13 @@ const ApplicationCommand = require("../../structure/ApplicationCommand");
 module.exports = new ApplicationCommand({
   command: {
     name: "eval",
-    description: "Execute a JavaScript code.",
+    description: "Evaluates JavaScript code.",
     type: 1,
     contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
       {
         name: "code",
-        description: "The code to execute.",
+        description: "The code to evaluate",
         type: ApplicationCommandOptionType.String,
         required: true,
       },

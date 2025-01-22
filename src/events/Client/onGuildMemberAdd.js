@@ -1,6 +1,7 @@
 const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const LanguageManager = require("../../utils/LanguageManager");
+const config = require("../../config");
 
 function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
@@ -52,21 +53,31 @@ module.exports = new Event({
 
     if (member.user.bot) return;
 
-    if (BlockListEnabled && obj.includes(member.id)) {
+    // Check if user is blacklisted
+    const blacklistedUser = obj.find(u => u.id === member.id);
+    if (BlockListEnabled && blacklistedUser) {
+      // Skip if this is the Warmane Tool Discord server
+      if (member.guild.id === config.development.guildId) {
+        return;
+      }
+
       try {
         await member.send(
           LanguageManager.getText('events.guildMemberAdd.blacklisted', lang)
         );
       } catch (error) {
-        console.error(`Failed to send a DM to ${member.tag}.`);
-        return;
+        console.error(`Failed to send a DM to ${member.user.tag}.`);
       }
+
       try {
-        await member.kick("Blacklisted user.");
-        success(`Kicked ${member.user.tag} due to being blacklisted.`);
+        await member.ban({
+          reason: `Blacklisted user. Reason: ${blacklistedUser.reason || 'No reason provided'}`,
+          deleteMessageSeconds: 60 * 60 * 24 * 7 // 7 days of messages
+        });
+        success(`Banned ${member.user.tag} due to being blacklisted.`);
       } catch (error) {
         console.error(
-          `Failed to kick ${member.user.tag} due to: ${error.message}.`
+          `Failed to ban ${member.user.tag} due to: ${error.message}.`
         );
       }
       return;

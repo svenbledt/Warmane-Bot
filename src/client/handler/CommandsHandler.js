@@ -81,13 +81,15 @@ class CommandsHandler {
                 file
             );
           }
-        } catch {
+        } catch (error) {
           error(
             "Unable to load a command from the path: " +
               "src/commands/" +
               directory +
               "/" +
-              file
+              file +
+              "\n" +
+              error
           );
         }
       }

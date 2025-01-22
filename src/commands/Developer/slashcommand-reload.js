@@ -10,10 +10,9 @@ const config = require("../../config");
 module.exports = new ApplicationCommand({
   command: {
     name: "reload",
-    description: "Reload every command.",
+    description: "Reloads all commands.",
     type: 1,
     contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
-    options: [],
   },
   options: {
     botDevelopers: true,

@@ -10,6 +10,7 @@ const {
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const LanguageManager = require("../../utils/LanguageManager");
+const config = require("../../config");
 
 module.exports = new ApplicationCommand({
   command: {
@@ -31,10 +32,14 @@ module.exports = new ApplicationCommand({
     const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
     const lang = guildSettings?.language || 'en';
 
-    if (!interaction.member.permissions.has([
+    // Check if user is a developer or has required permissions
+    const isDeveloper = config.users?.developers?.includes(interaction.user.id);
+    const hasPermissions = interaction.member.permissions.has([
       PermissionsBitField.Flags.KickMembers,
       PermissionsBitField.Flags.BanMembers,
-    ])) {
+    ]);
+
+    if (!isDeveloper && !hasPermissions) {
       await interaction.reply({
         content: LanguageManager.getText('commands.global_strings.no_permission', lang),
         flags: [MessageFlags.Ephemeral],
@@ -67,6 +72,22 @@ module.exports = new ApplicationCommand({
       });
       return;
     }
+
+    // Create action buttons
+    const actionRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("kick")
+        .setLabel(LanguageManager.getText('commands.globalcheck.BUTTONS.KICK', lang))
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("ban")
+        .setLabel(LanguageManager.getText('commands.globalcheck.BUTTONS.BAN', lang))
+        .setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("nothing")
+        .setLabel(LanguageManager.getText('commands.globalcheck.BUTTONS.NOTHING', lang))
+        .setStyle(ButtonStyle.Primary)
+    );
 
     // Create embeds for each blacklisted member (5 per page)
     let embeds = [];
@@ -103,43 +124,99 @@ module.exports = new ApplicationCommand({
         .setDisabled(embeds.length === 1) // Disable if only one page
     );
 
-    // Send the first embed and the buttons
-    await interaction.reply({ embeds: [embeds[0]], components: [row] });
+    // Send the first embed with action buttons
+    await interaction.reply({ 
+      embeds: [embeds[0]], 
+      components: [row, actionRow],
+      flags: [MessageFlags.Ephemeral]
+    });
     let message = await interaction.fetchReply();
 
-    // Create a collector to listen for button clicks
-    const filter = (i) => i.customId === "previous" || i.customId === "next";
+    // Create collectors for both navigation and action buttons
+    const filter = i => {
+      const validButtons = ["previous", "next", "kick", "ban", "nothing"];
+      return validButtons.includes(i.customId) && i.user.id === interaction.user.id;
+    };
+
     const collector = message.createMessageComponentCollector({
       filter,
       time: 60000,
     });
 
     let currentPage = 0;
-    collector.on("collect", async (interaction) => {
-      // Ensure the interaction is from the same user
-      if (interaction.user.id !== message.user.id) {
-        return interaction.reply({
-          content: LanguageManager.getText('commands.globalcheck.not_for_you', lang),
-          flags: [MessageFlags.Ephemeral],
+    let actionTaken = false;
+
+    collector.on("collect", async (i) => {
+      // Handle navigation buttons
+      if (i.customId === "previous" || i.customId === "next") {
+        if (i.customId === "previous") {
+          currentPage = currentPage > 0 ? --currentPage : embeds.length - 1;
+        } else {
+          currentPage = currentPage + 1 < embeds.length ? ++currentPage : 0;
+        }
+        await i.update({ 
+          embeds: [embeds[currentPage]],
+          components: actionTaken ? [row] : [row, actionRow]
+        });
+        return;
+      }
+
+      // Handle action buttons
+      if (["kick", "ban", "nothing"].includes(i.customId)) {
+        actionTaken = true;
+        let successCount = 0;
+        let failCount = 0;
+
+        if (i.customId === "nothing") {
+          await i.update({ 
+            content: LanguageManager.getText('commands.globalcheck.ACTION_RESULTS.NOTHING', lang),
+            components: [row]
+          });
+          return;
+        }
+
+        // Process kick/ban action
+        for (const member of blacklistedMembers) {
+          try {
+            if (i.customId === "kick") {
+              await member.kick(`Global Blacklist Check - Kicked by ${interaction.user.tag}`);
+              successCount++;
+            } else if (i.customId === "ban") {
+              await member.ban({
+                reason: `Global Blacklist Check - Banned by ${interaction.user.tag}`,
+                deleteMessageSeconds: 60 * 60 * 24 * 7 // 7 days
+              });
+              successCount++;
+            }
+          } catch (error) {
+            console.error(`Failed to ${i.customId} member ${member.user.tag}:`, error);
+            failCount++;
+          }
+        }
+
+        // Update message with results
+        const actionResult = i.customId === "kick" ? 
+          LanguageManager.getText('commands.globalcheck.ACTION_RESULTS.KICKED', lang, { COUNT: successCount }) :
+          LanguageManager.getText('commands.globalcheck.ACTION_RESULTS.BANNED', lang, { COUNT: successCount });
+
+        const failResult = failCount > 0 ? 
+          `\n${LanguageManager.getText('commands.globalcheck.ACTION_RESULTS.FAILED', lang, { COUNT: failCount })}` : 
+          '';
+
+        await i.update({ 
+          content: actionResult + failResult,
+          components: [row]
         });
       }
-
-      // Update the current page number based on the button that was clicked
-      if (interaction.customId === "previous") {
-        currentPage = currentPage > 0 ? --currentPage : embeds.length - 1;
-      } else {
-        currentPage = currentPage + 1 < embeds.length ? ++currentPage : 0;
-      }
-
-      // Update the message to show the new page
-      await interaction.update({ embeds: [embeds[currentPage]] });
     });
 
     collector.on("end", async () => {
-      // Delete the original message
-      await message.delete();
-      // Send a new message with the same content but without the buttons
-      await interaction.channel.send({ embeds: [embeds[currentPage]] });
+      if (interaction.replied) {
+        await interaction.editReply({
+          embeds: [embeds[currentPage]],
+          components: [],
+        });
+      }
     });
   },
 }).toJSON();

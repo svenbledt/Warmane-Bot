@@ -53,7 +53,7 @@ const config = {
     NOT_BOT_OWNER:
       "You do not have the permission to run this command because you're not the owner of me!",
     NOT_BOT_DEVELOPER:
-      "This function is at the moment limited to developers of the bot for testing purposes!",
+      "This function is limited to Staff only! Please contact a Staff member if you need this function.",
     NOT_GUILD_OWNER:
       "You do not have the permission to run this command because you\re not the guild owner!",
     CHANNEL_NOT_NSFW: "You cannot run this command in a non-NSFW channel!",
