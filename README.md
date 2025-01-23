@@ -10,3 +10,7 @@ A Discord bot that handles Warmane's API and provides useful information for pla
 - **Servertime**: Get the current servertime of the server.
 
 - **Github Token**: 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
+
+## TODO
+- [ ] Add a database to store main characters for users.
+- [ ] Add a command to set a main character for a user.

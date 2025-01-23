@@ -293,3 +293,19 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+  - guild: '542696785202774027'
+    guildName: Old Division
+    welcomeMessage: false
+    welcomeChannel: ''
+    CharNameAsk: false
+    BlockList: true
+    language: en
+    charNameAskDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
+    lastOwnerDM: {}

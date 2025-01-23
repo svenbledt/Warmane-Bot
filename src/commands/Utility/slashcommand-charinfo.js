@@ -312,10 +312,19 @@ module.exports = new ApplicationCommand({
             itemIDs.some((id) => id.itemID === item.itemID)
           );
 
+          // Check if character has Blacksmithing
+          const hasBlacksmithing = professions.includes("Blacksmithing");
+
           items.forEach((item) => {
             let foundItem = actualItems.filter(
               (x) => x.itemID === item.itemID
             )[0];
+            
+            // Skip gem check for Gloves and Bracers if character has Blacksmithing
+            if (hasBlacksmithing && (foundItem.type === "Gloves" || foundItem.type === "Bracer")) {
+              return;
+            }
+            
             if (foundItem.type === "Belt") {
               if (item.gems + 1 !== foundItem.gems) {
                 missingGems.push(foundItem.type);
@@ -476,7 +485,55 @@ module.exports = new ApplicationCommand({
 
           if (character) {
             const armoryLink = `${config.users.url}character/${charNameFormatted}/${realm}/`;
-            // If the character is found, create an embed with the information
+            // When building the embed fields, filter out "none" values
+            const embedFields = [
+              {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.character', lang),
+                value: character.name,
+                inline: true
+              },
+              {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.realm', lang),
+                value: character.realm,
+                inline: true
+              },
+              {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.online', lang),
+                value: character.online ? LanguageManager.getText('commands.charinfo.embed.fields.yes', lang) : LanguageManager.getText('commands.charinfo.embed.fields.no', lang),
+                inline: true,
+              },
+              {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.level', lang),
+                value: character.level.toString(),
+                inline: true
+              },
+              character.guild !== "None" && {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.guild', lang),
+                value: character.guild,
+                inline: true
+              },
+              character.honorableKills > 0 && {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.honorable_kills', lang),
+                value: character.honorableKills.toString(),
+                inline: true
+              },
+              character.achievementPoints > 0 && {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.achievement_points', lang),
+                value: character.achievementPoints.toString(),
+                inline: true
+              },
+              missingGems.length > 0 && {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.missing_gems', lang),
+                value: missingGems.join(", "),
+                inline: true
+              },
+              missingEnchants.length > 0 && {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.missing_enchants', lang),
+                value: missingEnchants.join(", "),
+                inline: true
+              }
+            ].filter(Boolean); // This removes any false/undefined entries
+
             const embed = new EmbedBuilder()
               .setColor(character.color || "#8B0000")
               .setTitle(LanguageManager.getText('commands.charinfo.embed.title', lang))
@@ -494,43 +551,8 @@ module.exports = new ApplicationCommand({
               });
 
             // Add fields to the embed
-            const fields = [
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.character', lang), value: character.name, inline: true },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.realm', lang), value: character.realm, inline: true },
-              {
-                name: LanguageManager.getText('commands.charinfo.embed.fields.online', lang),
-                value: character.online ? LanguageManager.getText('commands.charinfo.embed.fields.yes', lang) : LanguageManager.getText('commands.charinfo.embed.fields.no', lang),
-                inline: true,
-              },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.level', lang), value: character.level, inline: true },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.faction', lang), value: character.faction, inline: true },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.gender', lang), value: character.gender, inline: true },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.race', lang), value: character.race, inline: true },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.class', lang), value: character.class, inline: true },
-              {
-                name: LanguageManager.getText('commands.charinfo.embed.fields.honorable_kills', lang),
-                value: character.honorableKills,
-                inline: true,
-              },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.guild', lang), value: character.guild, inline: true },
-              {
-                name: LanguageManager.getText('commands.charinfo.embed.fields.achievement_points', lang),
-                value: character.achievementPoints,
-                inline: true,
-              },
-              {
-                name: LanguageManager.getText('commands.charinfo.embed.fields.talents', lang),
-                value: character.talents.join(", "),
-                inline: true,
-              },
-              { name: LanguageManager.getText('commands.charinfo.embed.fields.gearscore', lang), value: totalGearScoreString, inline: true },
-            ];
-
-            // Only add fields with non-empty values
-            fields.forEach((field) => {
-              if (field.value) {
-                embed.addFields(field);
-              }
+            embedFields.forEach((field) => {
+              embed.addFields(field);
             });
 
             // Check if the character has professions
@@ -561,20 +583,9 @@ module.exports = new ApplicationCommand({
               embed.addFields({
                 name: LanguageManager.getText('commands.charinfo.embed.fields.pvp_teams', lang),
                 value: pvpteams,
-                inline: true,
+                inline: false,
               });
             }
-
-            // Check if the character has missing gems
-            const gems = missingGems.join("\n");
-            embed.addFields({ name: LanguageManager.getText('commands.charinfo.embed.fields.missing_gems', lang), value: gems || "None" });
-
-            // Check if the character has missing enchants
-            const enchants = missingEnchants.join("\n");
-            embed.addFields({
-              name: LanguageManager.getText('commands.charinfo.embed.fields.missing_enchants', lang),
-              value: enchants || "None",
-            });
 
             await interaction.editReply({
               embeds: [embed],
