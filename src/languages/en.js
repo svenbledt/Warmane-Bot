@@ -152,7 +152,9 @@ module.exports = {
             log_interaction_failed: "Failed to interact with {username}: {error}",
             log_mod_notification_failed: "Failed to send mod notification: {error}",
             select_character: "Select one of your characters",
-            assigned_chars_found: "I found some characters assigned to your account. Please select one to use as your nickname:"
+            assigned_chars_found: "I found some characters assigned to your account. Please select one to use as your nickname:",
+            not_on_list_label: "Not on the list",
+            not_on_list_description: "Enter a different character name manually",
         }
     }
 };

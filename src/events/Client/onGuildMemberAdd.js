@@ -154,6 +154,13 @@ module.exports = new Event({
             });
           }
 
+          // Add "Not on the list" option
+          options.push({
+            label: LanguageManager.getText('events.guildMemberAdd.not_on_list_label', lang),
+            description: LanguageManager.getText('events.guildMemberAdd.not_on_list_description', lang),
+            value: "not_on_list"
+          });
+
           const row = new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
               .setCustomId('character_select')
@@ -176,22 +183,110 @@ module.exports = new Event({
             // Acknowledge the interaction first
             await response.deferUpdate();
 
-            const selectedName = response.values[0];
-            try {
-              await member.setNickname(selectedName);
-              await dmChannel.send(
-                LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
-                  nickname: selectedName,
-                  guildName: member.guild.name
-                })
+            const selectedValue = response.values[0];
+
+            if (selectedValue === "not_on_list") {
+              // Disable the select menu
+              const disabledRow = new ActionRowBuilder().addComponents(
+                StringSelectMenuBuilder.from(row.components[0]).setDisabled(true)
               );
-            } catch (error) {
-              console.error(`Failed to change nickname: ${error.message}`);
-              await dmChannel.send(
-                LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
-                  error: error.message
-                })
-              );
+              await selectMessage.edit({ components: [disabledRow] });
+
+              // Proceed with manual name collection
+              await dmChannel.send(guildSettings.charNameAskDM);
+              
+              const filter = (m) => m.author.id === member.user.id;
+              const collector = dmChannel.createMessageCollector({
+                filter,
+                time: 60000,
+              });
+
+              collector.on("collect", async (collected) => {
+                let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
+                if (response === "" || response.length > 16) {
+                  await dmChannel.send(
+                    LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
+                  );
+                } else {
+                  try {
+                    await member.setNickname(response);
+                    console.log(`Changed ${member.user.tag} to ${response}.`);
+                    await dmChannel.send(
+                      LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
+                        nickname: response,
+                        guildName: member.guild.name
+                      })
+                    );
+
+                    // Check if the character exists on Warmane and isn't assigned
+                    const realms = ["Icecrown", "Lordaeron", "Frostwolf", "Blackrock", "Onyxia"];
+                    for (const realm of realms) {
+                      const exists = await checkWarmaneCharacter(response, realm);
+                      if (exists && !isCharacterAssigned(userChars, response, realm)) {
+                        // Initialize user data if it doesn't exist
+                        if (!userChars[member.user.id]) {
+                          userChars[member.user.id] = {
+                            main: null,
+                            alts: []
+                          };
+                        }
+
+                        // Add as alt character
+                        const charData = {
+                          name: response,
+                          realm: realm,
+                          addedBy: client.user.id,
+                          addedAt: new Date().toISOString()
+                        };
+
+                        userChars[member.user.id].alts.push(charData);
+                        client.database.set("userCharacters", userChars);
+                        break; // Stop checking other realms once we find a match
+                      }
+                    }
+
+                    collector.stop("valid-response");
+                  } catch (error) {
+                    console.error(
+                      `Failed to change ${member.user.tag} to ${response} due to: ${error.message}.`
+                    );
+                    await dmChannel.send(
+                      LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
+                        error: error.message
+                      })
+                    );
+                  }
+                }
+              });
+
+              collector.on("end", async (collected, reason) => {
+                try {
+                  if (reason !== "valid-response") {
+                    await dmChannel.send(
+                      LanguageManager.getText('events.guildMemberAdd.timeout', lang)
+                    );
+                  }
+                } catch (error) {
+                  console.error(`Failed to send end message to ${member.user.tag}: ${error.message}`);
+                }
+              });
+            } else {
+              try {
+                await member.setNickname(selectedValue);
+                await dmChannel.send(
+                  LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
+                    nickname: selectedValue,
+                    guildName: member.guild.name
+                  })
+                );
+              } catch (error) {
+                console.error(`Failed to change nickname: ${error.message}`);
+                await dmChannel.send(
+                  LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
+                    error: error.message
+                  })
+                );
+              }
             }
           } catch (error) {
             console.error('Selection error:', error);
@@ -201,7 +296,7 @@ module.exports = new Event({
               );
             }
           } finally {
-            // Disable the select menu after use
+            // Disable the select menu after use if not already disabled
             try {
               const disabledRow = new ActionRowBuilder().addComponents(
                 StringSelectMenuBuilder.from(row.components[0]).setDisabled(true)

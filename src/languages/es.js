@@ -151,7 +151,9 @@ module.exports = {
             log_interaction_failed: "No se pudo interactuar con {username}: {error}",
             log_mod_notification_failed: "No se pudo enviar la notificación a los moderadores: {error}",
             select_character: "Selecciona uno de tus personajes",
-            assigned_chars_found: "He encontrado algunos personajes asignados a tu cuenta. Por favor, selecciona uno para usar como apodo:"
+            assigned_chars_found: "He encontrado algunos personajes asignados a tu cuenta. Por favor, selecciona uno para usar como apodo:",
+            not_on_list_label: "No está en la lista",
+            not_on_list_description: "Ingresar otro nombre de personaje manualmente"
         }
     }
 }; 

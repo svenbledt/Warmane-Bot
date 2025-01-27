@@ -152,6 +152,8 @@ module.exports = {
             log_mod_notification_failed: "Impossible d'envoyer la notification aux modérateurs : {error}",
             select_character: "Sélectionnez l'un de vos personnages",
             assigned_chars_found: "J'ai trouvé des personnages associés à votre compte. Veuillez en sélectionner un à utiliser comme pseudo :",
+            not_on_list_label: "Pas dans la liste",
+            not_on_list_description: "Entrer un autre nom de personnage manuellement",
         }
     }
 }; 

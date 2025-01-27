@@ -151,7 +151,9 @@ module.exports = {
             log_interaction_failed: "Konnte nicht mit {username} interagieren: {error}",
             log_mod_notification_failed: "Konnte keine Mod-Benachrichtigung senden: {error}",
             select_character: "Wähle einen deiner Charaktere",
-            assigned_chars_found: "Ich habe einige Charaktere gefunden, die deinem Account zugeordnet sind. Bitte wähle einen als deinen Nicknamen aus:"
+            assigned_chars_found: "Ich habe einige Charaktere gefunden, die deinem Account zugeordnet sind. Bitte wähle einen als deinen Nicknamen aus:",
+            not_on_list_label: "Nicht in der Liste",
+            not_on_list_description: "Einen anderen Charakternamen manuell eingeben",
         }
     }
 }; 
