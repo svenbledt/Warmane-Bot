@@ -27,7 +27,7 @@ const config = {
     draeneiFemale: "https://i.imgur.com/isDVJYZ.png", // The Draenei
   },
   development: {
-    enabled: true, // If true, the bot will register all application commands to a specific guild (not globally).
+    enabled: false, // If true, the bot will register all application commands to a specific guild (not globally).
     guildId: "1254444159985651712",
     reportChannel: "1257409168265187428",
     inviteChannel: "1257459204948627638",
