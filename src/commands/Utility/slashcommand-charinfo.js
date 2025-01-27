@@ -518,7 +518,7 @@ module.exports = new ApplicationCommand({
 
           if (character) {
             const armoryLink = `${config.users.url}character/${charNameFormatted}/${realm}/`;
-            // When building the embed fields, filter out "none" values
+            // Create base fields without missing gems/enchants
             const embedFields = [
               {
                 name: LanguageManager.getText('commands.charinfo.embed.fields.character', lang),
@@ -554,30 +554,37 @@ module.exports = new ApplicationCommand({
                 name: LanguageManager.getText('commands.charinfo.embed.fields.achievement_points', lang),
                 value: character.achievementPoints.toString(),
                 inline: true
-              },
-              shouldCheckMissing && missingGems.length > 0 && {
-                name: LanguageManager.getText('commands.charinfo.embed.fields.missing_gems', lang),
-                value: missingGems.join(", "),
-                inline: true
-              },
-              shouldCheckMissing && missingEnchants.length > 0 && {
-                name: LanguageManager.getText('commands.charinfo.embed.fields.missing_enchants', lang),
-                value: missingEnchants.join(", "),
-                inline: true
               }
-            ].filter(Boolean); // This removes any false/undefined entries
+            ].filter(Boolean);
 
-            // Add this before creating the embed
+            // Add owner information if it exists
             const userCharacters = client.database.get("userCharacters") || {};
             const ownerInfo = findCharacterOwner(userCharacters, character.name, realm);
 
-            // When building your embed fields, add the owner information if it exists:
             if (ownerInfo) {
               embedFields.push({
                 name: LanguageManager.getText('commands.charinfo.embed.fields.belongs_to', lang),
                 value: `<@${ownerInfo.userId}> (${ownerInfo.isMain ? 'Main' : 'Alt'})`,
                 inline: true
               });
+            }
+
+            // Add missing gems and enchants after owner info (only for level 80)
+            if (shouldCheckMissing) {
+              if (missingGems.length > 0) {
+                embedFields.push({
+                  name: LanguageManager.getText('commands.charinfo.embed.fields.missing_gems', lang),
+                  value: missingGems.join(", "),
+                  inline: true
+                });
+              }
+              if (missingEnchants.length > 0) {
+                embedFields.push({
+                  name: LanguageManager.getText('commands.charinfo.embed.fields.missing_enchants', lang),
+                  value: missingEnchants.join(", "),
+                  inline: true
+                });
+              }
             }
 
             const embed = new EmbedBuilder()
