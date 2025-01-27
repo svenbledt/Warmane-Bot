@@ -2,7 +2,8 @@ const {
   MessageFlags,
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
-  EmbedBuilder
+  EmbedBuilder,
+  PermissionsBitField
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
@@ -27,9 +28,11 @@ module.exports = new ApplicationCommand({
     cooldown: 5000,
   },
   run: async (client, interaction) => {
-    // Get target user (defaults to command user if not specified)
-    const targetUser = interaction.options.getUser("user") || interaction.user;
-
+    // If user has ban permissions, they can view others' lists, otherwise they see their own
+    const targetUser = interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers]) 
+      ? (interaction.options.getUser("user") || interaction.user)
+      : interaction.user;
+    
     // Get guild settings for language
     const settings = client.database.get("settings") || [];
     const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
