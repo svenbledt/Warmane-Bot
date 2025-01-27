@@ -276,6 +276,10 @@ module.exports = new ApplicationCommand({
           let professions = character.professions.map(
             (profession) => profession.name
           );
+
+          // Only check for missing enchants and gems if character is level 80
+          const shouldCheckMissing = character.level === 80;
+
           $(".item-model a").each(function () {
             let rel = $(this).attr("rel");
             if (rel) {
@@ -293,11 +297,12 @@ module.exports = new ApplicationCommand({
                 gems: amount,
                 type: itemNames[i],
               });
-              if (!bannedItems.includes(i)) {
+
+              // Only check for missing enchants if character is level 80
+              if (shouldCheckMissing && !bannedItems.includes(i)) {
                 let isEnchanted = rel.indexOf("ench") !== -1;
 
                 if (!isEnchanted) {
-                  // Ensure all class comparisons are case-insensitive
                   if (
                     itemNames[i] === "Ranged" &&
                     character.class.toLowerCase() === "hunter"
@@ -340,26 +345,29 @@ module.exports = new ApplicationCommand({
           // Check if character has Blacksmithing
           const hasBlacksmithing = professions.includes("Blacksmithing");
 
-          items.forEach((item) => {
-            let foundItem = actualItems.filter(
-              (x) => x.itemID === item.itemID
-            )[0];
-            
-            // Skip gem check for Gloves and Bracers if character has Blacksmithing
-            if (hasBlacksmithing && (foundItem.type === "Gloves" || foundItem.type === "Bracer")) {
-              return;
-            }
-            
-            if (foundItem.type === "Belt") {
-              if (item.gems + 1 !== foundItem.gems) {
-                missingGems.push(foundItem.type);
+          // Only check for missing gems if character is level 80
+          if (shouldCheckMissing) {
+            items.forEach((item) => {
+              let foundItem = actualItems.filter(
+                (x) => x.itemID === item.itemID
+              )[0];
+              
+              // Skip gem check for Gloves and Bracers if character has Blacksmithing
+              if (hasBlacksmithing && (foundItem.type === "Gloves" || foundItem.type === "Bracer")) {
+                return;
               }
-            } else {
-              if (item.gems !== foundItem.gems) {
-                missingGems.push(foundItem.type);
+              
+              if (foundItem.type === "Belt") {
+                if (item.gems + 1 !== foundItem.gems) {
+                  missingGems.push(foundItem.type);
+                }
+              } else {
+                if (item.gems !== foundItem.gems) {
+                  missingGems.push(foundItem.type);
+                }
               }
-            }
-          });
+            });
+          }
 
           // Switch based on characters Faction icon
           switch (character.faction) {
@@ -547,12 +555,12 @@ module.exports = new ApplicationCommand({
                 value: character.achievementPoints.toString(),
                 inline: true
               },
-              missingGems.length > 0 && {
+              shouldCheckMissing && missingGems.length > 0 && {
                 name: LanguageManager.getText('commands.charinfo.embed.fields.missing_gems', lang),
                 value: missingGems.join(", "),
                 inline: true
               },
-              missingEnchants.length > 0 && {
+              shouldCheckMissing && missingEnchants.length > 0 && {
                 name: LanguageManager.getText('commands.charinfo.embed.fields.missing_enchants', lang),
                 value: missingEnchants.join(", "),
                 inline: true
