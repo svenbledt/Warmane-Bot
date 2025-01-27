@@ -82,7 +82,8 @@ module.exports = {
                     missing_enchants: "Отсутствующие чары",
                     none: "Нет",
                     professions: "Профессии",
-                    teams: "PvP команды ({type}): {name} (Рейтинг: {rating}, Ранг: {rank})"
+                    teams: "PvP команды ({type}): {name} (Рейтинг: {rating}, Ранг: {rank})",
+                    belongs_to: "Принадлежит"
                 }
             }
         },
@@ -112,6 +113,14 @@ module.exports = {
                 PREVIOUS: "Назад",
                 NEXT: "Вперед"
             }
+        },
+        setchar: {
+            char_not_exist: "Персонаж {character} не существует на Warmane.",
+            char_already_assigned: "Персонаж {character} уже привязан к {user}.",
+            already_has_main: "У {user} уже есть основной персонаж: {character} ({realm}). Если это ошибка, свяжитесь с сотрудником в нашем [Discord](https://discord.gg/YDqBQU43Ht).",
+            success_with_type: "Персонаж {character} ({realm}) успешно установлен как {type} для {user}.",
+            success: "Персонаж {character} ({realm}) успешно установлен как основной для {user}.",
+            success_updated: "Основной персонаж для {user} изменен с {oldCharacter} на {character} ({realm})."
         }
     },
     events: {

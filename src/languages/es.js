@@ -82,7 +82,8 @@ module.exports = {
                     missing_enchants: "Encantamientos faltantes",
                     none: "Ninguno",
                     professions: "Profesiones",
-                    teams: "Equipos JcJ ({type}): {name} (Clasificación: {rating}, Rango: {rank})"
+                    teams: "Equipos JcJ ({type}): {name} (Clasificación: {rating}, Rango: {rank})",
+                    belongs_to: "Pertenece a"
                 }
             }
         },
@@ -112,6 +113,14 @@ module.exports = {
                 PREVIOUS: "Anterior",
                 NEXT: "Siguiente"
             }
+        },
+        setchar: {
+            char_not_exist: "El personaje {character} no existe en Warmane.",
+            char_already_assigned: "El personaje {character} ya está asignado a {user}.",
+            already_has_main: "{user} ya tiene un personaje principal: {character} ({realm}). Si esto es un error, contacta a un miembro del staff en nuestro [Discord](https://discord.gg/YDqBQU43Ht).",
+            success_with_type: "Se ha establecido exitosamente a {character} ({realm}) como personaje {type} para {user}.",
+            success: "Se ha establecido exitosamente a {character} ({realm}) como personaje principal para {user}.",
+            success_updated: "Personaje principal de {user} actualizado de {oldCharacter} a {character} ({realm})."
         }
     },
     events: {

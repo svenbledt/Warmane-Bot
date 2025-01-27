@@ -82,7 +82,8 @@ module.exports = {
                     missing_enchants: "Missing Enchants",
                     none: "None",
                     professions: "Professions",
-                    teams: "PvP Teams ({type}): {name} (Rating: {rating}, Rank: {rank})"
+                    teams: "PvP Teams ({type}): {name} (Rating: {rating}, Rank: {rank})",
+                    belongs_to: "Belongs to"
                 }
             }
         },
@@ -112,6 +113,14 @@ module.exports = {
                 PREVIOUS: "Previous",
                 NEXT: "Next"
             }
+        },
+        setchar: {
+            char_not_exist: "The character {character} does not exist on Warmane.",
+            char_already_assigned: "The character {character} is already assigned to {user}.",
+            already_has_main: "{user} already has a main character: {character} ({realm}). If this is a mistake, contact a staff member at our [Discord](https://discord.gg/YDqBQU43Ht).",
+            success_with_type: "Successfully set {character} ({realm}) as {type} character for {user}.",
+            success: "Successfully set {character} ({realm}) as main character for {user}.",
+            success_updated: "Updated main character for {user} from {oldCharacter} to {character} ({realm})."
         }
     },
     events: {

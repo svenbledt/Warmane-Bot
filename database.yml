@@ -309,3 +309,71 @@ settings:
       (Your response will not be stored by this Application and is only used for
       the Guilds nickname)
     lastOwnerDM: {}
+  - guild: '254185687643979786'
+    guildName: Jezu Kurna
+    welcomeMessage: false
+    welcomeChannel: ''
+    CharNameAsk: false
+    BlockList: true
+    language: en
+    charNameAskDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
+    lastOwnerDM: {}
+  - guild: '1331270035825754123'
+    guildName: Warmane Onyxia Asia
+    welcomeMessage: false
+    welcomeChannel: ''
+    CharNameAsk: false
+    BlockList: true
+    language: en
+    charNameAskDM: >-
+      Hey, I would like to ask you for your main Character name.
+
+      Please respond with your main Character name for the Server.
+
+
+      (Your response will not be stored by this Application and is only used for
+      the Guilds nickname)
+    lastOwnerDM: {}
+userCharacters:
+  '209319089930240004':
+    alts:
+      - name: Zalacar
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:03:29.431Z'
+      - name: Ravaged
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:13:19.887Z'
+      - name: Zeralock
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:13:41.379Z'
+      - name: Branched
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:14:00.745Z'
+      - name: Honestly
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:14:28.059Z'
+      - name: Insaneuh
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:14:44.678Z'
+      - name: Insanepq
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:17:45.584Z'
+    main:
+      name: Mirafirst
+      realm: Icecrown
+      addedBy: '209319089930240004'
+      addedAt: '2025-01-27T13:03:07.997Z'

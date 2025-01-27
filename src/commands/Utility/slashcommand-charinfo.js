@@ -20,6 +20,31 @@ const https = rateLimit(axios.create(), {
   perMilliseconds: 4000,
 });
 
+// Add this function to check character ownership
+const findCharacterOwner = (userCharacters, charName, realm) => {
+  for (const userId in userCharacters) {
+    const userData = userCharacters[userId];
+    
+    // Check main character
+    if (userData.main && 
+        userData.main.name.toLowerCase() === charName.toLowerCase() && 
+        userData.main.realm === realm) {
+      return { userId, isMain: true };
+    }
+    
+    // Check alt characters
+    const alt = userData.alts?.find(alt => 
+      alt.name.toLowerCase() === charName.toLowerCase() && 
+      alt.realm === realm
+    );
+    
+    if (alt) {
+      return { userId, isMain: false };
+    }
+  }
+  return null;
+};
+
 module.exports = new ApplicationCommand({
   command: {
     name: "charinfo",
@@ -533,6 +558,19 @@ module.exports = new ApplicationCommand({
                 inline: true
               }
             ].filter(Boolean); // This removes any false/undefined entries
+
+            // Add this before creating the embed
+            const userCharacters = client.database.get("userCharacters") || {};
+            const ownerInfo = findCharacterOwner(userCharacters, character.name, realm);
+
+            // When building your embed fields, add the owner information if it exists:
+            if (ownerInfo) {
+              embedFields.push({
+                name: LanguageManager.getText('commands.charinfo.embed.fields.belongs_to', lang),
+                value: `<@${ownerInfo.userId}> (${ownerInfo.isMain ? 'Main' : 'Alt'})`,
+                inline: true
+              });
+            }
 
             const embed = new EmbedBuilder()
               .setColor(character.color || "#8B0000")

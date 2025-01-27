@@ -82,7 +82,8 @@ module.exports = {
                     missing_enchants: "Fehlende Verzauberungen",
                     none: "Keine",
                     professions: "Berufe",
-                    teams: "PvP Teams ({type}): {name} (Wertung: {rating}, Rang: {rank})"
+                    teams: "PvP Teams ({type}): {name} (Wertung: {rating}, Rang: {rank})",
+                    belongs_to: "Gehört zu"
                 }
             }
         },
@@ -112,6 +113,14 @@ module.exports = {
                 PREVIOUS: "Zurück",
                 NEXT: "Weiter"
             }
+        },
+        setchar: {
+            char_not_exist: "Der Charakter {character} existiert nicht auf Warmane.",
+            char_already_assigned: "Der Charakter {character} ist bereits {user} zugewiesen.",
+            already_has_main: "{user} hat bereits einen Hauptcharakter: {character} ({realm}). Falls dies ein Fehler ist, kontaktiere einen Mitarbeiter in unserem [Discord](https://discord.gg/YDqBQU43Ht).",
+            success_with_type: "{character} ({realm}) wurde erfolgreich als {type} Charakter für {user} gesetzt.",
+            success: "{character} ({realm}) wurde erfolgreich als Hauptcharakter für {user} gesetzt.",
+            success_updated: "Hauptcharakter für {user} von {oldCharacter} zu {character} ({realm}) aktualisiert."
         }
     },
     events: {
