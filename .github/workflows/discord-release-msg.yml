@@ -3,11 +3,11 @@ name: Release messages to discord announcement channel
 on: 
   release:
     types:
-      - created
+      - published
 
 jobs:
   run_main:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     name: Sends custom message
     steps:
       - name: Sending message
