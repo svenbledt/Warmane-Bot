@@ -121,6 +121,15 @@ module.exports = {
             success_with_type: "Se ha establecido exitosamente a {character} ({realm}) como personaje {type} para {user}.",
             success: "Se ha establecido exitosamente a {character} ({realm}) como personaje principal para {user}.",
             success_updated: "Personaje principal de {user} actualizado de {oldCharacter} a {character} ({realm})."
+        },
+        charlist: {
+            embed: {
+                title: "Personajes de {username}",
+                no_characters: "No se encontraron personajes para este usuario.",
+                main_character: "**Personaje Principal:**\n{name} - {realm}",
+                alt_characters_header: "**Personajes Alternativos:**",
+                character_entry: "{name} - {realm}"
+            }
         }
     },
     events: {
@@ -140,7 +149,9 @@ module.exports = {
             log_name_change_failed: "No se pudo cambiar el nombre de {username} a {nickname}: {error}",
             log_end_message_failed: "No se pudo enviar el mensaje final a {username}: {error}",
             log_interaction_failed: "No se pudo interactuar con {username}: {error}",
-            log_mod_notification_failed: "No se pudo enviar la notificación a los moderadores: {error}"
+            log_mod_notification_failed: "No se pudo enviar la notificación a los moderadores: {error}",
+            select_character: "Selecciona uno de tus personajes",
+            assigned_chars_found: "He encontrado algunos personajes asignados a tu cuenta. Por favor, selecciona uno para usar como apodo:"
         }
     }
 }; 

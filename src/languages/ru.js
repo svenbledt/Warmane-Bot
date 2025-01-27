@@ -121,6 +121,15 @@ module.exports = {
             success_with_type: "Персонаж {character} ({realm}) успешно установлен как {type} для {user}.",
             success: "Персонаж {character} ({realm}) успешно установлен как основной для {user}.",
             success_updated: "Основной персонаж для {user} изменен с {oldCharacter} на {character} ({realm})."
+        },
+        charlist: {
+            embed: {
+                title: "Персонажи {username}",
+                no_characters: "Персонажи для этого пользователя не найдены.",
+                main_character: "**Основной персонаж:**\n{name} - {realm}",
+                alt_characters_header: "**Альтернативные персонажи:**",
+                character_entry: "{name} - {realm}"
+            }
         }
     },
     events: {
@@ -140,7 +149,9 @@ module.exports = {
             log_name_change_failed: "Не удалось изменить имя {username} на {nickname}: {error}",
             log_end_message_failed: "Не удалось отправить завершающее сообщение {username}: {error}",
             log_interaction_failed: "Не удалось взаимодействовать с {username}: {error}",
-            log_mod_notification_failed: "Не удалось отправить уведомление модератору: {error}"
+            log_mod_notification_failed: "Не удалось отправить уведомление модератору: {error}",
+            select_character: "Выберите одного из ваших персонажей",
+            assigned_chars_found: "Я нашел персонажей, привязанных к вашей учетной записи. Пожалуйста, выберите одного для использования в качестве никнейма:"
         }
     }
 };

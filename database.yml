@@ -368,12 +368,20 @@ userCharacters:
         realm: Icecrown
         addedBy: '209319089930240004'
         addedAt: '2025-01-27T13:14:44.678Z'
+      - name: Mythiel
+        realm: Icecrown
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:29:03.976Z'
       - name: Insanepq
         realm: Icecrown
         addedBy: '209319089930240004'
-        addedAt: '2025-01-27T13:17:45.584Z'
+        addedAt: '2025-01-27T13:37:08.261Z'
+      - name: Jawboned
+        realm: Lordaeron
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-27T13:44:10.303Z'
     main:
       name: Mirafirst
       realm: Icecrown
       addedBy: '209319089930240004'
-      addedAt: '2025-01-27T13:03:07.997Z'
+      addedAt: '2025-01-27T13:37:33.661Z'

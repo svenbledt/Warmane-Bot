@@ -121,6 +121,15 @@ module.exports = {
             success_with_type: "Successfully set {character} ({realm}) as {type} character for {user}.",
             success: "Successfully set {character} ({realm}) as main character for {user}.",
             success_updated: "Updated main character for {user} from {oldCharacter} to {character} ({realm})."
+        },
+        charlist: {
+            embed: {
+                title: "Characters for {username}",
+                no_characters: "No characters found for this user.",
+                main_character: "**Main Character:**\n{name} - {realm}",
+                alt_characters_header: "**Alt Characters:**",
+                character_entry: "{name} - {realm}"
+            }
         }
     },
     events: {
@@ -141,7 +150,9 @@ module.exports = {
             log_name_change_failed: "Failed to change {username} to {nickname} due to: {error}",
             log_end_message_failed: "Failed to send end message to {username}: {error}",
             log_interaction_failed: "Failed to interact with {username}: {error}",
-            log_mod_notification_failed: "Failed to send mod notification: {error}"
+            log_mod_notification_failed: "Failed to send mod notification: {error}",
+            select_character: "Select one of your characters",
+            assigned_chars_found: "I found some characters assigned to your account. Please select one to use as your nickname:"
         }
     }
 };

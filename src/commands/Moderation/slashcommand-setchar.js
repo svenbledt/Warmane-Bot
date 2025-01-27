@@ -71,25 +71,22 @@ module.exports = new ApplicationCommand({
     const charType = interaction.options.getString("type", true);
     const isMain = charType === "main";
     
+    // Check if user is a developer
+    const isDeveloper = config.users.developers.includes(interaction.user.id);
+    
     // Get guild settings for language
     const settings = client.database.get("settings") || [];
     const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
     const lang = guildSettings?.language || "en";
 
-    if (
-        !interaction.member.permissions.has([
-          PermissionsBitField.Flags.Administrator,
-        ])
-      ) {
-        await interaction.reply({
-          content: LanguageManager.getText(
-            "commands.global_strings.no_permission",
-            lang
-          ),
-          flags: [MessageFlags.Ephemeral],
-        });
-        return;
-      }
+    if (!isDeveloper && !interaction.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
+      await interaction.reply({
+        content: LanguageManager.getText("commands.global_strings.no_permission", lang),
+        flags: [MessageFlags.Ephemeral],
+      });
+      return;
+    }
+
     const charNameFormatted = charName.charAt(0).toUpperCase() + charName.slice(1).toLowerCase();
 
     try {
@@ -111,31 +108,45 @@ module.exports = new ApplicationCommand({
       let userChars = client.database.get("userCharacters") || {};
       
       // Check if character is already assigned to someone
+      let existingOwner = null;
       for (const userId in userChars) {
         const userData = userChars[userId];
         // Check main character
         if (userData.main && 
             userData.main.name.toLowerCase() === charNameFormatted.toLowerCase() && 
             userData.main.realm === realm) {
-          return interaction.reply({
-            content: LanguageManager.getText('commands.setchar.char_already_assigned', lang, {
-              character: charNameFormatted,
-              user: `<@${userId}>`
-            }),
-            flags: [MessageFlags.Ephemeral],
-          });
+          existingOwner = { userId, isMain: true };
+          break;
         }
         // Check alt characters
         if (userData.alts && userData.alts.some(alt => 
             alt.name.toLowerCase() === charNameFormatted.toLowerCase() && 
             alt.realm === realm)) {
-          return interaction.reply({
-            content: LanguageManager.getText('commands.setchar.char_already_assigned', lang, {
-              character: charNameFormatted,
-              user: `<@${userId}>`
-            }),
-            flags: [MessageFlags.Ephemeral],
-          });
+          existingOwner = { userId, isMain: false };
+          break;
+        }
+      }
+
+      // If character is already assigned and user is not a developer, prevent the assignment
+      if (existingOwner && !isDeveloper) {
+        return interaction.reply({
+          content: LanguageManager.getText('commands.setchar.char_already_assigned', lang, {
+            character: charNameFormatted,
+            user: `<@${existingOwner.userId}>`
+          }),
+          flags: [MessageFlags.Ephemeral],
+        });
+      }
+
+      // If character is assigned and user is a developer, remove it from previous owner
+      if (existingOwner) {
+        const prevUserData = userChars[existingOwner.userId];
+        if (existingOwner.isMain) {
+          prevUserData.main = null;
+        } else {
+          prevUserData.alts = prevUserData.alts.filter(alt => 
+            !(alt.name.toLowerCase() === charNameFormatted.toLowerCase() && alt.realm === realm)
+          );
         }
       }
 
@@ -155,16 +166,10 @@ module.exports = new ApplicationCommand({
       };
 
       if (isMain) {
-        // Check if user already has a main character
+        // If user already has a main character, move it to alts
         if (userChars[user.id].main) {
-          return interaction.reply({
-            content: LanguageManager.getText('commands.setchar.already_has_main', lang, {
-              user: `<@${user.id}>`,
-              character: userChars[user.id].main.name,
-              realm: userChars[user.id].main.realm
-            }),
-            flags: [MessageFlags.Ephemeral],
-          });
+          const oldMain = userChars[user.id].main;
+          userChars[user.id].alts.push(oldMain);
         }
         userChars[user.id].main = charData;
       } else {
@@ -173,13 +178,25 @@ module.exports = new ApplicationCommand({
 
       client.database.set("userCharacters", userChars);
 
-      return interaction.reply({
-        content: LanguageManager.getText('commands.setchar.success_with_type', lang, {
+      let responseContent;
+      if (isMain && userChars[user.id].alts.length > 0) {
+        responseContent = LanguageManager.getText('commands.setchar.success_updated', lang, {
+          character: charNameFormatted,
+          realm: realm,
+          user: `<@${user.id}>`,
+          oldCharacter: userChars[user.id].alts[userChars[user.id].alts.length - 1].name
+        });
+      } else {
+        responseContent = LanguageManager.getText('commands.setchar.success_with_type', lang, {
           character: charNameFormatted,
           realm: realm,
           user: `<@${user.id}>`,
           type: isMain ? 'main' : 'alt'
-        }),
+        });
+      }
+
+      return interaction.reply({
+        content: responseContent,
         flags: [MessageFlags.Ephemeral],
       });
 

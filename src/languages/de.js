@@ -121,6 +121,15 @@ module.exports = {
             success_with_type: "{character} ({realm}) wurde erfolgreich als {type} Charakter für {user} gesetzt.",
             success: "{character} ({realm}) wurde erfolgreich als Hauptcharakter für {user} gesetzt.",
             success_updated: "Hauptcharakter für {user} von {oldCharacter} zu {character} ({realm}) aktualisiert."
+        },
+        charlist: {
+            embed: {
+                title: "Charaktere von {username}",
+                no_characters: "Keine Charaktere für diesen Benutzer gefunden.",
+                main_character: "**Hauptcharakter:**\n{name} - {realm}",
+                alt_characters_header: "**Twink-Charaktere:**",
+                character_entry: "{name} - {realm}"
+            }
         }
     },
     events: {
@@ -140,7 +149,9 @@ module.exports = {
             log_name_change_failed: "Konnte den Namen von {username} nicht zu {nickname} ändern: {error}",
             log_end_message_failed: "Konnte keine Abschlussnachricht an {username} senden: {error}",
             log_interaction_failed: "Konnte nicht mit {username} interagieren: {error}",
-            log_mod_notification_failed: "Konnte keine Mod-Benachrichtigung senden: {error}"
+            log_mod_notification_failed: "Konnte keine Mod-Benachrichtigung senden: {error}",
+            select_character: "Wähle einen deiner Charaktere",
+            assigned_chars_found: "Ich habe einige Charaktere gefunden, die deinem Account zugeordnet sind. Bitte wähle einen als deinen Nicknamen aus:"
         }
     }
 }; 

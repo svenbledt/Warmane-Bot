@@ -121,6 +121,15 @@ module.exports = {
             success_with_type: "{character} ({realm}) a été défini comme personnage {type} pour {user}.",
             success: "{character} ({realm}) a été défini comme personnage principal pour {user}.",
             success_updated: "Personnage principal de {user} changé de {oldCharacter} à {character} ({realm})."
+        },
+        charlist: {
+            embed: {
+                title: "Personnages de {username}",
+                no_characters: "Aucun personnage trouvé pour cet utilisateur.",
+                main_character: "**Personnage Principal:**\n{name} - {realm}",
+                alt_characters_header: "**Personnages Alternatifs:**",
+                character_entry: "{name} - {realm}"
+            }
         }
     },
     events: {
@@ -140,7 +149,9 @@ module.exports = {
             log_name_change_failed: "Impossible de changer le nom de {username} en {nickname} : {error}",
             log_end_message_failed: "Impossible d'envoyer le message final à {username} : {error}",
             log_interaction_failed: "Impossible d'interagir avec {username} : {error}",
-            log_mod_notification_failed: "Impossible d'envoyer la notification aux modérateurs : {error}"
+            log_mod_notification_failed: "Impossible d'envoyer la notification aux modérateurs : {error}",
+            select_character: "Sélectionnez l'un de vos personnages",
+            assigned_chars_found: "J'ai trouvé des personnages associés à votre compte. Veuillez en sélectionner un à utiliser comme pseudo :",
         }
     }
 }; 
