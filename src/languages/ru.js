@@ -9,10 +9,11 @@ module.exports = {
             error_occurred: "Произошла ошибка: {error}"
         },
         charname: {
-            dm_initial: "Привет, я хотел бы узнать имя твоего основного персонажа. Пожалуйста, ответь именем своего основного персонажа.",
-            empty_response: "Ответ не может быть пустым. Пожалуйста, предоставьте действительный ответ.",
-            nickname_success: "Имя вашего основного персонажа успешно изменено на {nickname}.",
-            nickname_failed: "Не удалось изменить имя вашего основного персонажа: {error}"
+            dm_initial: "Привет, я хотел бы узнать имя твоего основного персонажа.\nПожалуйста, ответь именем своего основного персонажа для сервера.\n\nУ тебя есть 10 минут чтобы ответить.",
+            empty_response: "Твой ответ не может быть пустым. Пожалуйста, предоставь действительный ответ.",
+            nickname_success: "Имя твоего основного персонажа успешно изменено на {nickname}.",
+            nickname_failed: "Не удалось изменить имя твоего основного персонажа: {error}",
+            dm_timeout_message: "Время истекло. Пожалуйста, свяжитесь с персоналом {guildName} чтобы получить новый шанс."
         },
         language: {
             success: "✅ Язык сервера установлен на {language}."
@@ -85,42 +86,12 @@ module.exports = {
                     teams: "PvP команды ({type}): {name} (Рейтинг: {rating}, Ранг: {rank})",
                     belongs_to: "Принадлежит"
                 }
-            }
-        },
-        setwelcomemessage: {
-            dm_not_enabled: "Приветственное личное сообщение не включено.",
-            updated: "Приветственное сообщение обновлено."
-        },
-        servertime: {
-            embed: {
-                title: "Время сервера",
-                description: "Текущее время сервера: {time}",
-                footer: "Запрошено пользователем: {user}"
-            }
-        },
-        setwelcomechannel: {
-            channel_set: "Канал приветствия установлен на {channel}.",
-            error: "Не удалось установить канал приветствия из-за: {error}"
-        },
-        help: {
-            EMBED: {
-                TITLE: "Доступные команды",
-                DESCRIPTION: "Вот список всех доступных команд и их описаний:",
-                FOOTER: "Запрошено пользователем {USER_TAG}"
             },
-            NO_DESCRIPTION: "Описание отсутствует",
-            BUTTONS: {
-                PREVIOUS: "Назад",
-                NEXT: "Вперед"
-            }
-        },
-        setchar: {
-            char_not_exist: "Персонаж {character} не существует на Warmane.",
             char_already_assigned: "Персонаж {character} уже привязан к {user}.",
             already_has_main: "У {user} уже есть основной персонаж: {character} ({realm}). Если это ошибка, свяжитесь с сотрудником в нашем [Discord](https://discord.gg/YDqBQU43Ht).",
-            success_with_type: "Персонаж {character} ({realm}) успешно установлен как {type} для {user}.",
-            success: "Персонаж {character} ({realm}) успешно установлен как основной для {user}.",
-            success_updated: "Основной персонаж для {user} изменен с {oldCharacter} на {character} ({realm})."
+            success_with_type: "Успешно установлен {character} ({realm}) как {type} персонаж для {user}.",
+            success: "Успешно установлен {character} ({realm}) как основной персонаж для {user}.",
+            success_updated: "Основной персонаж для {user} обновлен с {oldCharacter} на {character} ({realm})."
         },
         charlist: {
             embed: {
@@ -130,6 +101,21 @@ module.exports = {
                 alt_characters_header: "**Альтернативные персонажи:**",
                 character_entry: "{name} - {realm}"
             }
+        },
+        setlogchannel: {
+            invalid_channel: "Пожалуйста, выберите текстовый канал для логирования.",
+            success: "Канал логирования установлен на #{channelName}.",
+            success_with_enable: "Канал логирования установлен на #{channelName} и логирование включено.",
+            no_channel_set: "Канал логирования не установлен. Пожалуйста, используйте `/set-logchannel`, чтобы установить его."
+        },
+        settings: {
+            logging_enabled: "Логирование Сервера",
+            logging_no_channel: "⚠️ Логирование включено, но канал не установлен. Используйте `/set-logchannel`, чтобы установить его."
+        },
+        nickname_changed: {
+            title: 'Никнейм Изменен',
+            description: 'Изменен никнейм пользователя {username} на {nickname}',
+            new_nickname: 'Новый Никнейм'
         }
     },
     events: {
@@ -154,6 +140,46 @@ module.exports = {
             assigned_chars_found: "Я нашел персонажей, привязанных к вашей учетной записи. Пожалуйста, выберите одного для использования в качестве никнейма:",
             not_on_list_label: "Нет в списке",
             not_on_list_description: "Ввести другое имя персонажа вручную",
+            character_not_found: "Я не могу найти этого персонажа. Пожалуйста, попробуйте еще раз с действительным именем персонажа."
+        },
+        nickname_changed: {
+            title: 'Никнейм Изменен',
+            description: 'Изменен никнейм пользователя {username} на {nickname}',
+            new_nickname: 'Новый Никнейм'
+        }
+    },
+    logging: {
+        dm_sent: {
+            title: 'ЛС Отправлено',
+            description: 'Отправлен запрос имени персонажа в ЛС пользователю {username}'
+        },
+        member_banned: {
+            title: 'Участник Заблокирован',
+            description: 'Заблокирован пользователь из черного списка',
+            reason_label: 'Причина'
+        },
+        invite_created: {
+            title: 'Приглашение Создано',
+            description: 'Новое приглашение на сервер создано для разработчиков {botName}',
+            channel: 'Канал',
+            created_by: 'Создано'
+        },
+        user_label: 'Пользователь',
+        user_id: 'ID Пользователя',
+        footer: 'Логи Сервера',
+        dm_failed: {
+            title: 'Ошибка ЛС',
+            description: 'Не удалось отправить ЛС пользователю {username}',
+            error_label: 'Ошибка'
+        },
+        dm_timeout: {
+            title: 'Время Ожидания ЛС Истекло',
+            description: '{username} не ответил в установленное время'
+        },
+        nickname_changed: {
+            title: 'Никнейм Изменен',
+            description: 'Изменен никнейм пользователя {username} на {nickname}',
+            new_nickname: 'Новый Никнейм'
         }
     }
 };

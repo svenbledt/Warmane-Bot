@@ -5,6 +5,10 @@ const config = require("../../config");
 const { ActionRowBuilder, StringSelectMenuBuilder, ComponentType } = require('discord.js');
 const axios = require("axios");
 const rateLimit = require("axios-rate-limit");
+const Logger = require('../../utils/Logger');
+
+const TIMEOUT_DURATION = 600000; // 10 minutes
+const MAX_CHAR_LENGTH = 16;
 
 // Define an axios instance with rate limit
 const https = rateLimit(axios.create(), {
@@ -12,429 +16,710 @@ const https = rateLimit(axios.create(), {
   perMilliseconds: 4000,
 });
 
-function ensureGuildSettings(guildSettings) {
-  const defaultSettings = {
-    welcomeMessage: false,
-    welcomeChannel: "",
-    CharNameAsk: false,
-    BlockList: true,
-    language: "en",
-    charNameAskDM:
-      "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
-    lastOwnerDM: {},
-  };
+// Add realm constants
+const REALMS = [
+  { name: 'Lordaeron', value: 'Lordaeron' },
+  { name: 'Frostmourne', value: 'Frostmourne' },
+  { name: 'Icecrown', value: 'Icecrown' },
+  { name: 'Blackrock', value: 'Blackrock' }
+];
 
-  let updated = false;
-
-  for (const [key, value] of Object.entries(defaultSettings)) {
-    if (!guildSettings.hasOwnProperty(key)) {
-      guildSettings[key] = value;
-      updated = true;
-    }
-  }
-
-  return updated;
-}
-
-// Helper function to check if character is already assigned
-const isCharacterAssigned = (userChars, charName, realm) => {
-  for (const userId in userChars) {
-    const userData = userChars[userId];
-    // Check main character
-    if (userData.main && 
-        userData.main.name.toLowerCase() === charName.toLowerCase() && 
-        userData.main.realm === realm) {
-      return true;
-    }
-    // Check alt characters
-    if (userData.alts && userData.alts.some(alt => 
-        alt.name.toLowerCase() === charName.toLowerCase() && 
-        alt.realm === realm)) {
-      return true;
-    }
-  }
-  return false;
-};
-
-// Helper function to check character exists on Warmane
-const checkWarmaneCharacter = async (charName, realm) => {
+// Function to check specific realm (for database characters)
+async function checkSpecificRealm(charName, realm) {
   try {
     const response = await https.get(
       `${config.users.url}/api/character/${charName}/${realm}/summary`
     );
-    return response.data && response.data.name ? true : false;
+    const exists = response.data && response.data.name;
+    return exists;
   } catch (error) {
     return false;
   }
-};
+}
+
+// Function to check all realms (for manual input)
+async function checkAllRealms(charName) {
+  for (const realm of REALMS) {
+    const exists = await checkSpecificRealm(charName, realm.value);
+    if (exists) {
+      return { found: true, realm: realm.value };
+    }
+  }
+  return { found: false };
+}
+
+// Add this helper function at the top with other helpers
+function formatCharacterName(name) {
+  if (!name) return name;
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+}
+
+// Update handleManualInput function
+async function handleManualInput(client, member, dmChannel, guildSettings, lang) {
+  const isDevServer = member.guild.id === config.development.guildId;
+  
+  await dmChannel.send(guildSettings.charNameAskDM);
+  
+  const filter = (m) => m.author.id === member.user.id;
+  const collector = dmChannel.createMessageCollector({
+    filter,
+    time: TIMEOUT_DURATION,
+  });
+
+  collector.on("collect", async (collected) => {
+    let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
+    
+    if (!response || response.length > MAX_CHAR_LENGTH) {
+      await dmChannel.send(
+        LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
+      );
+      return;
+    }
+
+    // Format the character name
+    response = formatCharacterName(response);
+
+    if (!isDevServer) {
+      // Check if character exists in database
+      const userCharacters = client.database.get("userCharacters") || {};
+      let existingCharacter = null;
+
+      // Search through all users
+      for (const [userId, userData] of Object.entries(userCharacters)) {
+        if (userData.main && userData.main.name.toLowerCase() === response.toLowerCase()) {
+          existingCharacter = { ...userData.main, isMain: true, ownerId: userId };
+          break;
+        }
+        if (userData.alts) {
+          const matchingAlt = userData.alts.find(alt => 
+            alt.name.toLowerCase() === response.toLowerCase()
+          );
+          if (matchingAlt) {
+            existingCharacter = { ...matchingAlt, isAlt: true, ownerId: userId };
+            break;
+          }
+        }
+      }
+
+      if (existingCharacter) {
+        // Character exists in database, check specific realm
+        const exists = await checkSpecificRealm(response, existingCharacter.realm);
+        if (!exists) {
+          await dmChannel.send(
+            LanguageManager.getText('events.guildMemberAdd.character_not_found', lang)
+          );
+          return;
+        }
+
+        if (existingCharacter.ownerId === member.user.id) {
+          await dmChannel.send(
+            LanguageManager.getText('events.guildMemberAdd.already_your_character', lang)
+          );
+          return;
+        }
+      } else {
+        // New character, check all realms
+        const result = await checkAllRealms(response);
+        if (!result.found) {
+          await dmChannel.send(
+            LanguageManager.getText('events.guildMemberAdd.character_not_found', lang)
+          );
+          return;
+        }
+
+        // Store new character in database
+        if (!userCharacters[member.user.id]) {
+          userCharacters[member.user.id] = { alts: [] };
+        }
+        
+        const characterData = {
+          name: response,
+          realm: result.realm,
+          addedBy: member.user.id,
+          addedAt: new Date().toISOString()
+        };
+
+        if (!userCharacters[member.user.id].main) {
+          userCharacters[member.user.id].main = characterData;
+        } else {
+          userCharacters[member.user.id].alts.push(characterData);
+        }
+
+        client.database.set("userCharacters", userCharacters);
+      }
+    }
+
+    const message = await handleNicknameChange(client, member, response, lang, member.guild.name);
+    await dmChannel.send(message);
+    collector.stop("valid-response");
+  });
+
+  collector.on("end", async (collected, reason) => {
+    if (reason !== "valid-response" && member.dmChannel) {
+      try {
+        await member.send(
+          LanguageManager.getText('commands.charname.dm_timeout_message', lang, {
+            guildName: member.guild.name
+          })
+        );
+        await Logger.log(client, member.guild.id, {
+          titleKey: 'dm_timeout',
+          descData: { username: member.user.tag },
+          color: '#ff0000',
+          fields: [
+            { nameKey: 'user_label', value: member.user.tag },
+            { nameKey: 'user_id', value: member.user.id }
+          ]
+        });
+      } catch (error) {
+        console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
+      }
+    }
+  });
+}
+
+// Update handleNicknameChange function
+async function handleNicknameChange(client, member, charName, lang, guildName) {
+  // Get fresh database content
+  const userChars = client.database.get("userCharacters") || {};
+  
+  const validation = await validateCharacterName(charName, userChars, lang);
+  if (!validation.valid) {
+    return validation.message;
+  }
+
+  try {
+    await member.setNickname(charName);
+    
+    await Logger.log(client, member.guild.id, {
+      titleKey: 'nickname_changed',
+      descData: { username: member.user.tag, nickname: charName },
+      color: '#00ff00',
+      fields: [
+        { nameKey: 'user_label', value: member.user.tag },
+        { nameKey: 'user_id', value: member.user.id },
+        { nameKey: 'new_nickname', value: charName }
+      ]
+    });
+    
+    return LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
+      nickname: charName,
+      guildName: guildName
+    });
+  } catch (error) {
+    console.error(`Failed to change nickname: ${error.message}`);
+    return LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
+      error: error.message
+    });
+  }
+}
+
+// Update handleDevServer to include all logging points
+async function handleDevServer(client, member, guildSettings, lang) {
+  if (!guildSettings.CharNameAsk) return;
+
+  try {
+    const dmChannel = await member.createDM();
+    await dmChannel.send(guildSettings.charNameAskDM);
+    
+    // Log DM sent
+    await Logger.log(client, member.guild.id, {
+      titleKey: 'dm_sent',
+      descData: { username: member.user.tag },
+      color: '#00ff00',
+      fields: [
+        { nameKey: 'user_label', value: member.user.tag },
+        { nameKey: 'user_id', value: member.user.id }
+      ]
+    });
+    
+    const filter = (m) => m.author.id === member.user.id;
+    const collector = dmChannel.createMessageCollector({
+      filter,
+      time: TIMEOUT_DURATION,
+    });
+
+    collector.on("collect", async (collected) => {
+      let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
+      
+      if (!response || response.length > MAX_CHAR_LENGTH) {
+        await dmChannel.send(
+          LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
+        );
+        
+        // Log invalid response
+        await Logger.log(client, member.guild.id, {
+          titleKey: 'invalid_response',
+          descData: { username: member.user.tag },
+          color: '#ff9900',
+          fields: [
+            { nameKey: 'user_label', value: member.user.tag },
+            { nameKey: 'user_id', value: member.user.id },
+            { nameKey: 'response', value: response || 'empty' }
+          ]
+        });
+        return;
+      }
+
+      // Format the character name
+      response = formatCharacterName(response);
+
+      const message = await handleNicknameChange(client, member, response, lang, member.guild.name);
+      await dmChannel.send(message);
+      collector.stop("valid-response");
+    });
+
+    collector.on("end", async (collected, reason) => {
+      if (reason !== "valid-response") {
+        try {
+          if (member.dmChannel) {
+            await member.send(
+              LanguageManager.getText('commands.charname.dm_timeout_message', lang, {
+                guildName: member.guild.name
+              })
+            );
+          }
+          
+          // Log timeout
+          await Logger.log(client, member.guild.id, {
+            titleKey: 'dm_timeout',
+            descData: { username: member.user.tag },
+            color: '#ff0000',
+            fields: [
+              { nameKey: 'user_label', value: member.user.tag },
+              { nameKey: 'user_id', value: member.user.id }
+            ]
+          });
+        } catch (error) {
+          console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
+          
+          // Log failed DM
+          await Logger.log(client, member.guild.id, {
+            titleKey: 'dm_failed',
+            descData: { username: member.user.tag },
+            color: '#ff0000',
+            fields: [
+              { nameKey: 'user_label', value: member.user.tag },
+              { nameKey: 'user_id', value: member.user.id },
+              { nameKey: 'error', value: error.message }
+            ]
+          });
+        }
+      }
+    });
+  } catch (error) {
+    console.error(`Failed to interact with ${member.user.tag}: ${error.message}`);
+    
+    // Log failed interaction
+    await Logger.log(client, member.guild.id, {
+      titleKey: 'interaction_failed',
+      descData: { username: member.user.tag },
+      color: '#ff0000',
+      fields: [
+        { nameKey: 'user_label', value: member.user.tag },
+        { nameKey: 'user_id', value: member.user.id },
+        { nameKey: 'error', value: error.message }
+      ]
+    });
+  }
+}
+
+// Helper function to handle blacklisted users
+async function handleBlacklistedUser(member, blacklistedUser, lang, client) {
+  try {
+    await member.send(
+      LanguageManager.getText('events.guildMemberAdd.blacklisted', lang, {
+        reason: blacklistedUser.reason
+      })
+    );
+    await member.ban({ reason: blacklistedUser.reason });
+    
+    await Logger.log(client, member.guild.id, {
+      titleKey: 'member_banned',
+      descData: { username: member.user.tag },
+      color: '#ff0000',
+      fields: [
+        { nameKey: 'user_label', value: member.user.tag },
+        { nameKey: 'user_id', value: member.user.id },
+        { nameKey: 'reason_label', value: blacklistedUser.reason }
+      ]
+    });
+  } catch (error) {
+    console.error(`Failed to handle blacklisted user ${member.user.tag}: ${error.message}`);
+  }
+}
+
+// Update handleRegularServer function
+async function handleRegularServer(client, member, guildSettings, lang) {
+  try {
+    const dmChannel = await member.createDM();
+    
+    // Get user's characters from both API and database
+    const characters = await fetchUserCharacters(client, member.user.id);
+
+    // If no characters found, proceed with manual input and send charNameAskDM
+    if (!characters || characters.length === 0) {
+      await dmChannel.send(guildSettings.charNameAskDM);
+      
+      // Log DM sent
+      await Logger.log(client, member.guild.id, {
+        titleKey: 'dm_sent',
+        descData: { username: member.user.tag },
+        color: '#00ff00',
+        fields: [
+          { nameKey: 'user_label', value: member.user.tag },
+          { nameKey: 'user_id', value: member.user.id }
+        ]
+      });
+      
+      return handleManualInput(client, member, dmChannel, guildSettings, lang);
+    }
+
+    // Create selection menu with character information
+    const options = characters.map(char => ({
+      label: char.name,
+      value: `${char.name}|${char.realm}`, // Store both name and realm
+      description: `${char.isMain ? '(Main) ' : char.isAlt ? '(Alt) ' : ''}${char.realm}`,
+      emoji: char.isMain ? '👑' : char.isAlt ? '🔄' : '👤'
+    }));
+
+    // Add "Not on list" option
+    options.push({
+      label: LanguageManager.getText('events.guildMemberAdd.not_on_list_label', lang),
+      value: "not_on_list",
+      description: LanguageManager.getText('events.guildMemberAdd.not_on_list_description', lang),
+      emoji: '➕'
+    });
+
+    const row = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId('character_select')
+        .setPlaceholder(LanguageManager.getText('events.guildMemberAdd.select_character', lang))
+        .addOptions(options)
+    );
+
+    const selectMessage = await dmChannel.send({
+      content: LanguageManager.getText('events.guildMemberAdd.assigned_chars_found', lang),
+      components: [row]
+    });
+
+    // Log DM sent
+    await Logger.log(client, member.guild.id, {
+      titleKey: 'dm_sent',
+      descData: { username: member.user.tag },
+      color: '#00ff00',
+      fields: [
+        { nameKey: 'user_label', value: member.user.tag },
+        { nameKey: 'user_id', value: member.user.id }
+      ]
+    });
+
+    try {
+      const response = await selectMessage.awaitMessageComponent({
+        filter: i => i.customId === 'character_select' && i.user.id === member.user.id,
+        time: TIMEOUT_DURATION,
+        componentType: ComponentType.StringSelect
+      });
+
+      await response.deferUpdate();
+      const selectedValue = response.values[0];
+
+      if (selectedValue === "not_on_list") {
+        // Disable the select menu before proceeding
+        const disabledRow = new ActionRowBuilder().addComponents(
+          StringSelectMenuBuilder.from(row.components[0]).setDisabled(true)
+        );
+        await selectMessage.edit({ components: [disabledRow] });
+        
+        return handleManualInput(client, member, dmChannel, guildSettings, lang);
+      } else {
+        // Split the value to get name and realm
+        const [charName, realm] = selectedValue.split('|');
+        
+        const message = await handleNicknameChange(client, member, charName, lang, member.guild.name);
+        await dmChannel.send(message);
+        
+        // Disable the select menu
+        const disabledRow = new ActionRowBuilder().addComponents(
+          StringSelectMenuBuilder.from(row.components[0])
+            .setDisabled(true)
+            .setPlaceholder(`Selected: ${charName}`)
+        );
+        await selectMessage.edit({ components: [disabledRow] });
+      }
+    } catch (error) {
+      await handleTimeout(client, member, selectMessage, row, lang);
+    }
+  } catch (error) {
+    console.error(`Failed to handle regular server join for ${member.user.tag}: ${error.message}`);
+    
+    // Log the error
+    await Logger.log(client, member.guild.id, {
+      titleKey: 'interaction_failed',
+      descData: { username: member.user.tag },
+      color: '#ff0000',
+      fields: [
+        { nameKey: 'user_label', value: member.user.tag },
+        { nameKey: 'user_id', value: member.user.id },
+        { nameKey: 'error', value: error.message }
+      ]
+    });
+  }
+}
+
+// Helper function to handle welcome messages
+async function handleWelcomeMessage(client, member, guildSettings, lang) {
+  try {
+    const welcomeChannel = member.guild.channels.cache.get(guildSettings.welcomeChannel);
+    if (!welcomeChannel) return;
+
+    const welcomeEmbed = {
+      title: LanguageManager.getText('events.guildMemberAdd.welcome_title', lang, {
+        guildName: member.guild.name
+      }),
+      description: LanguageManager.getText('events.guildMemberAdd.welcome_message', lang, {
+        member: member.toString()
+      }),
+      color: 10038562,
+      timestamp: new Date(),
+      footer: {
+        text: member.guild.name,
+        icon_url: client.user.displayAvatarURL(),
+      },
+      thumbnail: {
+        url: member.user.displayAvatarURL(),
+      },
+    };
+
+    await welcomeChannel.send({ embeds: [welcomeEmbed] });
+
+  } catch (error) {
+    console.error('Welcome Message Error:', {
+      error: error.message,
+      stack: error.stack,
+      guildId: member.guild.id,
+      channelId: guildSettings.welcomeChannel,
+      memberTag: member.user.tag
+    });
+  }
+}
+
+// Helper function to handle collector end
+function handleCollectorEnd(client, member, lang) {
+  return async (collected, reason) => {
+    if (reason !== "valid-response" && member.dmChannel) {
+      try {
+        await member.send(
+          LanguageManager.getText('commands.charname.dm_timeout_message', lang, {
+            guildName: member.guild.name
+          })
+        );
+        await Logger.log(client, member.guild.id, {
+          titleKey: 'dm_timeout',
+          descData: { username: member.user.tag },
+          color: '#ff0000',
+          fields: [
+            { nameKey: 'user_label', value: member.user.tag },
+            { nameKey: 'user_id', value: member.user.id }
+          ]
+        });
+      } catch (error) {
+        console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
+      }
+    }
+  };
+}
+
+// Helper function to handle timeouts
+async function handleTimeout(client, member, selectMessage, row, lang) {
+  try {
+    const disabledRow = new ActionRowBuilder().addComponents(
+      StringSelectMenuBuilder.from(row.components[0])
+        .setDisabled(true)
+        .setPlaceholder('Selection timed out')
+    );
+    await selectMessage.edit({ components: [disabledRow] });
+    
+    if (member.dmChannel) {
+      await member.send(
+        LanguageManager.getText('commands.charname.dm_timeout_message', lang, {
+          guildName: member.guild.name
+        })
+      );
+    }
+    
+    await Logger.log(client, member.guild.id, {
+      titleKey: 'dm_timeout',
+      descData: { username: member.user.tag },
+      color: '#ff0000',
+      fields: [
+        { nameKey: 'user_label', value: member.user.tag },
+        { nameKey: 'user_id', value: member.user.id }
+      ]
+    });
+  } catch (error) {
+    console.error(`Failed to handle timeout for ${member.user.tag}:`, error);
+  }
+}
+
+// Update fetchUserCharacters function to include database characters
+async function fetchUserCharacters(client, userId) {
+  let characters = [];
+
+  // Get characters from API
+  try {
+    const response = await https.get(`${config.users.url}/api/user/${userId}/characters`);
+    if (response.data && Array.isArray(response.data)) {
+      characters = response.data;
+    }
+  } catch (error) {
+    console.error(`[DEBUG] Error fetching API characters: ${error.message}`);
+  }
+
+  // Get characters from database
+  try {
+    const userCharacters = client.database.get("userCharacters") || {};
+    const dbUserData = userCharacters[userId];
+    
+    if (dbUserData) {
+      // Add main character if exists
+      if (dbUserData.main) {
+        const mainChar = {
+          name: dbUserData.main.name,
+          realm: dbUserData.main.realm,
+          isMain: true
+        };
+        
+        // Only add if not already present (same name AND realm)
+        if (!characters.some(char => 
+          char.name.toLowerCase() === mainChar.name.toLowerCase() && 
+          char.realm.toLowerCase() === mainChar.realm.toLowerCase()
+        )) {
+          characters.push(mainChar);
+        }
+      }
+
+      // Add alt characters
+      if (dbUserData.alts && Array.isArray(dbUserData.alts)) {
+        dbUserData.alts.forEach(alt => {
+          const altChar = {
+            name: alt.name,
+            realm: alt.realm,
+            isAlt: true
+          };
+          
+          // Only add if not already present (same name AND realm)
+          if (!characters.some(char => 
+            char.name.toLowerCase() === altChar.name.toLowerCase() && 
+            char.realm.toLowerCase() === altChar.realm.toLowerCase()
+          )) {
+            characters.push(altChar);
+          }
+        });
+      }
+    }
+  } catch (error) {
+    console.error(`[DEBUG] Error fetching database characters: ${error.message}`);
+  }
+
+  return characters;
+}
+
+// Update validateCharacterName function
+async function validateCharacterName(charName, userChars, lang) {
+  if (!charName || charName.length > MAX_CHAR_LENGTH) {
+    return {
+      valid: false,
+      message: LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
+    };
+  }
+
+  if (!userChars || Object.keys(userChars).length === 0) {
+    userChars = client.database.get("userCharacters") || {};
+  }
+
+  const charNameLower = charName.toLowerCase();
+
+  for (const [userId, userData] of Object.entries(userChars)) {
+    if (userData.main && userData.main.name.toLowerCase() === charNameLower) {
+      return { 
+        valid: true, 
+        realm: userData.main.realm,
+        isOwnCharacter: true,
+        character: userData.main
+      };
+    }
+
+    if (userData.alts && Array.isArray(userData.alts)) {
+      for (const alt of userData.alts) {
+        if (alt.name.toLowerCase() === charNameLower) {
+          return { 
+            valid: true, 
+            realm: alt.realm,
+            isOwnCharacter: true,
+            character: alt
+          };
+        }
+      }
+    }
+  }
+
+  const result = await checkAllRealms(charName);
+  if (!result.found) {
+    return {
+      valid: false,
+      message: LanguageManager.getText('events.guildMemberAdd.character_not_found', lang)
+    };
+  }
+
+  return { 
+    valid: true, 
+    realm: result.realm,
+    isNewCharacter: true
+  };
+}
 
 module.exports = new Event({
   event: "guildMemberAdd",
   once: false,
   run: async (client, member) => {
-    let obj = client.database.get("blacklisted") || [];
+    if (member.user.bot) return;
+
     let settings = client.database.get("settings") || [];
-    let guildSettings = settings.find(
-      (setting) => setting.guild === member.guild.id
-    );
+    let guildSettings = settings.find(setting => setting.guild === member.guild.id);
     
     if (!guildSettings) {
       guildSettings = { guild: member.guild.id };
       settings.push(guildSettings);
     }
 
-    if (ensureGuildSettings(guildSettings)) {
-      client.database.set("settings", settings);
+    const lang = guildSettings.language || "en";
+
+    // Handle welcome message first
+    if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+      await handleWelcomeMessage(client, member, guildSettings, lang);
     }
 
-    const lang = guildSettings.language || "en";
-    const charNameAskEnabled = guildSettings.CharNameAsk;
-    const welcomeMessageEnabled = guildSettings.welcomeMessage;
-    const BlockListEnabled = guildSettings.BlockList;
-
-    if (member.user.bot) return;
-
-    // Check if user is blacklisted
-    const blacklistedUser = obj.find(u => u.id === member.id);
-    if (BlockListEnabled && blacklistedUser) {
-      // Skip if this is the Warmane Tool Discord server
-      if (member.guild.id === config.development.guildId) {
+    // Handle blacklisted users
+    if (guildSettings.BlockList) {
+      const blacklistedUsers = client.database.get("blacklisted") || [];
+      const blacklistedUser = blacklistedUsers.find(u => u.id === member.id);
+      
+      if (blacklistedUser && member.guild.id !== config.development.guildId) {
+        await handleBlacklistedUser(member, blacklistedUser, lang, client);
         return;
       }
+    }
 
-      try {
-        await member.send(
-          LanguageManager.getText('events.guildMemberAdd.blacklisted', lang)
-        );
-      } catch (error) {
-        console.error(`Failed to send a DM to ${member.user.tag}.`);
-      }
-
-      try {
-        await member.ban({
-          reason: `Blacklisted user. Reason: ${blacklistedUser.reason || 'No reason provided'}`,
-          deleteMessageSeconds: 60 * 60 * 24 * 7 // 7 days of messages
-        });
-        success(`Banned ${member.user.tag} due to being blacklisted.`);
-      } catch (error) {
-        console.error(
-          `Failed to ban ${member.user.tag} due to: ${error.message}.`
-        );
-      }
+    // Development server handling
+    if (member.guild.id === config.development.guildId) {
+      await handleDevServer(client, member, guildSettings, lang);
       return;
     }
 
-    if (charNameAskEnabled) {
-      try {
-        const dmChannel = await member.createDM();
-        
-        // Check if user has assigned characters
-        const userChars = client.database.get("userCharacters") || {};
-        const userData = userChars[member.user.id];
-        
-        if (userData && (userData.main || (userData.alts && userData.alts.length > 0))) {
-          // Create dropdown with assigned characters
-          const options = [];
-          
-          if (userData.main) {
-            options.push({
-              label: `${userData.main.name} (Main)`,
-              description: `Main character - ${userData.main.realm}`,
-              value: userData.main.name
-            });
-          }
-          
-          if (userData.alts) {
-            userData.alts.forEach(alt => {
-              options.push({
-                label: `${alt.name} (Alt)`,
-                description: `Alt character - ${alt.realm}`,
-                value: alt.name
-              });
-            });
-          }
-
-          // Add "Not on the list" option
-          options.push({
-            label: LanguageManager.getText('events.guildMemberAdd.not_on_list_label', lang),
-            description: LanguageManager.getText('events.guildMemberAdd.not_on_list_description', lang),
-            value: "not_on_list"
-          });
-
-          const row = new ActionRowBuilder().addComponents(
-            new StringSelectMenuBuilder()
-              .setCustomId('character_select')
-              .setPlaceholder(LanguageManager.getText('events.guildMemberAdd.select_character', lang))
-              .addOptions(options)
-          );
-
-          const selectMessage = await dmChannel.send({
-            content: LanguageManager.getText('events.guildMemberAdd.assigned_chars_found', lang),
-            components: [row]
-          });
-
-          try {
-            const response = await selectMessage.awaitMessageComponent({
-              filter: i => i.customId === 'character_select' && i.user.id === member.user.id,
-              time: 60000,
-              componentType: ComponentType.StringSelect
-            });
-
-            // Acknowledge the interaction first
-            await response.deferUpdate();
-
-            const selectedValue = response.values[0];
-
-            if (selectedValue === "not_on_list") {
-              // Disable the select menu
-              const disabledRow = new ActionRowBuilder().addComponents(
-                StringSelectMenuBuilder.from(row.components[0]).setDisabled(true)
-              );
-              await selectMessage.edit({ components: [disabledRow] });
-
-              // Proceed with manual name collection
-              await dmChannel.send(guildSettings.charNameAskDM);
-              
-              const filter = (m) => m.author.id === member.user.id;
-              const collector = dmChannel.createMessageCollector({
-                filter,
-                time: 60000,
-              });
-
-              collector.on("collect", async (collected) => {
-                let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
-                if (response === "" || response.length > 16) {
-                  await dmChannel.send(
-                    LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
-                  );
-                } else {
-                  try {
-                    await member.setNickname(response);
-                    console.log(`Changed ${member.user.tag} to ${response}.`);
-                    await dmChannel.send(
-                      LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
-                        nickname: response,
-                        guildName: member.guild.name
-                      })
-                    );
-
-                    // Check if the character exists on Warmane and isn't assigned
-                    const realms = ["Icecrown", "Lordaeron", "Frostwolf", "Blackrock", "Onyxia"];
-                    for (const realm of realms) {
-                      const exists = await checkWarmaneCharacter(response, realm);
-                      if (exists && !isCharacterAssigned(userChars, response, realm)) {
-                        // Initialize user data if it doesn't exist
-                        if (!userChars[member.user.id]) {
-                          userChars[member.user.id] = {
-                            main: null,
-                            alts: []
-                          };
-                        }
-
-                        // Add as alt character
-                        const charData = {
-                          name: response,
-                          realm: realm,
-                          addedBy: client.user.id,
-                          addedAt: new Date().toISOString()
-                        };
-
-                        userChars[member.user.id].alts.push(charData);
-                        client.database.set("userCharacters", userChars);
-                        break; // Stop checking other realms once we find a match
-                      }
-                    }
-
-                    collector.stop("valid-response");
-                  } catch (error) {
-                    console.error(
-                      `Failed to change ${member.user.tag} to ${response} due to: ${error.message}.`
-                    );
-                    await dmChannel.send(
-                      LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
-                        error: error.message
-                      })
-                    );
-                  }
-                }
-              });
-
-              collector.on("end", async (collected, reason) => {
-                try {
-                  if (reason !== "valid-response") {
-                    await dmChannel.send(
-                      LanguageManager.getText('events.guildMemberAdd.timeout', lang)
-                    );
-                  }
-                } catch (error) {
-                  console.error(`Failed to send end message to ${member.user.tag}: ${error.message}`);
-                }
-              });
-            } else {
-              try {
-                await member.setNickname(selectedValue);
-                await dmChannel.send(
-                  LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
-                    nickname: selectedValue,
-                    guildName: member.guild.name
-                  })
-                );
-              } catch (error) {
-                console.error(`Failed to change nickname: ${error.message}`);
-                await dmChannel.send(
-                  LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
-                    error: error.message
-                  })
-                );
-              }
-            }
-          } catch (error) {
-            console.error('Selection error:', error);
-            if (error.code === 'INTERACTION_COLLECTOR_ERROR') {
-              await dmChannel.send(
-                LanguageManager.getText('events.guildMemberAdd.timeout', lang)
-              );
-            }
-          } finally {
-            // Disable the select menu after use if not already disabled
-            try {
-              const disabledRow = new ActionRowBuilder().addComponents(
-                StringSelectMenuBuilder.from(row.components[0]).setDisabled(true)
-              );
-              await selectMessage.edit({ components: [disabledRow] });
-            } catch (error) {
-              console.error('Failed to disable select menu:', error);
-            }
-          }
-        } else {
-          // Manual character name input for users without assigned characters
-          await dmChannel.send(guildSettings.charNameAskDM);
-          
-          const filter = (m) => m.author.id === member.user.id;
-          const collector = dmChannel.createMessageCollector({
-            filter,
-            time: 60000,
-          });
-
-          collector.on("collect", async (collected) => {
-            let response = collected.content.trim().replace(/[^a-zA-Z ]/g, "");
-            if (response === "" || response.length > 16) {
-              await dmChannel.send(
-                LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
-              );
-            } else {
-              try {
-                await member.setNickname(response);
-                console.log(`Changed ${member.user.tag} to ${response}.`);
-                await dmChannel.send(
-                  LanguageManager.getText('events.guildMemberAdd.name_changed', lang, {
-                    nickname: response,
-                    guildName: member.guild.name
-                  })
-                );
-
-                // Check if the character exists on Warmane and isn't assigned
-                const realms = ["Icecrown", "Lordaeron", "Frostwolf", "Blackrock", "Onyxia"];
-                for (const realm of realms) {
-                  const exists = await checkWarmaneCharacter(response, realm);
-                  if (exists && !isCharacterAssigned(userChars, response, realm)) {
-                    // Initialize user data if it doesn't exist
-                    if (!userChars[member.user.id]) {
-                      userChars[member.user.id] = {
-                        main: null,
-                        alts: []
-                      };
-                    }
-
-                    // Add as alt character
-                    const charData = {
-                      name: response,
-                      realm: realm,
-                      addedBy: client.user.id,
-                      addedAt: new Date().toISOString()
-                    };
-
-                    userChars[member.user.id].alts.push(charData);
-                    client.database.set("userCharacters", userChars);
-                    break; // Stop checking other realms once we find a match
-                  }
-                }
-
-                collector.stop("valid-response");
-              } catch (error) {
-                console.error(
-                  `Failed to change ${member.user.tag} to ${response} due to: ${error.message}.`
-                );
-                await dmChannel.send(
-                  LanguageManager.getText('events.guildMemberAdd.name_change_failed', lang, {
-                    error: error.message
-                  })
-                );
-              }
-            }
-          });
-
-          collector.on("end", async (collected, reason) => {
-            try {
-              if (reason !== "valid-response") {
-                await dmChannel.send(
-                  LanguageManager.getText('events.guildMemberAdd.timeout', lang)
-                );
-              }
-            } catch (error) {
-              console.error(`Failed to send end message to ${member.user.tag}: ${error.message}`);
-            }
-          });
-        }
-
-      } catch (error) {
-        console.error(`Failed to interact with ${member.user.tag}: ${error.message}`);
-        try {
-          const modChannel = member.guild.channels.cache.find(
-            channel => channel.name === "mod-logs"
-          );
-          if (modChannel) {
-            await modChannel.send(
-              LanguageManager.getText('events.guildMemberAdd.mod_notification', lang, {
-                username: member.user.tag
-              })
-            );
-          }
-        } catch (err) {
-          console.error("Failed to send mod notification:", err);
-        }
-      }
-    }
-
-    if (welcomeMessageEnabled) {
-      let welcomeChannel = guildSettings.welcomeChannel;
-      if (!welcomeChannel || welcomeChannel === "") {
-        welcomeChannel = member.guild.channels.cache.find(
-          (channel) => channel.name === "welcome"
-        );
-      } else {
-        welcomeChannel = member.guild.channels.cache.get(welcomeChannel);
-      }
-      if (!welcomeChannel) return;
-
-      const embed = {
-        title: LanguageManager.getText('events.guildMemberAdd.welcome_title', lang, {
-          guildName: member.guild.name
-        }),
-        description: LanguageManager.getText('events.guildMemberAdd.welcome_message', lang, {
-          member: member.toString()
-        }),
-        color: 10038562,
-        timestamp: new Date(),
-        footer: {
-          text: member.guild.name,
-          icon_url: client.user.displayAvatarURL(),
-        },
-        thumbnail: {
-          url: member.user.displayAvatarURL(),
-        },
-      };
-      await welcomeChannel.send({ embeds: [embed] });
+    // Regular server handling
+    if (guildSettings.CharNameAsk) {
+      await handleRegularServer(client, member, guildSettings, lang);
     }
   },
 }).toJSON();

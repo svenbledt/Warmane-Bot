@@ -9,10 +9,11 @@ module.exports = {
             error_occurred: "Ein Fehler ist aufgetreten: {error}"
         },
         charname: {
-            dm_initial: "Hey, ich möchte dich nach deinem Hauptcharakternamen fragen. Bitte antworte mit deinem Hauptcharakternamen.",
+            dm_initial: "Hey, ich würde gerne nach deinem Hauptcharakter-Namen fragen.\nBitte antworte mit deinem Hauptcharakter-Namen für den Server.\n\nDu hast 10 Minuten Zeit zum Antworten.",
             empty_response: "Deine Antwort darf nicht leer sein. Bitte gib eine gültige Antwort.",
-            nickname_success: "Dein Hauptcharaktername wurde erfolgreich zu {nickname} geändert.",
-            nickname_failed: "Fehler beim Ändern deines Hauptcharakternamens: {error}"
+            nickname_success: "Dein Hauptcharakter-Name wurde erfolgreich zu {nickname} geändert.",
+            nickname_failed: "Fehler beim Ändern deines Hauptcharakter-Namens: {error}",
+            dm_timeout_message: "Zeit abgelaufen. Bitte kontaktiere einen Mitarbeiter von {guildName} für eine neue Chance."
         },
         language: {
             success: "✅ Serversprache wurde auf {language} eingestellt."
@@ -130,6 +131,16 @@ module.exports = {
                 alt_characters_header: "**Twink-Charaktere:**",
                 character_entry: "{name} - {realm}"
             }
+        },
+        setlogchannel: {
+            invalid_channel: "Bitte wähle einen Textkanal für die Protokollierung.",
+            success: "Protokollkanal wurde auf #{channelName} gesetzt.",
+            success_with_enable: "Protokollkanal wurde auf #{channelName} gesetzt und die Protokollierung wurde aktiviert.",
+            no_channel_set: "Es wurde kein Protokollkanal festgelegt. Bitte verwende `/set-logchannel`, um einen festzulegen."
+        },
+        settings: {
+            logging_enabled: "Server-Protokollierung",
+            logging_no_channel: "⚠️ Protokollierung ist aktiviert, aber kein Kanal ist festgelegt. Verwende `/set-logchannel`, um einen festzulegen."
         }
     },
     events: {
@@ -154,6 +165,46 @@ module.exports = {
             assigned_chars_found: "Ich habe einige Charaktere gefunden, die deinem Account zugeordnet sind. Bitte wähle einen als deinen Nicknamen aus:",
             not_on_list_label: "Nicht in der Liste",
             not_on_list_description: "Einen anderen Charakternamen manuell eingeben",
+            character_not_found: "Ich konnte diesen Charakter nicht finden. Bitte versuche es mit einem gültigen Charakternamen erneut."
+        },
+        nickname_changed: {
+            title: 'Nickname Geändert',
+            description: 'Nickname für {username} zu {nickname} geändert',
+            new_nickname: 'Neuer Nickname'
+        }
+    },
+    logging: {
+        dm_sent: {
+            title: 'DM Gesendet',
+            description: 'Charakternamen-Anfrage DM an {username} gesendet'
+        },
+        member_banned: {
+            title: 'Mitglied Gebannt',
+            description: 'Blacklist-Benutzer gebannt',
+            reason_label: 'Grund'
+        },
+        invite_created: {
+            title: 'Einladung Erstellt',
+            description: 'Neue Server-Einladung für {botName} Entwickler erstellt',
+            channel: 'Kanal',
+            created_by: 'Erstellt von'
+        },
+        user_label: 'Benutzer',
+        user_id: 'Benutzer ID',
+        footer: 'Server Logs',
+        dm_failed: {
+            title: 'DM Fehlgeschlagen',
+            description: 'Konnte keine DM an {username} senden',
+            error_label: 'Fehler'
+        },
+        dm_timeout: {
+            title: 'DM Antwort Zeitüberschreitung',
+            description: '{username} hat nicht innerhalb der Zeitbegrenzung geantwortet'
+        },
+        nickname_changed: {
+            title: 'Nickname Geändert',
+            description: 'Nickname für {username} zu {nickname} geändert',
+            new_nickname: 'Neuer Nickname'
         }
     }
 }; 

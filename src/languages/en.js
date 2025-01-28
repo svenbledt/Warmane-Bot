@@ -9,10 +9,11 @@ module.exports = {
             error_occurred: "An error occurred: {error}"
         },
         charname: {
-            dm_initial: "Hey, I would like to ask you for your main Character name. Please respond with your main Character name.",
+            dm_initial: "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\nYou have 10 minutes to respond.",
             empty_response: "Your response cannot be empty. Please provide a valid response.",
             nickname_success: "Your main Characters name has been successfully changed to {nickname}.",
-            nickname_failed: "Failed to change your main Characters name due to: {error}"
+            nickname_failed: "Failed to change your main Characters name due to: {error}",
+            dm_timeout_message: "Time expired. Please contact a staff member of {guildName} to get a new chance."
         },
         language: {
             success: "✅ Server language has been set to {language}."
@@ -130,6 +131,16 @@ module.exports = {
                 alt_characters_header: "**Alt Characters:**",
                 character_entry: "{name} - {realm}"
             }
+        },
+        setlogchannel: {
+            invalid_channel: "Please select a text channel for logging.",
+            success: "Log channel has been set to #{channelName}.",
+            success_with_enable: "Log channel has been set to #{channelName} and logging has been enabled.",
+            no_channel_set: "No log channel has been set. Please use `/set-logchannel` to set one."
+        },
+        settings: {
+            logging_enabled: "Server Logging",
+            logging_no_channel: "⚠️ Logging is enabled but no channel is set. Use `/set-logchannel` to set one."
         }
     },
     events: {
@@ -139,7 +150,6 @@ module.exports = {
             invalid_response: "Your response cannot be empty or too long.\nPlease provide a valid response.",
             name_changed: "Your name has been successfully changed to {nickname} for the Guild {guildName}.",
             name_change_failed: "Failed to change your name due to: {error}",
-            timeout: "Time's up! Contact a staff of the server if you like to change your name again.",
             mod_notification: "Failed to send character name request to {username}. They likely have DMs disabled.",
             welcome_title: "Welcome to {guildName}!",
             welcome_message: "Welcome {member} to our server!\n\nIf you have any questions, feel free to ask in a Public channel.",
@@ -155,6 +165,41 @@ module.exports = {
             assigned_chars_found: "I found some characters assigned to your account. Please select one to use as your nickname:",
             not_on_list_label: "Not on the list",
             not_on_list_description: "Enter a different character name manually",
+            character_not_found: "I couldn't find that character. Please try again with a valid character name.",
+        }
+    },
+    logging: {
+        dm_sent: {
+            title: 'DM Sent',
+            description: 'Sent character name request DM to {username}'
+        },
+        member_banned: {
+            title: 'Member Banned',
+            description: 'Banned blacklisted user',
+            reason_label: 'Reason'
+        },
+        invite_created: {
+            title: 'Invite Created',
+            description: 'Created new server invite for {botName} Developers',
+            channel: 'Channel',
+            created_by: 'Created By'
+        },
+        user_label: 'User',
+        user_id: 'User ID',
+        footer: 'Server Logs',
+        dm_failed: {
+            title: 'DM Failed',
+            description: 'Failed to send DM to {username}',
+            error_label: 'Error'
+        },
+        nickname_changed: {
+            title: 'Nickname Changed',
+            description: 'Changed nickname for {username} to {nickname}',
+            new_nickname: 'New Nickname'
+        },
+        dm_timeout: {
+            title: 'DM Response Timeout',
+            description: '{username} did not respond within the time limit'
         }
     }
 };

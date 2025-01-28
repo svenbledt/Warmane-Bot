@@ -15,6 +15,8 @@ function ensureGuildSettings(guildSettings) {
     CharNameAsk: false,
     BlockList: true,
     language: "en",  // Add default language setting
+    logChannel: "", // Add logging channel setting
+    enableLogging: false, // Add logging toggle
     charNameAskDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
     lastOwnerDM: {},

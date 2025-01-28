@@ -9,10 +9,11 @@ module.exports = {
             error_occurred: "Une erreur s'est produite : {error}"
         },
         charname: {
-            dm_initial: "Bonjour, j'aimerais connaître le nom de votre personnage principal. Veuillez répondre avec le nom de votre personnage principal.",
-            empty_response: "Votre réponse ne peut pas être vide. Veuillez fournir une réponse valide.",
-            nickname_success: "Le nom de votre personnage principal a été changé avec succès en {nickname}.",
-            nickname_failed: "Échec du changement du nom de votre personnage principal en raison de : {error}"
+            dm_initial: "Salut, j'aimerais connaître le nom de ton personnage principal.\nMerci de répondre avec le nom de ton personnage principal pour le serveur.\n\nTu as 10 minutes pour répondre.",
+            empty_response: "Ta réponse ne peut pas être vide. Merci de fournir une réponse valide.",
+            nickname_success: "Le nom de ton personnage principal a été changé avec succès en {nickname}.",
+            nickname_failed: "Échec du changement du nom de ton personnage principal : {error}",
+            dm_timeout_message: "Temps expiré. Veuillez contacter un membre du personnel de {guildName} pour obtenir une nouvelle chance."
         },
         language: {
             success: "✅ La langue du serveur a été définie sur {language}."
@@ -130,6 +131,16 @@ module.exports = {
                 alt_characters_header: "**Personnages Alternatifs:**",
                 character_entry: "{name} - {realm}"
             }
+        },
+        setlogchannel: {
+            invalid_channel: "Veuillez sélectionner un canal textuel pour la journalisation.",
+            success: "Le canal de journalisation a été défini sur #{channelName}.",
+            success_with_enable: "Le canal de journalisation a été défini sur #{channelName} et la journalisation a été activée.",
+            no_channel_set: "Aucun canal de journalisation n'a été défini. Veuillez utiliser `/set-logchannel` pour en définir un."
+        },
+        settings: {
+            logging_enabled: "Journalisation du Serveur",
+            logging_no_channel: "⚠️ La journalisation est activée mais aucun canal n'est défini. Utilisez `/set-logchannel` pour en définir un."
         }
     },
     events: {
@@ -154,6 +165,46 @@ module.exports = {
             assigned_chars_found: "J'ai trouvé des personnages associés à votre compte. Veuillez en sélectionner un à utiliser comme pseudo :",
             not_on_list_label: "Pas dans la liste",
             not_on_list_description: "Entrer un autre nom de personnage manuellement",
+            character_not_found: "Je n'ai pas trouvé ce personnage. Veuillez réessayer avec un nom de personnage valide."
+        },
+        nickname_changed: {
+            title: 'Surnom Modifié',
+            description: 'Surnom de {username} changé en {nickname}',
+            new_nickname: 'Nouveau Surnom'
+        }
+    },
+    logging: {
+        dm_sent: {
+            title: 'MP Envoyé',
+            description: 'MP de demande de nom de personnage envoyé à {username}'
+        },
+        member_banned: {
+            title: 'Membre Banni',
+            description: 'Utilisateur de la liste noire banni',
+            reason_label: 'Raison'
+        },
+        invite_created: {
+            title: 'Invitation Créée',
+            description: 'Nouvelle invitation du serveur créée pour les développeurs de {botName}',
+            channel: 'Canal',
+            created_by: 'Créé par'
+        },
+        user_label: 'Utilisateur',
+        user_id: 'ID Utilisateur',
+        footer: 'Journaux du Serveur',
+        dm_failed: {
+            title: 'Échec du MP',
+            description: 'Impossible d\'envoyer un MP à {username}',
+            error_label: 'Erreur'
+        },
+        dm_timeout: {
+            title: 'Délai de Réponse DM Dépassé',
+            description: '{username} n\'a pas répondu dans le délai imparti'
+        },
+        nickname_changed: {
+            title: 'Surnom Modifié',
+            description: 'Surnom de {username} changé en {nickname}',
+            new_nickname: 'Nouveau Surnom'
         }
     }
 }; 

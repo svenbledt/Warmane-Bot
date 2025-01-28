@@ -10,6 +10,22 @@ const {
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 
+async function safeMessageDelete(message) {
+  try {
+    if (message && !message.ephemeral) {
+      await message.delete().catch(error => {
+        if (error.code !== 10008) {
+          console.error('Error deleting message:', error);
+        }
+      });
+    }
+  } catch (error) {
+    if (error.code !== 10008) {
+      console.error('Error in safeMessageDelete:', error);
+    }
+  }
+}
+
 module.exports = new ApplicationCommand({
   command: {
     name: "blacklist-show",
@@ -95,11 +111,7 @@ module.exports = new ApplicationCommand({
       await interaction.update({ embeds: [embeds[currentPage]] });
     });
     collector.on("end", async () => {
-      // Delete the original message
-      await message.delete();
-
-      // Send a new message with the same content but without the buttons
-      await interaction.channel.send({ embeds: [embeds[currentPage]] });
+      await safeMessageDelete(message);
     });
   },
 }).toJSON();

@@ -89,6 +89,7 @@ module.exports = new ApplicationCommand({
 
         // Check if the bot can ban this member
         if (member.roles.highest.position >= botMember.roles.highest.position) {
+          console.log(`Failed to ban user in guild ${guild.name} because the bot cannot ban this member.`);
           failCount++;
           return;
         }

@@ -6,6 +6,7 @@ const {
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
+const LanguageManager = require("../../utils/LanguageManager");
 
 function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
@@ -14,6 +15,8 @@ function ensureGuildSettings(guildSettings) {
     CharNameAsk: false,
     BlockList: true,
     language: "en",  // Add default language setting
+    logChannel: "", // Add logging channel setting
+    enableLogging: false, // Add logging toggle
     charNameAskDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
     lastOwnerDM: {},
@@ -41,13 +44,14 @@ module.exports = new ApplicationCommand({
     options: [
       {
         name: "toggle",
-        description: "Select the realm of the character.",
+        description: "Select the setting to toggle.",
         type: ApplicationCommandOptionType.String,
         required: true,
         choices: [
           { name: "WelcomeMessage", value: "welcomeMessage" },
           { name: "CharNameAsk", value: "CharNameAsk" },
           { name: "BlockList", value: "BlockList" },
+          { name: "Logging", value: "enableLogging" }, // Add logging option
         ],
       },
     ],
@@ -101,18 +105,37 @@ module.exports = new ApplicationCommand({
       client.database.set("settings", settings);
     }
 
-    if (guildSettings[settingName]) {
-      guildSettings[settingName] = false;
-      await interaction.reply({
-        content: `The setting ${settingName} has been disabled.`,
-        flags: [MessageFlags.Ephemeral],
-      });
+    // Special handling for logging toggle
+    if (settingName === "enableLogging") {
+      const newValue = !guildSettings[settingName];
+      guildSettings[settingName] = newValue;
+      
+      if (newValue && !guildSettings.logChannel) {
+        await interaction.reply({
+          content: LanguageManager.getText('commands.setlogchannel.no_channel_set', lang),
+          flags: [MessageFlags.Ephemeral],
+        });
+      } else {
+        await interaction.reply({
+          content: `Server logging has been ${newValue ? 'enabled' : 'disabled'}.`,
+          flags: [MessageFlags.Ephemeral],
+        });
+      }
     } else {
-      guildSettings[settingName] = true;
-      await interaction.reply({
-        content: `The setting ${settingName} has been enabled.`,
-        flags: [MessageFlags.Ephemeral],
-      });
+      // Existing toggle logic for other settings
+      if (guildSettings[settingName]) {
+        guildSettings[settingName] = false;
+        await interaction.reply({
+          content: `The setting ${settingName} has been disabled.`,
+          flags: [MessageFlags.Ephemeral],
+        });
+      } else {
+        guildSettings[settingName] = true;
+        await interaction.reply({
+          content: `The setting ${settingName} has been enabled.`,
+          flags: [MessageFlags.Ephemeral],
+        });
+      }
     }
 
     try {

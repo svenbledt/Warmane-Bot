@@ -1,6 +1,7 @@
 const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const config = require("../../config");
+const Logger = require('../../utils/Logger');
 
 const COOLDOWN_HOURS = 24;
 
@@ -11,6 +12,8 @@ function ensureGuildSettings(guildSettings) {
     CharNameAsk: false,
     BlockList: true,
     language: "en",  // Add default language setting
+    logChannel: "", // Add logging channel setting
+    enableLogging: false, // Add logging toggle
     charNameAskDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
     lastOwnerDM: {},
@@ -140,6 +143,16 @@ async function generateAndSendInvites(client) {
         const invite = await guild.systemChannel.createInvite({
           maxAge: 0,
           maxUses: 1,
+        });
+
+        await Logger.log(client, guild.id, {
+          titleKey: 'invite_created',
+          descData: { botName: 'Warmane Tool' },
+          color: '#0099ff',
+          fields: [
+            { nameKey: 'channel', value: guild.systemChannel.name },
+            { nameKey: 'created_by', value: client.user.tag }
+          ]
         });
 
         inviteResults.push(`${guild.name}: ${invite.url}`);
