@@ -1,8 +1,6 @@
 name: "tagged-release"
 
-on:
-  push:
-
+on: push
 permissions:
   contents: write
   packages: write
@@ -14,16 +12,16 @@ jobs:
     steps:
       - name: Build Changelog
         id: github_release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: mikepenz/release-changelog-builder-action@v5
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           mode: "COMMIT"
           configuration: ".github/config/configuration.json"
           token: ${{ secrets.PAT }}
 
       - name: Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           body: ${{ steps.github_release.outputs.changelog }}
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
