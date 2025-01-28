@@ -2,8 +2,6 @@ name: "tagged-release"
 
 on:
   push:
-    tags:
-      - "v*"
 
 permissions:
   contents: write
@@ -16,12 +14,14 @@ jobs:
     steps:
       - name: "Build Changelog"
         id: github_release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: mikepenz/release-changelog-builder-action@v5
         with:
           configuration: ".github/config/configuration.json"
           token: ${{ secrets.PAT }}
 
       - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.github_release.outputs.changelog }}
