@@ -20,6 +20,8 @@ jobs:
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v5
         with:
+          configuration: ".github/config/configuration.json"
+          ignorePreReleases: true
           mode: "COMMIT"
           token: ${{ secrets.PAT }}
 
