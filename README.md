@@ -12,5 +12,4 @@ A Discord bot that handles Warmane's API and provides useful information for pla
 - **Github Token**: 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
 
 ## TODO
-- [x] Add a database to store main characters for users.
-- [x] Add a command to set a main character for a user.
+- [ ] Excesive Testing of logging system.
