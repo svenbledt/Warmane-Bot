@@ -1,6 +1,10 @@
 name: "tagged-release"
 
-on: push
+on:
+  push:
+    tags:
+      - "v*"
+
 permissions:
   contents: write
   packages: write
@@ -13,7 +17,6 @@ jobs:
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v5
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           mode: "COMMIT"
           configuration: ".github/config/configuration.json"
@@ -21,7 +24,6 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           body: ${{ steps.github_release.outputs.changelog }}
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
@@ -30,7 +32,6 @@ jobs:
 
       - name: Sending message
         uses: svenbledt/discord-styled-releases@main
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
