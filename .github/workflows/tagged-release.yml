@@ -20,14 +20,16 @@ jobs:
           fetch-depth: 0
 
       - name: '🔧 setup node'
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          cache: 'npm'
           node-version: 20
-          cache-dependency-path: 'package-lock.json'
+          cache: 'pnpm'
+        
+      - name: Install dependencies
+        run: pnpm ci
 
-      - run: 'npm ci'
-      - run: 'npm test'
+      - name: 'Run tests'
+        run: pnpm test
 
       - name: 'Extract version from commit'
         id: get_version
