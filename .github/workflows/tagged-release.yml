@@ -37,11 +37,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Get latest release
+      - name: Get current release
         id: get_release
         uses: octokit/request-action@v2.x
         with:
-          route: GET /repos/{owner}/{repo}/releases/latest
+          route: GET /repos/{owner}/{repo}/releases/tags/${{ github.ref_name }}
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
         env:
