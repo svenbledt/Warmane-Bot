@@ -2,8 +2,10 @@ name: "tagged-release"
 
 on:
   push:
+    branches:
+      - master
     tags:
-      - '*'
+      - 'v*'
 
 permissions:
   contents: write
