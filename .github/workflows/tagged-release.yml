@@ -1,9 +1,9 @@
-name: 'tagged-release'
+name: "tagged-release"
 
 on:
   push:
     branches:
-      - 'master'
+      - "master"
 
 permissions:
   contents: write
@@ -11,25 +11,25 @@ permissions:
 
 jobs:
   gh_tagged_release:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
 
     steps:
-      - name: 'Checkout source code'
-        uses: 'actions/checkout@v3'
+      - name: "Checkout source code"
+        uses: "actions/checkout@v3"
         with:
           fetch-depth: 0
 
-      - name: '🔧 setup node'
-        uses: actions/setup-node@v3
+      - name: "🔧 setup node"
+        uses: actions/setup-node@v4
         with:
-          cache: 'npm'
+          cache: "npm"
           node-version: 20
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: "package-lock.json"
 
-      - run: 'npm ci'
-      - run: 'npm test'
+      - run: "npm ci"
+      - run: "npm test"
 
-      - name: 'Extract version from commit'
+      - name: "Extract version from commit"
         id: get_version
         run: |
           COMMIT_MSG=$(git log --format=%B -n 1 ${{ github.sha }})
@@ -37,7 +37,7 @@ jobs:
             echo "version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
           fi
 
-      - name: 'Create tag'
+      - name: "Create tag"
         if: steps.get_version.outputs.version != ''
         run: |
           git tag ${{ steps.get_version.outputs.version }}
