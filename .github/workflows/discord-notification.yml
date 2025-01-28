@@ -1,0 +1,15 @@
+name: "Discord Notification"
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  discord_notification:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Send message to discord
+        uses: svenbledt/discord-styled-releases@main
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }} 
