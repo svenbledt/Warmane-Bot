@@ -17,6 +17,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: mikepenz/release-changelog-builder-action@v5
         with:
+          mode: "COMMIT"
           configuration: ".github/config/configuration.json"
           token: ${{ secrets.PAT }}
 
