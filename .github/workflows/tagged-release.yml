@@ -18,7 +18,6 @@ jobs:
     steps:
       - name: Build Changelog
         id: github_release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: mikepenz/release-changelog-builder-action@v5
         with:
           mode: "HYBRID"
@@ -26,7 +25,6 @@ jobs:
           token: ${{ secrets.PAT }}
 
       - name: Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.github_release.outputs.changelog }}
