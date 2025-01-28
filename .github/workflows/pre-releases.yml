@@ -7,6 +7,10 @@ on:
     tags-ignore:
       - '*'
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   gh_pre_release:
     runs-on: 'ubuntu-latest'
