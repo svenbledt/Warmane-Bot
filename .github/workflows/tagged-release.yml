@@ -19,7 +19,6 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v5
         with:
           mode: "COMMIT"
-          configuration: ".github/config/configuration.json"
           token: ${{ secrets.PAT }}
 
       - name: Release
@@ -28,4 +27,11 @@ jobs:
           body: ${{ steps.github_release.outputs.changelog }}
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
           files: |
-            LICENSE
+            LICENSE.txt
+      
+      - name: Send message to discord
+        uses: svenbledt/discord-styled-releases@main
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+
