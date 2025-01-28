@@ -2,10 +2,6 @@ name: "tagged-release"
 
 on:
   push:
-    branches:
-      - master
-    tags:
-      - "v*"
 
 permissions:
   contents: write
@@ -16,15 +12,17 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      - name: Build Changelog
+      - name: "Build Changelog"
         id: github_release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: mikepenz/release-changelog-builder-action@v5
         with:
-          mode: "HYBRID"
+          mode: "COMMIT"
           configuration: ".github/config/configuration.json"
           token: ${{ secrets.PAT }}
 
       - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.github_release.outputs.changelog }}
@@ -34,6 +32,7 @@ jobs:
 
       - name: Sending message
         uses: svenbledt/discord-styled-releases@main
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
