@@ -1,12 +1,14 @@
-name: 'tagged-release'
+name: 'pre-release'
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - 'master'
+    tags-ignore:
+      - '*'
 
 jobs:
-  gh_tagged_release:
+  gh_pre_release:
     runs-on: 'ubuntu-latest'
 
     steps:
@@ -28,6 +30,8 @@ jobs:
       - uses: 'marvinpinto/action-automatic-releases@latest'
         with:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
-          prerelease: false
+          automatic_release_tag: 'latest'
+          prerelease: true
+          title: 'Development Build'
           files: |
             LICENSE
