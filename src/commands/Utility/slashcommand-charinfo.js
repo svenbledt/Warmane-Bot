@@ -278,7 +278,8 @@ module.exports = new ApplicationCommand({
           );
 
           // Only check for missing enchants and gems if character is level 80
-          const shouldCheckMissing = character.level === 80;
+          const maxLevels = [60, 70, 80]; // Classic, TBC, WotLK max levels
+          const shouldCheckMissing = maxLevels.includes(character.level);
 
           $(".item-model a").each(function () {
             let rel = $(this).attr("rel");
