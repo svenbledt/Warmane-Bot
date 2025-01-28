@@ -29,9 +29,3 @@ jobs:
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
           files: |
             LICENSE
-
-      - name: Sending message
-        uses: svenbledt/discord-styled-releases@main
-        with:
-          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
-          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
