@@ -15,9 +15,6 @@ module.exports = {
             nickname_failed: "Failed to change your main Characters name due to: {error}",
             dm_timeout_message: "Time expired. Please contact a staff member of {guildName} to get a new chance."
         },
-        language: {
-            success: "✅ Server language has been set to {language}."
-        },
         globalcheck: {
             no_blacklisted: "There are no blacklisted users.",
             no_blacklisted_guild: "There are no blacklisted users in the guild.",
@@ -132,17 +129,63 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
-        setlogchannel: {
-            invalid_channel: "Please select a text channel for logging.",
-            success: "Log channel has been set to #{channelName}.",
-            success_with_enable: "Log channel has been set to #{channelName} and logging has been enabled.",
-            no_channel_set: "No log channel has been set. Please use `/set-logchannel` to set one."
-        },
-        settings: {
-            logging_enabled: "Server Logging",
-            logging_no_channel: "⚠️ Logging is enabled but no channel is set. Use `/set-logchannel` to set one."
+        setup: {
+            title: "Server Settings",
+            description: "Configure your server settings by clicking the buttons below. Each setting controls different aspects of the bot's functionality.",
+            no_permission: "You need to be an administrator or developer to use this command.",
+            no_button_permission: "You need to be an administrator or developer to use these settings.",
+            different_user: "You cannot interact with someone else's settings menu. Please use the /settings command to open your own.",
+            save_failed: "Failed to update settings. Please try again.",
+            menu_expired: "Settings menu has expired.",
+            footer: "Settings will automatically save when toggled • Interface times out after 5 minutes",
+            features: {
+                welcome_message: {
+                    name: "👋 Welcome Message",
+                    description: "When enabled, the bot will send a welcome message to new members in the configured welcome channel."
+                },
+                char_name_ask: {
+                    name: "👤 Character Name Ask",
+                    description: "When enabled, the bot will automatically DM new members asking for their character name and update their nickname accordingly."
+                },
+                block_list: {
+                    name: "🚫 Block List",
+                    description: "When enabled, the bot uses the global Blacklist to ban members that are on the list."
+                },
+                logging: {
+                    name: "📝 Logging",
+                    description: "When enabled, the bot will log important events that are executed by the bot in relation to your server."
+                },
+                status: {
+                    enabled: "✅ Enabled",
+                    disabled: "❌ Disabled",
+                    channel: "Channel: {channel}"
+                }
+            },
+            buttons: {
+                welcome_message: "Welcome Message",
+                char_name_ask: "Character Name Ask",
+                block_list: "Block List",
+                logging: "Logging",
+                change_language: "Change Language",
+                select_language: "Select a language",
+                select_welcome_channel: "Select welcome channel",
+                edit_charname_dm: "Edit Character Name DM"
+            },
+            select_log_channel: "Select logging channel",
+            log_channel_set: "✅ Logging channel has been set to {channel}",
+            not_set: "Not set",
+            language_set: "✅ Server language has been set to {language}",
+            welcome_channel_set: "✅ Welcome channel has been set to {channel}",
+            charname_dm_modal: {
+                title: "Edit Character Name DM Message",
+                message_label: "DM Message",
+                message_placeholder: "Enter the message to send when asking for character name..."
+            },
+            charname_dm_updated: "✅ Character name DM message has been updated",
+            select_log_channel: "Select logging channel"
         }
     },
+
     events: {
         guildMemberAdd: {
             blacklisted: "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff. Or appeal at https://discord.gg/YDqBQU43Ht",

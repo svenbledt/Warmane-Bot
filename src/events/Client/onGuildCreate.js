@@ -98,14 +98,24 @@ module.exports = new Event({
             {
               name: '⚙️ Essential Setup',
               value: [
-                '`/set-welcome-channel` - Set up a welcome channel',
-                '`/set-log-channel` - Configure the logging channel',
-                '`/language` - Change the bot\'s language',
-                '`/settings` - Toggle various bot settings',
-                '`/set-char` - Assign a character to a user',
-                '`/charname` - Ask a user for their character name'
+                '`/setup` - Configure all bot features:',
+                '• Welcome Messages & Channel',
+                '• Character Name System',
+                '• Block List Protection',
+                '• Server Logging',
+                '• Bot Language',
+                '• Custom DM Messages'
               ].join('\n')
             },
+            {
+              name: '👤 Character Management',
+              value: [
+                '`/set-char` - Assign a character to a user',
+                '`/charname` - Ask a user for their character name',
+                'U can also right click on a user and select "Ask for Charname" to ask for a character name'
+              ].join('\n')
+            },
+
             {
               name: '🔗 Need Help?',
               value: '[Join our Support Server](https://discord.gg/YDqBQU43Ht)'

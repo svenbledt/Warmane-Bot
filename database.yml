@@ -34,7 +34,6 @@ settings:
       Hey, we kindly want to ask you how we should name you :)
 
       Please Respond with the name you want to be called.
-      The Response will not be stored on the database!
     lastOwnerDM: {}
     language: en
     logChannel: '1257409169447719062'

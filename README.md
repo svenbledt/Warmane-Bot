@@ -13,3 +13,25 @@ A Discord bot that handles Warmane's API and provides useful information for pla
 
 ## TODO
 - [ ] Excesive Testing of logging system.
+
+## Starting the Bot
+
+To use PM2 to manage the bot.
+
+First install pm2 and dependencies
+
+```js
+npm i --global pm2
+npm i
+```
+
+Then u need to link your PM2 Dashboard to the npm instance.<br>
+The command for that u can get on https://app.pm2.io/<br>
+After you linked pm2 successfully u need to start the app and save the process in the list.
+
+```js
+pm2 start npm --name "Warmane Tool" -- start
+pm2 save
+```
+
+Done

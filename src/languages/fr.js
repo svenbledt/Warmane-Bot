@@ -89,23 +89,23 @@ module.exports = {
             }
         },
         setwelcomemessage: {
-            dm_not_enabled: "Le message de bienvenue en MP n'est pas activé.",
+            dm_not_enabled: "Le MP de bienvenue n'est pas activé.",
             updated: "Le message de bienvenue a été mis à jour."
         },
         servertime: {
             embed: {
                 title: "Heure du serveur",
-                description: "L'heure actuelle du serveur est: {time}",
-                footer: "Demandé par: {user}"
+                description: "L'heure actuelle du serveur est : {time}",
+                footer: "Demandé par : {user}"
             }
         },
         setwelcomechannel: {
-            channel_set: "Le salon de bienvenue a été défini sur {channel}.",
-            error: "Impossible de définir le salon de bienvenue en raison de: {error}"
+            channel_set: "Le canal de bienvenue a été défini sur {channel}.",
+            error: "Erreur lors de la définition du canal de bienvenue : {error}"
         },
         help: {
             EMBED: {
-                TITLE: "Commandes Disponibles",
+                TITLE: "Commandes disponibles",
                 DESCRIPTION: "Voici une liste de toutes les commandes disponibles et leurs descriptions :",
                 FOOTER: "Demandé par {USER_TAG}"
             },
@@ -118,29 +118,73 @@ module.exports = {
         setchar: {
             char_not_exist: "Le personnage {character} n'existe pas sur Warmane.",
             char_already_assigned: "Le personnage {character} est déjà assigné à {user}.",
-            already_has_main: "{user} a déjà un personnage principal: {character} ({realm}). Si c'est une erreur, contactez un membre du staff sur notre [Discord](https://discord.gg/YDqBQU43Ht).",
-            success_with_type: "{character} ({realm}) a été défini comme personnage {type} pour {user}.",
-            success: "{character} ({realm}) a été défini comme personnage principal pour {user}.",
-            success_updated: "Personnage principal de {user} changé de {oldCharacter} à {character} ({realm})."
+            already_has_main: "{user} a déjà un personnage principal : {character} ({realm}). Si c'est une erreur, contactez un membre du personnel sur notre [Discord](https://discord.gg/YDqBQU43Ht).",
+            success_with_type: "{character} ({realm}) a été défini avec succès comme personnage {type} pour {user}.",
+            success: "{character} ({realm}) a été défini avec succès comme personnage principal pour {user}.",
+            success_updated: "Personnage principal pour {user} mis à jour de {oldCharacter} à {character} ({realm})."
         },
         charlist: {
             embed: {
                 title: "Personnages de {username}",
                 no_characters: "Aucun personnage trouvé pour cet utilisateur.",
-                main_character: "**Personnage Principal:**\n{name} - {realm}",
-                alt_characters_header: "**Personnages Alternatifs:**",
+                main_character: "**Personnage Principal :**\n{name} - {realm}",
+                alt_characters_header: "**Personnages Alternatifs :**",
                 character_entry: "{name} - {realm}"
             }
         },
-        setlogchannel: {
-            invalid_channel: "Veuillez sélectionner un canal textuel pour la journalisation.",
-            success: "Le canal de journalisation a été défini sur #{channelName}.",
-            success_with_enable: "Le canal de journalisation a été défini sur #{channelName} et la journalisation a été activée.",
-            no_channel_set: "Aucun canal de journalisation n'a été défini. Veuillez utiliser `/set-logchannel` pour en définir un."
-        },
-        settings: {
-            logging_enabled: "Journalisation du Serveur",
-            logging_no_channel: "⚠️ La journalisation est activée mais aucun canal n'est défini. Utilisez `/set-logchannel` pour en définir un."
+        setup: {
+            title: "Paramètres du Serveur",
+            description: "Configurez les paramètres de votre serveur en cliquant sur les boutons ci-dessous. Chaque paramètre contrôle différents aspects de la fonctionnalité du bot.",
+            no_permission: "Vous devez être administrateur ou développeur pour utiliser cette commande.",
+            no_button_permission: "Vous devez être administrateur ou développeur pour utiliser ces paramètres.",
+            different_user: "Vous ne pouvez pas interagir avec le menu de paramètres de quelqu'un d'autre. Veuillez utiliser la commande /settings pour ouvrir le vôtre.",
+            save_failed: "Échec de la mise à jour des paramètres. Veuillez réessayer.",
+            menu_expired: "Le menu des paramètres a expiré.",
+            footer: "Les paramètres seront automatiquement sauvegardés lors du basculement • L'interface expire après 5 minutes",
+            features: {
+                welcome_message: {
+                    name: "👋 Message de Bienvenue",
+                    description: "Lorsqu'activé, le bot enverra un message de bienvenue aux nouveaux membres dans le canal de bienvenue configuré."
+                },
+                char_name_ask: {
+                    name: "👤 Demande de Nom de Personnage",
+                    description: "Lorsqu'activé, le bot enverra automatiquement un MP aux nouveaux membres leur demandant leur nom de personnage et mettra à jour leur surnom en conséquence."
+                },
+                block_list: {
+                    name: "🚫 Liste Noire",
+                    description: "Lorsqu'activé, le bot utilise la Liste Noire globale pour bannir les membres qui sont sur la liste."
+                },
+                logging: {
+                    name: "📝 Journalisation",
+                    description: "Lorsqu'activé, le bot enregistrera les événements importants qui sont exécutés par le bot en relation avec votre serveur."
+                },
+                status: {
+                    enabled: "✅ Activé",
+                    disabled: "❌ Désactivé",
+                    channel: "Canal: {channel}"
+                }
+            },
+            buttons: {
+                welcome_message: "Message de Bienvenue",
+                char_name_ask: "Demande de Nom de Personnage",
+                block_list: "Liste Noire",
+                logging: "Journalisation",
+                change_language: "Changer la Langue",
+                select_language: "Sélectionner une langue",
+                select_welcome_channel: "Sélectionner le canal de bienvenue",
+                edit_charname_dm: "Modifier DM du nom"
+            },
+            select_log_channel: "Sélectionner le canal de journalisation",
+            log_channel_set: "✅ Le canal de journalisation a été défini sur {channel}",
+            not_set: "Non défini",
+            language_set: "✅ La langue du serveur a été définie sur {language}",
+            welcome_channel_set: "✅ Le canal de bienvenue a été défini sur {channel}",
+            charname_dm_modal: {
+                title: "Modifier le message DM du nom de personnage",
+                message_label: "Message DM",
+                message_placeholder: "Entrez le message à envoyer lors de la demande du nom du personnage..."
+            },
+            charname_dm_updated: "✅ Le message DM du nom de personnage a été mis à jour"
         }
     },
     events: {
@@ -149,7 +193,6 @@ module.exports = {
             invalid_response: "Votre réponse ne peut pas être vide ou trop longue.\nVeuillez fournir une réponse valide.",
             name_changed: "Votre nom a été changé avec succès en {nickname} pour la guilde {guildName}.",
             name_change_failed: "Échec du changement de votre nom : {error}",
-            timeout: "Temps écoulé ! Contactez un administrateur du serveur si vous souhaitez changer à nouveau votre nom.",
             mod_notification: "Impossible d'envoyer la demande de nom de personnage à {username}. Leurs MPs sont probablement désactivés.",
             welcome_title: "Bienvenue sur {guildName} !",
             welcome_message: "Bienvenue {member} sur notre serveur !\n\nSi vous avez des questions, n'hésitez pas à les poser dans un canal public.",
@@ -166,11 +209,6 @@ module.exports = {
             not_on_list_label: "Pas dans la liste",
             not_on_list_description: "Entrer un autre nom de personnage manuellement",
             character_not_found: "Je n'ai pas trouvé ce personnage. Veuillez réessayer avec un nom de personnage valide."
-        },
-        nickname_changed: {
-            title: 'Surnom Modifié',
-            description: 'Surnom de {username} changé en {nickname}',
-            new_nickname: 'Nouveau Surnom'
         }
     },
     logging: {
@@ -198,7 +236,7 @@ module.exports = {
             error_label: 'Erreur'
         },
         dm_timeout: {
-            title: 'Délai de Réponse DM Dépassé',
+            title: 'Délai de Réponse MP Dépassé',
             description: '{username} n\'a pas répondu dans le délai imparti'
         },
         nickname_changed: {
