@@ -132,7 +132,7 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
-        settings: {
+        setup: {
             title: "Ajustes del Servidor",
             description: "Configura los ajustes de tu servidor haciendo clic en los botones de abajo. Cada ajuste controla diferentes aspectos de la funcionalidad del bot.",
             no_permission: "Necesitas ser administrador o desarrollador para usar este comando.",

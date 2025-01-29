@@ -129,7 +129,7 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
-        settings: {
+        setup: {
             title: "Server Settings",
             description: "Configure your server settings by clicking the buttons below. Each setting controls different aspects of the bot's functionality.",
             no_permission: "You need to be an administrator or developer to use this command.",
@@ -181,7 +181,8 @@ module.exports = {
                 message_label: "DM Message",
                 message_placeholder: "Enter the message to send when asking for character name..."
             },
-            charname_dm_updated: "✅ Character name DM message has been updated"
+            charname_dm_updated: "✅ Character name DM message has been updated",
+            select_log_channel: "Select logging channel"
         }
     },
 

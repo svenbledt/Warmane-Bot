@@ -1,7 +1,5 @@
 const {
   MessageFlags,
-  ChatInputCommandInteraction,
-  ApplicationCommandOptionType,
   PermissionsBitField,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +8,6 @@ const {
   ChannelSelectMenuBuilder,
   ChannelType,
   StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
@@ -56,8 +50,8 @@ function ensureGuildSettings(guildSettings) {
 }
 
 function createSettingsEmbed(guildSettings, language = 'en') {
-  const t = (key) => LanguageManager.getText(`commands.settings.${key}`, language);
-  const f = (key) => LanguageManager.getText(`commands.settings.features.${key}`, language);
+  const t = (key) => LanguageManager.getText(`commands.setup.${key}`, language);
+  const f = (key) => LanguageManager.getText(`commands.setup.features.${key}`, language);
 
   return new EmbedBuilder()
     .setColor(0x0099FF)
@@ -72,13 +66,15 @@ function createSettingsEmbed(guildSettings, language = 'en') {
         inline: false
       },
       {
-        name: f('char_name_ask.name'),
-        value: `${f('status.enabled').replace('✅', guildSettings.CharNameAsk ? '✅' : '❌')}\n${f('char_name_ask.description')}`,
+        name: f('char_name.name'),
+        value: `${f('status.enabled').replace('✅', guildSettings.CharNameAsk ? '✅' : '❌')}\n` +
+               `${f('char_name.description')}`,
         inline: false
       },
       {
         name: f('block_list.name'),
-        value: `${f('status.enabled').replace('✅', guildSettings.BlockList ? '✅' : '❌')}\n${f('block_list.description')}`,
+        value: `${f('status.enabled').replace('✅', guildSettings.BlockList ? '✅' : '❌')}\n` +
+               `${f('block_list.description')}`,
         inline: false
       },
       {
@@ -87,6 +83,12 @@ function createSettingsEmbed(guildSettings, language = 'en') {
                `${f('status.channel').replace('{channel}', guildSettings.logChannel ? `<#${guildSettings.logChannel}>` : t('not_set'))}\n` +
                `${f('logging.description')}`,
         inline: false
+      },
+      {
+        name: f('language.name'),
+        value: `${f('language.current').replace('{language}', languageNames[guildSettings.language])}\n` +
+               `${f('language.description')}`,
+        inline: false
       }
     )
     .setFooter({ text: t('footer') });
@@ -94,7 +96,7 @@ function createSettingsEmbed(guildSettings, language = 'en') {
 
 function createSettingsButtons(guildSettings) {
   const components = [];
-  const t = (key) => LanguageManager.getText(`commands.settings.buttons.${key}`, guildSettings.language || 'en');
+  const t = (key) => LanguageManager.getText(`commands.setup.buttons.${key}`, guildSettings.language || 'en');
   
   // If welcome message is enabled but no channel is set, only show channel select
   if (guildSettings.welcomeMessage && !guildSettings.welcomeChannel) {
@@ -115,7 +117,7 @@ function createSettingsButtons(guildSettings) {
       .addComponents(
         new ChannelSelectMenuBuilder()
           .setCustomId('set_logChannel')
-          .setPlaceholder(LanguageManager.getText('commands.settings.select_log_channel', guildSettings.language || 'en'))
+          .setPlaceholder(LanguageManager.getText('commands.setup.select_log_channel', guildSettings.language || 'en'))
           .setChannelTypes(ChannelType.GuildText)
       );
     components.push(channelSelect);
@@ -168,7 +170,7 @@ function createSettingsButtons(guildSettings) {
 
 module.exports = new ApplicationCommand({
   command: {
-    name: "settings",
+    name: "setup",
     description: "Manage server settings",
     type: 1,
     contexts: [0],
@@ -184,7 +186,7 @@ module.exports = new ApplicationCommand({
     );
 
     const language = guildSettings?.language || 'en';
-    const t = (key) => LanguageManager.getText(`commands.settings.${key}`, language);
+    const t = (key) => LanguageManager.getText(`commands.setup.${key}`, language);
 
     if (!isDeveloper && !isAdmin) {
       await interaction.reply({
@@ -295,7 +297,7 @@ module.exports = new ApplicationCommand({
         client.database.set("settings", settings);
 
         await i.reply({
-          content: LanguageManager.getText('commands.settings.language_set', newLanguage, {
+          content: LanguageManager.getText('commands.setup.language_set', newLanguage, {
             language: languageNames[newLanguage]
           }),
           flags: [MessageFlags.Ephemeral],
@@ -322,7 +324,7 @@ module.exports = new ApplicationCommand({
 
           await i.showModal({
             custom_id: "charname-dm-modal",
-            title: LanguageManager.getText('commands.settings.charname_dm_modal.title', language),
+            title: LanguageManager.getText('commands.setup.charname_dm_modal.title', language),
             components: [
               {
                 type: 1,
@@ -330,11 +332,11 @@ module.exports = new ApplicationCommand({
                   {
                     type: 4,
                     custom_id: "charname-dm-message",
-                    label: LanguageManager.getText('commands.settings.charname_dm_modal.message_label', language),
+                    label: LanguageManager.getText('commands.setup.charname_dm_modal.message_label', language),
                     style: 2,
                     min_length: 10,
                     max_length: 1000,
-                    placeholder: LanguageManager.getText('commands.settings.charname_dm_modal.message_placeholder', language),
+                    placeholder: LanguageManager.getText('commands.setup.charname_dm_modal.message_placeholder', language),
                     value: guildSettings.charNameAskDM || '',
                     required: true,
                   },
@@ -359,7 +361,7 @@ module.exports = new ApplicationCommand({
             client.database.set("settings", settings);
 
             await modalSubmit.reply({
-              content: LanguageManager.getText('commands.settings.charname_dm_updated', language),
+              content: LanguageManager.getText('commands.setup.charname_dm_updated', language),
               flags: [MessageFlags.Ephemeral],
             });
 
@@ -420,7 +422,7 @@ module.exports = new ApplicationCommand({
           client.database.set("settings", settings);
           
           await i.reply({
-            content: LanguageManager.getText('commands.settings.welcome_channel_set', language, {
+            content: LanguageManager.getText('commands.setup.welcome_channel_set', language, {
               channel: `<#${channel}>`
             }),
             flags: [MessageFlags.Ephemeral],
@@ -461,7 +463,7 @@ module.exports = new ApplicationCommand({
         client.database.set("settings", settings);
 
         await i.reply({
-          content: LanguageManager.getText('commands.settings.log_channel_set', language, {
+          content: LanguageManager.getText('commands.setup.log_channel_set', language, {
             channel: `<#${channelId}>`
           }),
           flags: [MessageFlags.Ephemeral],
