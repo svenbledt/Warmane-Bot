@@ -2,7 +2,6 @@ const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const config = require("../../config");
 const Logger = require('../../utils/Logger');
-const io = require('@pm2/io');
 
 const COOLDOWN_HOURS = 24;
 
