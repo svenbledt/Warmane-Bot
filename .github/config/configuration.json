@@ -17,10 +17,6 @@
             "labels": ["other"]
         },
         {
-            "title": "## 📦 Dependencies",
-            "labels": ["deps"]
-        },
-        {
             "title": "## 📚 Documentation",
             "labels": ["docs"]
         },
