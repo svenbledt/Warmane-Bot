@@ -385,6 +385,11 @@ settings:
     enableLogging: false
 userCharacters:
   '209319089930240004':
+    main:
+      name: Mirafirst
+      realm: Icecrown
+      addedBy: '209319089930240004'
+      addedAt: '2025-01-27T13:37:33.661Z'
     alts:
       - name: Zalacar
         realm: Icecrown
@@ -422,11 +427,6 @@ userCharacters:
         realm: Lordaeron
         addedBy: '209319089930240004'
         addedAt: '2025-01-27T13:44:10.303Z'
-    main:
-      name: Mirafirst
-      realm: Icecrown
-      addedBy: '209319089930240004'
-      addedAt: '2025-01-27T13:37:33.661Z'
   '194874349294059521':
     main:
       name: Lunareclipse
@@ -440,4 +440,11 @@ userCharacters:
       realm: Onyxia
       addedBy: '209319089930240004'
       addedAt: '2025-01-28T06:51:16.468Z'
+    alts: []
+  '992028601308422326':
+    main:
+      name: Holyborder
+      realm: Lordaeron
+      addedBy: '209319089930240004'
+      addedAt: '2025-01-28T14:47:21.976Z'
     alts: []
