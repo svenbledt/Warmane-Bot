@@ -189,7 +189,7 @@ module.exports = {
     events: {
         guildMemberAdd: {
             blacklisted: "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff. Or appeal at https://discord.gg/YDqBQU43Ht",
-            charname_ask: "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\n(Your response will not be stored by this Application and is only used for the Guilds nickname)",
+            charname_ask: "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
             invalid_response: "Your response cannot be empty or too long.\nPlease provide a valid response.",
             name_changed: "Your name has been successfully changed to {nickname} for the Guild {guildName}.",
             name_change_failed: "Failed to change your name due to: {error}",
