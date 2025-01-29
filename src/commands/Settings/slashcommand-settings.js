@@ -9,6 +9,8 @@ const {
   ButtonStyle,
   ChannelSelectMenuBuilder,
   ChannelType,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
@@ -79,6 +81,7 @@ function createSettingsEmbed(guildSettings, language = 'en') {
 
 function createSettingsButtons(guildSettings) {
   const components = [];
+  const t = (key) => LanguageManager.getText(`commands.settings.buttons.${key}`, guildSettings.language || 'en');
   
   // If logging is enabled but no channel is set, only show channel select
   if (guildSettings.enableLogging && !guildSettings.logChannel) {
@@ -86,7 +89,7 @@ function createSettingsButtons(guildSettings) {
       .addComponents(
         new ChannelSelectMenuBuilder()
           .setCustomId('set_logChannel')
-          .setPlaceholder('Select a logging channel')
+          .setPlaceholder(t('select_log_channel'))
           .setChannelTypes(ChannelType.GuildText)
       );
     components.push(channelSelect);
@@ -94,32 +97,75 @@ function createSettingsButtons(guildSettings) {
   }
 
   // Otherwise show all buttons
-  const row = new ActionRowBuilder()
+  const row1 = new ActionRowBuilder()
     .addComponents(
       new ButtonBuilder()
         .setCustomId('toggle_welcomeMessage')
-        .setLabel('Welcome Message')
+        .setLabel(t('welcome_message'))
         .setStyle(guildSettings.welcomeMessage ? ButtonStyle.Success : ButtonStyle.Danger)
         .setEmoji('👋'),
       new ButtonBuilder()
         .setCustomId('toggle_CharNameAsk')
-        .setLabel('Character Name Ask')
+        .setLabel(t('char_name_ask'))
         .setStyle(guildSettings.CharNameAsk ? ButtonStyle.Success : ButtonStyle.Danger)
         .setEmoji('👤'),
       new ButtonBuilder()
         .setCustomId('toggle_BlockList')
-        .setLabel('Block List')
+        .setLabel(t('block_list'))
         .setStyle(guildSettings.BlockList ? ButtonStyle.Success : ButtonStyle.Danger)
         .setEmoji('🚫'),
       new ButtonBuilder()
         .setCustomId('toggle_enableLogging')
-        .setLabel('Logging')
+        .setLabel(t('logging'))
         .setStyle(guildSettings.enableLogging ? ButtonStyle.Success : ButtonStyle.Danger)
         .setEmoji('📝')
     );
+
+  const row2 = new ActionRowBuilder()
+    .addComponents(
+      new ButtonBuilder()
+        .setCustomId('change_language')
+        .setLabel(t('change_language'))
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('🌐')
+    );
   
-  components.push(row);
+  components.push(row1, row2);
   return components;
+}
+
+function createLanguageSelect(language = 'en') {
+  const t = (key) => LanguageManager.getText(`commands.settings.buttons.${key}`, language);
+  
+  const languageSelect = new ActionRowBuilder()
+    .addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId('set_language')
+        .setPlaceholder(t('select_language'))
+        .addOptions([
+          new StringSelectMenuOptionBuilder()
+            .setLabel('English')
+            .setValue('en')
+            .setEmoji('🇬🇧'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('Deutsch')
+            .setValue('de')
+            .setEmoji('🇩🇪'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('Русский')
+            .setValue('ru')
+            .setEmoji('🇷🇺'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('Français')
+            .setValue('fr')
+            .setEmoji('🇫🇷'),
+          new StringSelectMenuOptionBuilder()
+            .setLabel('Español')
+            .setValue('es')
+            .setEmoji('🇪🇸')
+        ])
+    );
+  return [languageSelect];
 }
 
 module.exports = new ApplicationCommand({
@@ -210,6 +256,51 @@ module.exports = new ApplicationCommand({
           const updatedButtons = createSettingsButtons(guildSettings);
           
           await i.update({
+            embeds: [updatedEmbed],
+            components: updatedButtons
+          });
+        } catch (error) {
+          console.error(`Failed to save settings: ${error.message}`);
+          await i.reply({
+            content: t('save_failed'),
+            flags: [MessageFlags.Ephemeral],
+          });
+        }
+        return;
+      }
+
+      if (i.customId === 'change_language') {
+        const languageSelect = createLanguageSelect(language);
+        await i.update({ components: languageSelect });
+        return;
+      }
+
+      if (i.customId === 'set_language') {
+        const newLanguage = i.values[0];
+        guildSettings.language = newLanguage;
+        
+        try {
+          client.database.set("settings", settings);
+          
+          const languageNames = {
+            en: "English",
+            de: "Deutsch",
+            ru: "Русский",
+            fr: "Français",
+            es: "Español",
+          };
+
+          await i.reply({
+            content: LanguageManager.getText('commands.language.success', newLanguage, {
+              language: languageNames[newLanguage]
+            }),
+            flags: [MessageFlags.Ephemeral],
+          });
+
+          const updatedEmbed = createSettingsEmbed(guildSettings, newLanguage);
+          const updatedButtons = createSettingsButtons(guildSettings);
+          
+          await interaction.editReply({
             embeds: [updatedEmbed],
             components: updatedButtons
           });

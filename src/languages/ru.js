@@ -86,7 +86,37 @@ module.exports = {
                     teams: "PvP команды ({type}): {name} (Рейтинг: {rating}, Ранг: {rank})",
                     belongs_to: "Принадлежит"
                 }
+            }
+        },
+        setwelcomemessage: {
+            dm_not_enabled: "Приветственное ЛС не включено.",
+            updated: "Приветственное сообщение обновлено."
+        },
+        servertime: {
+            embed: {
+                title: "Время сервера",
+                description: "Текущее время сервера: {time}",
+                footer: "Запрошено пользователем: {user}"
+            }
+        },
+        setwelcomechannel: {
+            channel_set: "Канал приветствия установлен на {channel}.",
+            error: "Ошибка при установке канала приветствия: {error}"
+        },
+        help: {
+            EMBED: {
+                TITLE: "Доступные команды",
+                DESCRIPTION: "Вот список всех доступных команд и их описания:",
+                FOOTER: "Запрошено пользователем {USER_TAG}"
             },
+            NO_DESCRIPTION: "Описание отсутствует",
+            BUTTONS: {
+                PREVIOUS: "Назад",
+                NEXT: "Вперед"
+            }
+        },
+        setchar: {
+            char_not_exist: "Персонаж {character} не существует на Warmane.",
             char_already_assigned: "Персонаж {character} уже привязан к {user}.",
             already_has_main: "У {user} уже есть основной персонаж: {character} ({realm}). Если это ошибка, свяжитесь с персоналом в нашем [Discord](https://discord.gg/YDqBQU43Ht).",
             success_with_type: "{character} ({realm}) успешно установлен как {type} персонаж для {user}.",
@@ -133,6 +163,15 @@ module.exports = {
                     disabled: "❌ Отключено",
                     channel: "Канал: {channel}"
                 }
+            },
+            buttons: {
+                welcome_message: "Приветственное Сообщение",
+                char_name_ask: "Запрос Имени Персонажа",
+                block_list: "Черный Список",
+                logging: "Логирование",
+                change_language: "Изменить Язык",
+                select_language: "Выберите язык",
+                select_log_channel: "Выберите канал для логов"
             }
         }
     },

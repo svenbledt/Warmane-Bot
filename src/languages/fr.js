@@ -163,6 +163,15 @@ module.exports = {
                     disabled: "❌ Désactivé",
                     channel: "Canal : {channel}"
                 }
+            },
+            buttons: {
+                welcome_message: "Message de Bienvenue",
+                char_name_ask: "Demande de Nom de Personnage",
+                block_list: "Liste Noire",
+                logging: "Journalisation",
+                change_language: "Changer la Langue",
+                select_language: "Sélectionner une langue",
+                select_log_channel: "Sélectionner le canal de journalisation"
             }
         }
     },

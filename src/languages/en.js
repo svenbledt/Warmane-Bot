@@ -163,6 +163,15 @@ module.exports = {
                     disabled: "❌ Disabled",
                     channel: "Channel: {channel}"
                 }
+            },
+            buttons: {
+                welcome_message: "Welcome Message",
+                char_name_ask: "Character Name Ask",
+                block_list: "Block List",
+                logging: "Logging",
+                change_language: "Change Language",
+                select_language: "Select a language",
+                select_log_channel: "Select logging channel"
             }
         }
     },

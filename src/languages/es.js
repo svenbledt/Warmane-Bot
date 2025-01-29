@@ -163,6 +163,15 @@ module.exports = {
                     disabled: "❌ Desactivado",
                     channel: "Canal: {channel}"
                 }
+            },
+            buttons: {
+                welcome_message: "Mensaje de Bienvenida",
+                char_name_ask: "Preguntar Nombre de Personaje",
+                block_list: "Lista Negra",
+                logging: "Registro",
+                change_language: "Cambiar Idioma",
+                select_language: "Seleccionar idioma",
+                select_log_channel: "Seleccionar canal de registro"
             }
         }
     },

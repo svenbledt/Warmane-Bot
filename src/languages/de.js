@@ -163,6 +163,15 @@ module.exports = {
                     disabled: "❌ Deaktiviert",
                     channel: "Kanal: {channel}"
                 }
+            },
+            buttons: {
+                welcome_message: "Willkommensnachricht",
+                char_name_ask: "Charaktername Abfrage",
+                block_list: "Sperrliste",
+                logging: "Protokollierung",
+                change_language: "Sprache ändern",
+                select_language: "Sprache auswählen",
+                select_log_channel: "Protokollkanal auswählen"
             }
         }
     },
@@ -224,4 +233,4 @@ module.exports = {
             description: '{username} hat nicht innerhalb der Zeitbegrenzung geantwortet'
         }
     }
-}; 
+};
