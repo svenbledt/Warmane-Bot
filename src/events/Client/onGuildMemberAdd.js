@@ -685,7 +685,9 @@ async function createWelcomeImage(member, guildName) {
 
 
 
-  const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'welcome.png' });
+  // Create attachment using buffer
+  const buffer = canvas.toBuffer('image/png');
+  const attachment = new AttachmentBuilder(buffer, { name: 'welcome.png' });
   return attachment;
 }
 
