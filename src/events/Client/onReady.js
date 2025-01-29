@@ -150,8 +150,8 @@ async function generateAndSendInvites(client) {
           descData: { botName: 'Warmane Tool' },
           color: '#0099ff',
           fields: [
-            { nameKey: 'channel', value: guild.systemChannel.name },
-            { nameKey: 'created_by', value: client.user.tag }
+            { nameKey: 'invite_created.channel', value: guild.systemChannel.name },
+            { nameKey: 'invite_created.created_by', value: client.user.tag }
           ]
         });
 
