@@ -173,10 +173,10 @@ module.exports = {
                 logging: "Journalisation",
                 change_language: "Changer la Langue",
                 select_language: "Sélectionner une langue",
-                select_welcome_channel: "Sélectionner le canal de bienvenue",
                 edit_charname_dm: "Modifier DM du nom"
             },
             select_log_channel: "Sélectionner le canal de journalisation",
+            select_welcome_channel: "Sélectionner le canal de bienvenue",
             log_channel_set: "✅ Le canal de journalisation a été défini sur {channel}",
             not_set: "Non défini",
             language_set: "✅ La langue du serveur a été définie sur {language}",

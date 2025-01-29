@@ -173,10 +173,10 @@ module.exports = {
                 logging: "Registro",
                 change_language: "Cambiar Idioma",
                 select_language: "Seleccionar idioma",
-                select_welcome_channel: "Seleccionar canal de bienvenida",
                 edit_charname_dm: "Editar DM del nombre"
             },
             select_log_channel: "Seleccionar canal de registro",
+            select_welcome_channel: "Seleccionar canal de bienvenida",
             log_channel_set: "✅ Canal de registro establecido en {channel}",
             not_set: "No establecido",
             language_set: "✅ El idioma del servidor se ha establecido en {language}",
