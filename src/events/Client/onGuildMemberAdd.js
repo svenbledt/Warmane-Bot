@@ -278,6 +278,11 @@ async function handleDevServer(client, member, guildSettings, lang) {
       const message = await handleNicknameChange(client, member, response, lang, member.guild.name);
       await dmChannel.send(message);
       collector.stop("valid-response");
+
+      // Send welcome message after nickname is set
+      if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+        await handleWelcomeMessage(client, member, guildSettings, lang);
+      }
     });
 
     collector.on("end", async (collected, reason) => {
@@ -301,6 +306,11 @@ async function handleDevServer(client, member, guildSettings, lang) {
               { nameKey: 'user_id', value: member.user.id }
             ]
           });
+
+          // Send welcome message with current nickname if timeout
+          if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+            await handleWelcomeMessage(client, member, guildSettings, lang);
+          }
         } catch (error) {
           console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
           
