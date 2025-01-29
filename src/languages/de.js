@@ -171,12 +171,20 @@ module.exports = {
                 logging: "Protokollierung",
                 change_language: "Sprache ändern",
                 select_language: "Sprache auswählen",
-                select_log_channel: "Protokollkanal auswählen",
-                select_welcome_channel: "Willkommenskanal auswählen"
+                select_welcome_channel: "Willkommenskanal auswählen",
+                edit_charname_dm: "Charakternamen DM bearbeiten"
             },
-            not_set: "Nicht gesetzt",
+            select_log_channel: "Protokollkanal auswählen",
+            log_channel_set: "✅ Protokollkanal wurde auf {channel} gesetzt",
+            not_set: "Nicht eingestellt",
             language_set: "✅ Serversprache wurde auf {language} eingestellt",
-            welcome_channel_set: "✅ Willkommenskanal wurde auf {channel} gesetzt"
+            welcome_channel_set: "✅ Willkommenskanal wurde auf {channel} gesetzt",
+            charname_dm_modal: {
+                title: "Charakternamen DM-Nachricht bearbeiten",
+                message_label: "DM-Nachricht",
+                message_placeholder: "Gib die Nachricht ein, die beim Fragen nach dem Charakternamen gesendet werden soll..."
+            },
+            charname_dm_updated: "✅ Charakternamen DM-Nachricht wurde aktualisiert"
         }
     },
     events: {

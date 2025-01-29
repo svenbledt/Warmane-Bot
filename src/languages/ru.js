@@ -171,12 +171,20 @@ module.exports = {
                 logging: "Логирование",
                 change_language: "Изменить Язык",
                 select_language: "Выберите язык",
-                select_log_channel: "Выберите канал для логов",
-                select_welcome_channel: "Выберите канал приветствия"
+                select_welcome_channel: "Выберите канал приветствия",
+                edit_charname_dm: "Изменить ЛС имени"
             },
+            select_log_channel: "Выберите канал для логов",
+            log_channel_set: "✅ Канал логирования установлен на {channel}",
             not_set: "Не установлено",
             language_set: "✅ Язык сервера установлен на {language}",
-            welcome_channel_set: "✅ Канал приветствия установлен на {channel}"
+            welcome_channel_set: "✅ Канал приветствия установлен на {channel}",
+            charname_dm_modal: {
+                title: "Изменить сообщение ЛС для имени персонажа",
+                message_label: "Сообщение ЛС",
+                message_placeholder: "Введите сообщение, которое будет отправлено при запросе имени персонажа..."
+            },
+            charname_dm_updated: "✅ Сообщение ЛС для имени персонажа обновлено"
         }
     },
     events: {

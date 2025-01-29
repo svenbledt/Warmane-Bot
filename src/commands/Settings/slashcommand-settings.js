@@ -10,12 +10,23 @@ const {
   ChannelSelectMenuBuilder,
   ChannelType,
   StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder
+  StringSelectMenuOptionBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const LanguageManager = require("../../utils/LanguageManager");
 const config = require("../../config");
+
+const languageNames = {
+  'en': 'English',
+  'de': 'Deutsch',
+  'es': 'Español',
+  'fr': 'Français',
+  'ru': 'Русский'
+};
 
 function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
@@ -104,7 +115,7 @@ function createSettingsButtons(guildSettings) {
       .addComponents(
         new ChannelSelectMenuBuilder()
           .setCustomId('set_logChannel')
-          .setPlaceholder(t('select_log_channel'))
+          .setPlaceholder(LanguageManager.getText('commands.settings.select_log_channel', guildSettings.language || 'en'))
           .setChannelTypes(ChannelType.GuildText)
       );
     components.push(channelSelect);
@@ -142,45 +153,17 @@ function createSettingsButtons(guildSettings) {
         .setCustomId('change_language')
         .setLabel(t('change_language'))
         .setStyle(ButtonStyle.Primary)
-        .setEmoji('🌐')
+        .setEmoji('🌐'),
+      new ButtonBuilder()
+        .setCustomId('edit_charname_dm')
+        .setLabel(t('edit_charname_dm'))
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('✏️')
+        .setDisabled(!guildSettings.CharNameAsk) // Disable if character name ask is off
     );
   
   components.push(row1, row2);
   return components;
-}
-
-function createLanguageSelect(language = 'en') {
-  const t = (key) => LanguageManager.getText(`commands.settings.buttons.${key}`, language);
-  
-  const languageSelect = new ActionRowBuilder()
-    .addComponents(
-      new StringSelectMenuBuilder()
-        .setCustomId('set_language')
-        .setPlaceholder(t('select_language'))
-        .addOptions([
-          new StringSelectMenuOptionBuilder()
-            .setLabel('English')
-            .setValue('en')
-            .setEmoji('🇬🇧'),
-          new StringSelectMenuOptionBuilder()
-            .setLabel('Deutsch')
-            .setValue('de')
-            .setEmoji('🇩🇪'),
-          new StringSelectMenuOptionBuilder()
-            .setLabel('Русский')
-            .setValue('ru')
-            .setEmoji('🇷🇺'),
-          new StringSelectMenuOptionBuilder()
-            .setLabel('Français')
-            .setValue('fr')
-            .setEmoji('🇫🇷'),
-          new StringSelectMenuOptionBuilder()
-            .setLabel('Español')
-            .setValue('es')
-            .setEmoji('🇪🇸')
-        ])
-    );
-  return [languageSelect];
 }
 
 module.exports = new ApplicationCommand({
@@ -242,118 +225,190 @@ module.exports = new ApplicationCommand({
 
     collector.on('collect', async (i) => {
       const isDeveloper = config.users?.developers?.includes(i.user.id);
-      const isAdmin = i.member?.permissions?.has([PermissionsBitField.Flags.Administrator]);
-
-      if (!isDeveloper && !isAdmin) {
+      const isAdmin = i.member?.permissions?.has([PermissionsBitField.Flags.Administrator]);  
+      if (!isAdmin && !isDeveloper) {
         await i.reply({
-          content: t('no_button_permission'),
+          content: t('no_permission'),
           flags: [MessageFlags.Ephemeral],
         });
         return;
       }
 
-      if (i.user.id !== interaction.user.id) {
-        await i.reply({
-          content: t('different_user'),
-          flags: [MessageFlags.Ephemeral],
-        });
-        return;
-      }
-
-      if (i.customId === 'set_logChannel') {
-        const channel = i.values[0];
-        guildSettings.logChannel = channel;
-        
+      // Handle language change button
+      if (i.customId === 'change_language') {
         try {
-          client.database.set("settings", settings);
-          
-          const updatedEmbed = createSettingsEmbed(guildSettings, language);
-          const updatedButtons = createSettingsButtons(guildSettings);
-          
-          await i.update({
-            embeds: [updatedEmbed],
-            components: updatedButtons
-          });
+          const languageSelect = new ActionRowBuilder()
+            .addComponents(
+              new StringSelectMenuBuilder()
+                .setCustomId('set_language')
+                .setPlaceholder(t('select_language'))
+                .addOptions([
+                  {
+                    label: 'English',
+                    value: 'en',
+                    emoji: '🇬🇧',
+                    default: guildSettings.language === 'en'
+                  },
+                  {
+                    label: 'Deutsch',
+                    value: 'de',
+                    emoji: '🇩🇪',
+                    default: guildSettings.language === 'de'
+                  },
+                  {
+                    label: 'Español',
+                    value: 'es',
+                    emoji: '🇪🇸',
+                    default: guildSettings.language === 'es'
+                  },
+                  {
+                    label: 'Français',
+                    value: 'fr',
+                    emoji: '🇫🇷',
+                    default: guildSettings.language === 'fr'
+                  },
+                  {
+                    label: 'Русский',
+                    value: 'ru',
+                    emoji: '🇷🇺',
+                    default: guildSettings.language === 'ru'
+                  }
+                ])
+            );
+
+          await i.update({ components: [languageSelect] });
         } catch (error) {
-          console.error(`Failed to save settings: ${error.message}`);
-          await i.reply({
-            content: t('save_failed'),
+          console.error('Failed to show language select:', error);
+          await i.followUp({
+            content: t('error_occurred').replace('{error}', error.message),
             flags: [MessageFlags.Ephemeral],
           });
         }
         return;
       }
 
-      if (i.customId === 'change_language') {
-        const languageSelect = createLanguageSelect(language);
-        await i.update({ components: languageSelect });
-        return;
-      }
-
+      // Handle language selection
       if (i.customId === 'set_language') {
         const newLanguage = i.values[0];
+        // Only update the language value
         guildSettings.language = newLanguage;
+        client.database.set("settings", settings);
+
+        await i.reply({
+          content: LanguageManager.getText('commands.settings.language_set', newLanguage, {
+            language: languageNames[newLanguage]
+          }),
+          flags: [MessageFlags.Ephemeral],
+        });
+
+        const updatedEmbed = createSettingsEmbed(guildSettings, newLanguage);
+        const updatedButtons = createSettingsButtons(guildSettings);
         
+        await i.message.edit({
+          embeds: [updatedEmbed],
+          components: updatedButtons
+        });
+        return;
+      }
+
+      // Handle charname DM modal
+      if (i.customId === 'edit_charname_dm') {
         try {
-          client.database.set("settings", settings);
-          
-          const languageNames = {
-            en: "English",
-            de: "Deutsch",
-            ru: "Русский",
-            fr: "Français",
-            es: "Español",
-          };
+          // Get fresh settings to show current value
+          let settings = client.database.get("settings") || [];
+          let guildSettings = settings.find(
+            (setting) => setting.guild === interaction.guild.id
+          );
 
-          await i.reply({
-            content: LanguageManager.getText('commands.settings.language_set', newLanguage, {
-              language: languageNames[newLanguage]
-            }),
-            flags: [MessageFlags.Ephemeral],
+          await i.showModal({
+            custom_id: "charname-dm-modal",
+            title: LanguageManager.getText('commands.settings.charname_dm_modal.title', language),
+            components: [
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 4,
+                    custom_id: "charname-dm-message",
+                    label: LanguageManager.getText('commands.settings.charname_dm_modal.message_label', language),
+                    style: 2,
+                    min_length: 10,
+                    max_length: 1000,
+                    placeholder: LanguageManager.getText('commands.settings.charname_dm_modal.message_placeholder', language),
+                    value: guildSettings.charNameAskDM || '',
+                    required: true,
+                  },
+                ],
+              },
+            ],
           });
 
-          const updatedEmbed = createSettingsEmbed(guildSettings, newLanguage);
-          const updatedButtons = createSettingsButtons(guildSettings);
-          
-          await interaction.editReply({
-            embeds: [updatedEmbed],
-            components: updatedButtons
-          });
+          const modalSubmit = await i.awaitModalSubmit({
+            filter: (interaction) => interaction.customId === 'charname-dm-modal',
+            time: 300000
+          }).catch(() => null);
+
+          if (modalSubmit) {
+            const message = modalSubmit.fields.getTextInputValue("charname-dm-message")
+              .replace(/\\n/g, '\n');
+
+            // Update the charNameAskDM value
+            guildSettings.charNameAskDM = message;
+            
+            // Save to database
+            client.database.set("settings", settings);
+
+            await modalSubmit.reply({
+              content: LanguageManager.getText('commands.settings.charname_dm_updated', language),
+              flags: [MessageFlags.Ephemeral],
+            });
+
+            const updatedEmbed = createSettingsEmbed(guildSettings, language);
+            const updatedButtons = createSettingsButtons(guildSettings);
+            
+            await modalSubmit.message.edit({
+              embeds: [updatedEmbed],
+              components: updatedButtons
+            });
+          }
         } catch (error) {
-          console.error(`Failed to save settings: ${error.message}`);
-          await i.reply({
-            content: t('save_failed'),
+          console.error('Failed to handle modal:', error);
+          await i.followUp({
+            content: t('error_occurred').replace('{error}', error.message),
             flags: [MessageFlags.Ephemeral],
           });
         }
         return;
       }
 
-      if (i.customId === 'toggle_welcomeMessage') {
-        guildSettings.welcomeMessage = !guildSettings.welcomeMessage;
-        
-        // Clear welcome channel when disabling welcome message
-        if (!guildSettings.welcomeMessage) {
-          guildSettings.welcomeChannel = '';
+      // For all toggle buttons (welcomeMessage, CharNameAsk, BlockList, enableLogging)
+      if (i.customId.startsWith('toggle_')) {
+        // Get fresh settings before toggle
+        let settings = client.database.get("settings") || [];
+        let guildSettings = settings.find(
+          (setting) => setting.guild === interaction.guild.id
+        );
+
+        const feature = i.customId.replace('toggle_', '');
+        guildSettings[feature] = !guildSettings[feature];
+
+        // Special handling for logging toggle
+        if (feature === 'enableLogging') {
+          if (!guildSettings.enableLogging) {
+            guildSettings.logChannel = '';
+          }
         }
+
+        // Save settings
+        client.database.set("settings", settings);
         
-        try {
-          client.database.set("settings", settings);
-          
-          const updatedEmbed = createSettingsEmbed(guildSettings, language);
-          const updatedButtons = createSettingsButtons(guildSettings);
-          
-          await i.update({
-            embeds: [updatedEmbed],
-            components: updatedButtons
-          });
-        } catch (error) {
-          console.error(`Failed to save settings: ${error.message}`);
-          await i.reply({
-            content: t('save_failed'),
-            flags: [MessageFlags.Ephemeral],
-          });
-        }
+        const updatedEmbed = createSettingsEmbed(guildSettings, language);
+        const updatedButtons = createSettingsButtons(guildSettings);
+        
+        await i.update({
+          embeds: [updatedEmbed],
+          components: updatedButtons
+        });
         return;
       }
 
@@ -384,6 +439,69 @@ module.exports = new ApplicationCommand({
             content: t('save_failed'),
             flags: [MessageFlags.Ephemeral],
           });
+        }
+        return;
+      }
+
+      if (i.customId === 'set_logChannel') {
+        // Get fresh settings before updating
+        let settings = client.database.get("settings") || [];
+        let guildSettings = settings.find(
+          (setting) => setting.guild === interaction.guild.id
+        );
+        
+        // Get the selected channel ID
+        const channelId = i.values[0];
+        
+        // Update only the logging-related settings
+        guildSettings.logChannel = channelId;
+        guildSettings.enableLogging = true;  // Enable logging only after channel is set
+        
+        // Save updated settings
+        client.database.set("settings", settings);
+
+        await i.reply({
+          content: LanguageManager.getText('commands.settings.log_channel_set', language, {
+            channel: `<#${channelId}>`
+          }),
+          flags: [MessageFlags.Ephemeral],
+        });
+
+        const updatedEmbed = createSettingsEmbed(guildSettings, language);
+        const updatedButtons = createSettingsButtons(guildSettings);
+        
+        await i.message.edit({
+          embeds: [updatedEmbed],
+          components: updatedButtons
+        });
+        return;
+      }
+
+      if (i.customId === 'toggle_enableLogging') {
+        if (guildSettings.enableLogging) {
+          // If logging is enabled, disable it and clear the channel
+          guildSettings.enableLogging = false;
+          guildSettings.logChannel = '';
+          client.database.set("settings", settings);
+          
+          const updatedEmbed = createSettingsEmbed(guildSettings, language);
+          const updatedButtons = createSettingsButtons(guildSettings);
+          
+          await i.update({
+            embeds: [updatedEmbed],
+            components: updatedButtons
+          });
+        } else {
+          // If logging is disabled, show channel selection without enabling logging yet
+          const channelSelect = new ActionRowBuilder()
+            .addComponents(
+              new ChannelSelectMenuBuilder()
+                .setCustomId('set_logChannel')
+                .setPlaceholder(t('select_log_channel'))
+                .setChannelTypes(ChannelType.GuildText)
+            );
+
+          await i.update({ components: [channelSelect] });
         }
         return;
       }
@@ -461,5 +579,5 @@ module.exports = new ApplicationCommand({
         }
       }
     });
-  },
+  }
 }).toJSON();

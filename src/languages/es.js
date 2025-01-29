@@ -171,12 +171,20 @@ module.exports = {
                 logging: "Registro",
                 change_language: "Cambiar Idioma",
                 select_language: "Seleccionar idioma",
-                select_log_channel: "Seleccionar canal de registro",
-                select_welcome_channel: "Seleccionar canal de bienvenida"
+                select_welcome_channel: "Seleccionar canal de bienvenida",
+                edit_charname_dm: "Editar DM del nombre"
             },
+            select_log_channel: "Seleccionar canal de registro",
+            log_channel_set: "✅ Canal de registro establecido en {channel}",
             not_set: "No establecido",
             language_set: "✅ El idioma del servidor se ha establecido en {language}",
-            welcome_channel_set: "✅ Canal de bienvenida establecido en {channel}"
+            welcome_channel_set: "✅ Canal de bienvenida establecido en {channel}",
+            charname_dm_modal: {
+                title: "Editar mensaje DM del nombre del personaje",
+                message_label: "Mensaje DM",
+                message_placeholder: "Ingrese el mensaje para enviar cuando se pregunte por el nombre del personaje..."
+            },
+            charname_dm_updated: "✅ El mensaje DM del nombre del personaje ha sido actualizado"
         }
     },
     events: {
