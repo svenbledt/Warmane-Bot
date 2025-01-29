@@ -132,15 +132,38 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
-        setlogchannel: {
-            invalid_channel: "Bitte wähle einen Textkanal für die Protokollierung.",
-            success: "Protokollkanal wurde auf #{channelName} gesetzt.",
-            success_with_enable: "Protokollkanal wurde auf #{channelName} gesetzt und die Protokollierung wurde aktiviert.",
-            no_channel_set: "Es wurde kein Protokollkanal festgelegt. Bitte verwende `/set-logchannel`, um einen festzulegen."
-        },
         settings: {
-            logging_enabled: "Server-Protokollierung",
-            logging_no_channel: "⚠️ Protokollierung ist aktiviert, aber kein Kanal ist festgelegt. Verwende `/set-logchannel`, um einen festzulegen."
+            title: "Server Einstellungen",
+            description: "Konfiguriere deine Server-Einstellungen durch Klicken der Schaltflächen unten. Jede Einstellung steuert verschiedene Aspekte der Bot-Funktionalität.",
+            no_permission: "Du musst Administrator oder Entwickler sein, um diesen Befehl zu verwenden.",
+            no_button_permission: "Du musst Administrator oder Entwickler sein, um diese Einstellungen zu verwenden.",
+            different_user: "Du kannst nicht mit den Einstellungen eines anderen interagieren. Bitte verwende den /settings Befehl, um deine eigenen zu öffnen.",
+            save_failed: "Fehler beim Aktualisieren der Einstellungen. Bitte versuche es erneut.",
+            menu_expired: "Einstellungsmenü ist abgelaufen.",
+            footer: "Einstellungen werden automatisch beim Umschalten gespeichert • Interface läuft nach 5 Minuten ab",
+            features: {
+                welcome_message: {
+                    name: "👋 Willkommensnachricht",
+                    description: "Wenn aktiviert, sendet der Bot eine Willkommensnachricht an neue Mitglieder im konfigurierten Willkommenskanal."
+                },
+                char_name_ask: {
+                    name: "👤 Charaktername Abfrage",
+                    description: "Wenn aktiviert, fragt der Bot neue Mitglieder automatisch nach ihrem Charakternamen und aktualisiert ihren Nicknamen entsprechend."
+                },
+                block_list: {
+                    name: "🚫 Sperrliste",
+                    description: "Wenn aktiviert, verwendet der Bot die globale Blacklist, um Mitglieder zu sperren, die auf der Liste stehen."
+                },
+                logging: {
+                    name: "📝 Protokollierung",
+                    description: "Wenn aktiviert, protokolliert der Bot wichtige Ereignisse, die vom Bot in Bezug auf deinen Server ausgeführt werden."
+                },
+                status: {
+                    enabled: "✅ Aktiviert",
+                    disabled: "❌ Deaktiviert",
+                    channel: "Kanal: {channel}"
+                }
+            }
         }
     },
     events: {
@@ -149,11 +172,10 @@ module.exports = {
             invalid_response: "Deine Antwort darf nicht leer oder zu lang sein.\nBitte gib eine gültige Antwort.",
             name_changed: "Dein Name wurde erfolgreich zu {nickname} für die Gilde {guildName} geändert.",
             name_change_failed: "Fehler beim Ändern deines Namens: {error}",
-            timeout: "Zeit abgelaufen! Kontaktiere einen Mitarbeiter des Servers, wenn du deinen Namen ändern möchtest.",
             mod_notification: "Konnte keine Charakternamenanfrage an {username} senden. Wahrscheinlich sind DMs deaktiviert.",
             welcome_title: "Willkommen bei {guildName}!",
             welcome_message: "Willkommen {member} auf unserem Server!\n\nWenn du Fragen hast, kannst du sie gerne in einem öffentlichen Kanal stellen.",
-            log_kicked: "{username} wurde aufgrund der schwarzen Liste gekickt.",
+            log_kicked: "Gekickt {username} aufgrund der schwarzen Liste.",
             log_kick_failed: "Konnte {username} nicht kicken: {error}",
             log_dm_failed: "Konnte keine DM an {username} senden.",
             log_name_changed: "Name von {username} zu {nickname} geändert.",
@@ -166,11 +188,6 @@ module.exports = {
             not_on_list_label: "Nicht in der Liste",
             not_on_list_description: "Einen anderen Charakternamen manuell eingeben",
             character_not_found: "Ich konnte diesen Charakter nicht finden. Bitte versuche es mit einem gültigen Charakternamen erneut."
-        },
-        nickname_changed: {
-            title: 'Nickname Geändert',
-            description: 'Nickname für {username} zu {nickname} geändert',
-            new_nickname: 'Neuer Nickname'
         }
     },
     logging: {
@@ -197,14 +214,14 @@ module.exports = {
             description: 'Konnte keine DM an {username} senden',
             error_label: 'Fehler'
         },
-        dm_timeout: {
-            title: 'DM Antwort Zeitüberschreitung',
-            description: '{username} hat nicht innerhalb der Zeitbegrenzung geantwortet'
-        },
         nickname_changed: {
             title: 'Nickname Geändert',
             description: 'Nickname für {username} zu {nickname} geändert',
             new_nickname: 'Neuer Nickname'
+        },
+        dm_timeout: {
+            title: 'DM Antwort Zeitüberschreitung',
+            description: '{username} hat nicht innerhalb der Zeitbegrenzung geantwortet'
         }
     }
 }; 

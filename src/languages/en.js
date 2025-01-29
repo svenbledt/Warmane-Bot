@@ -132,15 +132,38 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
-        setlogchannel: {
-            invalid_channel: "Please select a text channel for logging.",
-            success: "Log channel has been set to #{channelName}.",
-            success_with_enable: "Log channel has been set to #{channelName} and logging has been enabled.",
-            no_channel_set: "No log channel has been set. Please use `/set-logchannel` to set one."
-        },
         settings: {
-            logging_enabled: "Server Logging",
-            logging_no_channel: "⚠️ Logging is enabled but no channel is set. Use `/set-logchannel` to set one."
+            title: "Server Settings",
+            description: "Configure your server settings by clicking the buttons below. Each setting controls different aspects of the bot's functionality.",
+            no_permission: "You need to be an administrator or developer to use this command.",
+            no_button_permission: "You need to be an administrator or developer to use these settings.",
+            different_user: "You cannot interact with someone else's settings menu. Please use the /settings command to open your own.",
+            save_failed: "Failed to update settings. Please try again.",
+            menu_expired: "Settings menu has expired.",
+            footer: "Settings will automatically save when toggled • Interface times out after 5 minutes",
+            features: {
+                welcome_message: {
+                    name: "👋 Welcome Message",
+                    description: "When enabled, the bot will send a welcome message to new members in the configured welcome channel."
+                },
+                char_name_ask: {
+                    name: "👤 Character Name Ask",
+                    description: "When enabled, the bot will automatically DM new members asking for their character name and update their nickname accordingly."
+                },
+                block_list: {
+                    name: "🚫 Block List",
+                    description: "When enabled, the bot uses the global Blacklist to ban members that are on the list."
+                },
+                logging: {
+                    name: "📝 Logging",
+                    description: "When enabled, the bot will log important events that are executed by the bot in relation to your server."
+                },
+                status: {
+                    enabled: "✅ Enabled",
+                    disabled: "❌ Disabled",
+                    channel: "Channel: {channel}"
+                }
+            }
         }
     },
     events: {

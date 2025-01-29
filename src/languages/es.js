@@ -132,15 +132,38 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
-        setlogchannel: {
-            invalid_channel: "Por favor, selecciona un canal de texto para el registro.",
-            success: "Canal de registro establecido en #{channelName}.",
-            success_with_enable: "Canal de registro establecido en #{channelName} y registro habilitado.",
-            no_channel_set: "No se ha establecido ningún canal de registro. Por favor, usa `/set-logchannel` para establecer uno."
-        },
         settings: {
-            logging_enabled: "Registro del Servidor",
-            logging_no_channel: "⚠️ El registro está activado pero no se ha establecido ningún canal. Use `/set-logchannel` para establecer uno."
+            title: "Ajustes del Servidor",
+            description: "Configura los ajustes de tu servidor haciendo clic en los botones de abajo. Cada ajuste controla diferentes aspectos de la funcionalidad del bot.",
+            no_permission: "Necesitas ser administrador o desarrollador para usar este comando.",
+            no_button_permission: "Necesitas ser administrador o desarrollador para usar estos ajustes.",
+            different_user: "No puedes interactuar con el menú de ajustes de otra persona. Por favor, usa el comando /settings para abrir el tuyo.",
+            save_failed: "Error al actualizar los ajustes. Por favor, inténtalo de nuevo.",
+            menu_expired: "El menú de ajustes ha expirado.",
+            footer: "Los ajustes se guardarán automáticamente al cambiarlos • La interfaz expira después de 5 minutos",
+            features: {
+                welcome_message: {
+                    name: "👋 Mensaje de Bienvenida",
+                    description: "Cuando está activado, el bot enviará un mensaje de bienvenida a los nuevos miembros en el canal de bienvenida configurado."
+                },
+                char_name_ask: {
+                    name: "👤 Preguntar Nombre de Personaje",
+                    description: "Cuando está activado, el bot automáticamente enviará un MD a los nuevos miembros preguntando por su nombre de personaje y actualizará su apodo en consecuencia."
+                },
+                block_list: {
+                    name: "🚫 Lista Negra",
+                    description: "Cuando está activado, el bot usa la Lista Negra global para banear miembros que están en la lista."
+                },
+                logging: {
+                    name: "📝 Registro",
+                    description: "Cuando está activado, el bot registrará eventos importantes que son ejecutados por el bot en relación con tu servidor."
+                },
+                status: {
+                    enabled: "✅ Activado",
+                    disabled: "❌ Desactivado",
+                    channel: "Canal: {channel}"
+                }
+            }
         }
     },
     events: {
@@ -149,7 +172,6 @@ module.exports = {
             invalid_response: "Tu respuesta no puede estar vacía o demasiado larga.\nPor favor, proporciona una respuesta válida.",
             name_changed: "Tu nombre ha sido cambiado exitosamente a {nickname} para la Hermandad {guildName}.",
             name_change_failed: "No se pudo cambiar tu nombre: {error}",
-            timeout: "¡Se acabó el tiempo! Contacta a un miembro del personal del servidor si deseas cambiar tu nombre nuevamente.",
             mod_notification: "No se pudo enviar la solicitud de nombre de personaje a {username}. Probablemente tienen los MDs desactivados.",
             welcome_title: "¡Bienvenido a {guildName}!",
             welcome_message: "¡Bienvenido {member} a nuestro servidor!\n\nSi tienes alguna pregunta, no dudes en preguntar en un canal público.",
@@ -166,11 +188,6 @@ module.exports = {
             not_on_list_label: "No está en la lista",
             not_on_list_description: "Ingresar otro nombre de personaje manualmente",
             character_not_found: "No pude encontrar ese personaje. Por favor, inténtalo de nuevo con un nombre de personaje válido."
-        },
-        nickname_changed: {
-            title: 'Apodo Modificado',
-            description: 'Apodo de {username} cambiado a {nickname}',
-            new_nickname: 'Nuevo Apodo'
         }
     },
     logging: {
