@@ -15,9 +15,6 @@ module.exports = {
             nickname_failed: "Échec du changement du nom de ton personnage principal : {error}",
             dm_timeout_message: "Temps expiré. Veuillez contacter un membre du personnel de {guildName} pour obtenir une nouvelle chance."
         },
-        language: {
-            success: "✅ La langue du serveur a été définie sur {language}."
-        },
         globalcheck: {
             no_blacklisted: "Il n'y a pas d'utilisateurs sur liste noire.",
             no_blacklisted_guild: "Il n'y a pas d'utilisateurs sur liste noire dans ce serveur.",
@@ -157,6 +154,11 @@ module.exports = {
                 logging: {
                     name: "📝 Journalisation",
                     description: "Lorsqu'activé, le bot enregistrera les événements importants qui sont exécutés par le bot en relation avec votre serveur."
+                },
+                language: {
+                    name: "🌍 Langue",
+                    description: "Changez la langue que le bot utilise sur votre serveur.",
+                    current: "Langue actuelle : {language}"
                 },
                 status: {
                     enabled: "✅ Activé",

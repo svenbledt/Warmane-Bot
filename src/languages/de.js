@@ -15,9 +15,6 @@ module.exports = {
             nickname_failed: "Fehler beim Ändern deines Hauptcharakter-Namens: {error}",
             dm_timeout_message: "Zeit abgelaufen. Bitte kontaktiere einen Mitarbeiter von {guildName} für eine neue Chance."
         },
-        language: {
-            success: "✅ Serversprache wurde auf {language} eingestellt."
-        },
         globalcheck: {
             no_blacklisted: "Es gibt keine Benutzer auf der schwarzen Liste.",
             no_blacklisted_guild: "Es gibt keine Benutzer auf der schwarzen Liste in diesem Server.",
@@ -162,6 +159,15 @@ module.exports = {
                     enabled: "✅ Aktiviert",
                     disabled: "❌ Deaktiviert",
                     channel: "Kanal: {channel}"
+                },
+                char_name: {
+                    name: "👤 Charaktername",
+                    description: "Konfiguriere die Einstellungen für Charakternamen auf deinem Server."
+                },
+                language: {
+                    name: "🌍 Sprache",
+                    description: "Ändere die Sprache, die der Bot auf deinem Server verwendet.",
+                    current: "Aktuelle Sprache: {language}"
                 }
             },
             buttons: {

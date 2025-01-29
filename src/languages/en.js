@@ -155,6 +155,15 @@ module.exports = {
                     name: "📝 Logging",
                     description: "When enabled, the bot will log important events that are executed by the bot in relation to your server."
                 },
+                language: {
+                    name: "🌍 Language",
+                    description: "Change the language that the bot uses on your server.",
+                    current: "Current language: {language}"
+                },
+                char_name: {
+                    name: "👤 Character Name",
+                    description: "Configure character name settings for your server."
+                },
                 status: {
                     enabled: "✅ Enabled",
                     disabled: "❌ Disabled",
