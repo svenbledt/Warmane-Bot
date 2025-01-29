@@ -56,6 +56,6 @@ jobs:
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          mention_everyone: 'false'
+          mention_everyone: 'true'
         env:
           GITHUB_CONTEXT: ${{ steps.get_release.outputs.data }}
