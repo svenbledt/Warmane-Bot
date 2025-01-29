@@ -12,9 +12,8 @@ settings:
     BlockList: true
     welcomeChannel: '1242902565520146552'
     guildName: RSA Legends
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -40,9 +39,8 @@ settings:
     CharNameAsk: true
     BlockList: true
     guildName: The Exalted Pugs
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -54,9 +52,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -68,9 +65,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: true
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM:
       '432161293227524116': 1736322239606
@@ -83,9 +79,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -97,9 +92,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -111,9 +105,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -125,9 +118,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -139,9 +131,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -153,9 +144,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -167,9 +157,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -181,9 +170,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -195,9 +183,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM:
       '299209989174722560': 1736185303422
@@ -210,9 +197,8 @@ settings:
     welcomeChannel: '1330716536050028607'
     CharNameAsk: true
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -224,9 +210,8 @@ settings:
     welcomeChannel: ''
     CharNameAsk: false
     BlockList: true
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     language: en
@@ -239,9 +224,8 @@ settings:
     CharNameAsk: false
     BlockList: true
     language: en
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     logChannel: ''
@@ -253,9 +237,8 @@ settings:
     CharNameAsk: false
     BlockList: true
     language: en
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     logChannel: ''
@@ -267,9 +250,8 @@ settings:
     CharNameAsk: false
     BlockList: true
     language: en
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     logChannel: ''
@@ -281,9 +263,8 @@ settings:
     CharNameAsk: false
     BlockList: true
     language: en
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     logChannel: ''
@@ -295,13 +276,25 @@ settings:
     CharNameAsk: false
     BlockList: true
     language: en
-    charNameAskDM: >-
+    charNameAskDM: |-
       Hey, I would like to ask you for your main Character name.
-
       Please respond with your main Character name for the Server.
     lastOwnerDM: {}
     logChannel: ''
     enableLogging: false
+  - guild: '1331502110923161681'
+    guildName: Development Server
+    welcomeMessage: true
+    welcomeChannel: '1331502112122605662'
+    CharNameAsk: false
+    BlockList: true
+    language: en
+    logChannel: ''
+    enableLogging: false
+    charNameAskDM: |-
+      Hey, I would like to ask you for your main Character name.
+      Please respond with your main Character name for the Server.
+    lastOwnerDM: {}
 userCharacters:
   '209319089930240004':
     main:

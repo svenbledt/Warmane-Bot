@@ -177,10 +177,10 @@ module.exports = {
                 logging: "Logging",
                 change_language: "Change Language",
                 select_language: "Select a language",
-                select_welcome_channel: "Select welcome channel",
                 edit_charname_dm: "Edit Character Name DM"
             },
             select_log_channel: "Select logging channel",
+            select_welcome_channel: "Select welcome channel",
             log_channel_set: "✅ Logging channel has been set to {channel}",
             not_set: "Not set",
             language_set: "✅ Server language has been set to {language}",

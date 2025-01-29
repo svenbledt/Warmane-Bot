@@ -177,10 +177,10 @@ module.exports = {
                 logging: "Protokollierung",
                 change_language: "Sprache ändern",
                 select_language: "Sprache auswählen",
-                select_welcome_channel: "Willkommenskanal auswählen",
                 edit_charname_dm: "Charakternamen DM bearbeiten"
             },
             select_log_channel: "Protokollkanal auswählen",
+            select_welcome_channel: "Willkommenskanal auswählen",
             log_channel_set: "✅ Protokollkanal wurde auf {channel} gesetzt",
             not_set: "Nicht eingestellt",
             language_set: "✅ Serversprache wurde auf {language} eingestellt",

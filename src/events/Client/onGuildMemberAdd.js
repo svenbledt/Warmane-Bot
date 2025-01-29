@@ -2,10 +2,12 @@ const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const LanguageManager = require("../../utils/LanguageManager");
 const config = require("../../config");
-const { ActionRowBuilder, StringSelectMenuBuilder, ComponentType, EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, StringSelectMenuBuilder, ComponentType, AttachmentBuilder } = require('discord.js');
 const axios = require("axios");
 const rateLimit = require("axios-rate-limit");
 const Logger = require('../../utils/Logger');
+const { createCanvas, loadImage } = require('canvas');
+const path = require('path');
 
 const TIMEOUT_DURATION = 600000; // 10 minutes
 const MAX_CHAR_LENGTH = 16;
@@ -76,7 +78,6 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
       return;
     }
 
-    // Format the character name
     response = formatCharacterName(response);
 
     if (!isDevServer) {
@@ -152,6 +153,11 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
     const message = await handleNicknameChange(client, member, response, lang, member.guild.name);
     await dmChannel.send(message);
     collector.stop("valid-response");
+
+    // Send welcome message after nickname is set
+    if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+      await handleWelcomeMessage(client, member, guildSettings, lang);
+    }
   });
 
   collector.on("end", async (collected, reason) => {
@@ -171,6 +177,11 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
             { nameKey: 'user_id', value: member.user.id }
           ]
         });
+
+        // Send welcome message with current nickname if timeout
+        if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+          await handleWelcomeMessage(client, member, guildSettings, lang);
+        }
       } catch (error) {
         console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
       }
@@ -349,19 +360,31 @@ async function handleBlacklistedUser(member, blacklistedUser, lang, client) {
   }
 }
 
+// Add a Set to track processed users
+const processedUsers = new Set();
+
 // Update handleRegularServer function
 async function handleRegularServer(client, member, guildSettings, lang) {
+  // Check if user is already being processed
+  const userId = member.user.id;
+  if (processedUsers.has(userId)) {
+    console.log(`Skipping duplicate processing for user ${member.user.tag}`);
+    return;
+  }
+  
+  // Add user to processed set
+  processedUsers.add(userId);
+  
   try {
     const dmChannel = await member.createDM();
     
     // Get user's characters from both API and database
     const characters = await fetchUserCharacters(client, member.user.id);
 
-    // If no characters found, proceed with manual input and send charNameAskDM
+    // If no characters found, proceed with manual input
     if (!characters || characters.length === 0) {
       await dmChannel.send(guildSettings.charNameAskDM);
       
-      // Log DM sent
       await Logger.log(client, member.guild.id, {
         titleKey: 'dm_sent',
         descData: { username: member.user.tag },
@@ -372,18 +395,17 @@ async function handleRegularServer(client, member, guildSettings, lang) {
         ]
       });
       
-      return handleManualInput(client, member, dmChannel, guildSettings, lang);
+      return await handleManualInput(client, member, dmChannel, guildSettings, lang);
     }
 
     // Create selection menu with character information
     const options = characters.map(char => ({
       label: char.name,
-      value: `${char.name}|${char.realm}`, // Store both name and realm
+      value: `${char.name}|${char.realm}`,
       description: `${char.isMain ? '(Main) ' : char.isAlt ? '(Alt) ' : ''}${char.realm}`,
       emoji: char.isMain ? '👑' : char.isAlt ? '🔄' : '👤'
     }));
 
-    // Add "Not on list" option
     options.push({
       label: LanguageManager.getText('events.guildMemberAdd.not_on_list_label', lang),
       value: "not_on_list",
@@ -398,12 +420,12 @@ async function handleRegularServer(client, member, guildSettings, lang) {
         .addOptions(options)
     );
 
+    // Send selection menu only once
     const selectMessage = await dmChannel.send({
       content: LanguageManager.getText('events.guildMemberAdd.assigned_chars_found', lang),
       components: [row]
     });
 
-    // Log DM sent
     await Logger.log(client, member.guild.id, {
       titleKey: 'dm_sent',
       descData: { username: member.user.tag },
@@ -425,35 +447,41 @@ async function handleRegularServer(client, member, guildSettings, lang) {
       const selectedValue = response.values[0];
 
       if (selectedValue === "not_on_list") {
-        // Disable the select menu before proceeding
         const disabledRow = new ActionRowBuilder().addComponents(
           StringSelectMenuBuilder.from(row.components[0]).setDisabled(true)
         );
         await selectMessage.edit({ components: [disabledRow] });
         
-        return handleManualInput(client, member, dmChannel, guildSettings, lang);
+        return await handleManualInput(client, member, dmChannel, guildSettings, lang);
       } else {
-        // Split the value to get name and realm
         const [charName, realm] = selectedValue.split('|');
         
         const message = await handleNicknameChange(client, member, charName, lang, member.guild.name);
         await dmChannel.send(message);
         
-        // Disable the select menu
         const disabledRow = new ActionRowBuilder().addComponents(
           StringSelectMenuBuilder.from(row.components[0])
             .setDisabled(true)
             .setPlaceholder(`Selected: ${charName}`)
         );
         await selectMessage.edit({ components: [disabledRow] });
+
+        // Send welcome message after nickname is set
+        if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+          await handleWelcomeMessage(client, member, guildSettings, lang);
+        }
       }
     } catch (error) {
       await handleTimeout(client, member, selectMessage, row, lang);
+      
+      // Send welcome message with current nickname if timeout
+      if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+        await handleWelcomeMessage(client, member, guildSettings, lang);
+      }
     }
   } catch (error) {
     console.error(`Failed to handle regular server join for ${member.user.tag}: ${error.message}`);
     
-    // Log the error
     await Logger.log(client, member.guild.id, {
       titleKey: 'interaction_failed',
       descData: { username: member.user.tag },
@@ -464,31 +492,87 @@ async function handleRegularServer(client, member, guildSettings, lang) {
         { nameKey: 'error', value: error.message }
       ]
     });
+  } finally {
+    // Remove user from processed set after a delay
+    setTimeout(() => {
+      processedUsers.delete(userId);
+    }, TIMEOUT_DURATION);
   }
 }
 
-// Helper function to handle welcome messages
+// Update createWelcomeImage function
+async function createWelcomeImage(member, guildName) {
+  // Fetch fresh member data to get updated nickname
+  const freshMember = await member.guild.members.fetch(member.id);
+  
+  const canvas = createCanvas(1024, 500);
+  const ctx = canvas.getContext('2d');
+
+  // Load all images first
+  const background = await loadImage(path.join(__dirname, '../../assets/welcome-bg.png'));
+  const avatar = await loadImage(freshMember.user.displayAvatarURL({ extension: 'png', size: 256 }));
+  const frame = await loadImage(path.join(__dirname, '../../assets/frames.png'));
+
+  // Draw background
+  ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+  // Add dark overlay
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Create clipping circle for avatar
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(canvas.width / 2, 190, 125, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  
+  // Draw avatar
+  ctx.drawImage(avatar, canvas.width / 2 - 125, 65, 250, 250);
+  ctx.restore();
+
+  // Draw frame overlay with correct aspect ratio
+  const frameWidth = 405; // Base width
+  const frameHeight = (frameWidth * 320) / 388; // Calculate height to maintain aspect ratio
+  
+  ctx.drawImage(
+    frame,
+    (canvas.width / 2 - frameWidth / 2) + 45,
+    65 - (frameHeight - 250) / 2,
+    frameWidth,
+    frameHeight
+  );
+
+  // Add text
+  const displayName = freshMember.nickname || freshMember.user.username;
+  const memberCount = freshMember.guild.memberCount || 0;
+  ctx.font = 'bold 60px Sans';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+
+  ctx.fillText(`Welcome ${displayName}`, canvas.width / 2, 400);
+
+
+  // Use fresh member data to get the current nickname
+  ctx.font = '40px Sans';
+  ctx.fillText(`You are member #${memberCount}`, canvas.width / 2, 450);
+
+
+
+  const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: 'welcome.png' });
+  return attachment;
+}
+
+// Update the welcome message to use the canvas
 async function handleWelcomeMessage(client, member, guildSettings, lang) {
   try {
     const welcomeChannel = member.guild.channels.cache.get(guildSettings.welcomeChannel);
     if (!welcomeChannel) return;
 
-    const welcomeEmbed = new EmbedBuilder()
-      .setTitle(LanguageManager.getText('events.guildMemberAdd.welcome_title', lang, {
-        guildName: member.guild.name
-      }))
-      .setDescription(LanguageManager.getText('events.guildMemberAdd.welcome_message', lang, {
-        member: member.toString()
-      }))
-      .setColor("#261b0d")
-      .setTimestamp()
-      .setFooter({
-        text: member.guild.name,
-        iconURL: client.user.displayAvatarURL()
-      })
-      .setThumbnail(member.user.displayAvatarURL());
-
-    await welcomeChannel.send({ embeds: [welcomeEmbed] });
+    const welcomeMessage = await createWelcomeImage(member, member.guild.name);
+    await welcomeChannel.send({ 
+      files: [welcomeMessage] 
+    });
 
   } catch (error) {
     console.error('Welcome Message Error:', {
@@ -499,32 +583,6 @@ async function handleWelcomeMessage(client, member, guildSettings, lang) {
       memberTag: member.user.tag
     });
   }
-}
-
-// Helper function to handle collector end
-function handleCollectorEnd(client, member, lang) {
-  return async (collected, reason) => {
-    if (reason !== "valid-response" && member.dmChannel) {
-      try {
-        await member.send(
-          LanguageManager.getText('commands.charname.dm_timeout_message', lang, {
-            guildName: member.guild.name
-          })
-        );
-        await Logger.log(client, member.guild.id, {
-          titleKey: 'dm_timeout',
-          descData: { username: member.user.tag },
-          color: '#ff0000',
-          fields: [
-            { nameKey: 'user_label', value: member.user.tag },
-            { nameKey: 'user_id', value: member.user.id }
-          ]
-        });
-      } catch (error) {
-        console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
-      }
-    }
-  };
 }
 
 // Helper function to handle timeouts
@@ -692,8 +750,8 @@ module.exports = new Event({
 
     const lang = guildSettings.language || "en";
 
-    // Handle welcome message first
-    if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+    // Only send welcome message immediately if CharNameAsk is disabled
+    if (guildSettings.welcomeMessage && guildSettings.welcomeChannel && !guildSettings.CharNameAsk) {
       await handleWelcomeMessage(client, member, guildSettings, lang);
     }
 
