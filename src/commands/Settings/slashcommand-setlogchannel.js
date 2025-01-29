@@ -11,7 +11,7 @@ const LanguageManager = require("../../utils/LanguageManager");
 
 module.exports = new ApplicationCommand({
   command: {
-    name: "set-logchannel",
+    name: "set-log-channel",
     description: "Set the channel for server logs",
     type: 1,
     contexts: [0],

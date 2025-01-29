@@ -37,8 +37,8 @@ function ensureGuildSettings(guildSettings) {
 
 module.exports = new ApplicationCommand({
   command: {
-    name: "set-welcome-message-dm",
-    description: "Sets the welcome message for DMs. (When we ask for the character name)",
+    name: "set-charname-ask-dm",
+    description: "Sets the message for the character name ask in DMs.",
     type: 1,
     contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
     options: [
