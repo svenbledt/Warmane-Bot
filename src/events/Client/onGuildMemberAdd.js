@@ -2,7 +2,7 @@ const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const LanguageManager = require("../../utils/LanguageManager");
 const config = require("../../config");
-const { ActionRowBuilder, StringSelectMenuBuilder, ComponentType } = require('discord.js');
+const { ActionRowBuilder, StringSelectMenuBuilder, ComponentType, EmbedBuilder } = require('discord.js');
 const axios = require("axios");
 const rateLimit = require("axios-rate-limit");
 const Logger = require('../../utils/Logger');
@@ -473,23 +473,20 @@ async function handleWelcomeMessage(client, member, guildSettings, lang) {
     const welcomeChannel = member.guild.channels.cache.get(guildSettings.welcomeChannel);
     if (!welcomeChannel) return;
 
-    const welcomeEmbed = {
-      title: LanguageManager.getText('events.guildMemberAdd.welcome_title', lang, {
+    const welcomeEmbed = new EmbedBuilder()
+      .setTitle(LanguageManager.getText('events.guildMemberAdd.welcome_title', lang, {
         guildName: member.guild.name
-      }),
-      description: LanguageManager.getText('events.guildMemberAdd.welcome_message', lang, {
+      }))
+      .setDescription(LanguageManager.getText('events.guildMemberAdd.welcome_message', lang, {
         member: member.toString()
-      }),
-      color: 10038562,
-      timestamp: new Date(),
-      footer: {
+      }))
+      .setColor("#261b0d")
+      .setTimestamp()
+      .setFooter({
         text: member.guild.name,
-        icon_url: client.user.displayAvatarURL(),
-      },
-      thumbnail: {
-        url: member.user.displayAvatarURL(),
-      },
-    };
+        iconURL: client.user.displayAvatarURL()
+      })
+      .setThumbnail(member.user.displayAvatarURL());
 
     await welcomeChannel.send({ embeds: [welcomeEmbed] });
 
