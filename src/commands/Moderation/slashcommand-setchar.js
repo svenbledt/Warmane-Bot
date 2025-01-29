@@ -19,7 +19,7 @@ const https = rateLimit(axios.create(), {
 
 module.exports = new ApplicationCommand({
   command: {
-    name: "setchar",
+    name: "set-char",
     description: "Set a character for a user",
     type: 1,
     contexts: [0],
