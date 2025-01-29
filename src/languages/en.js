@@ -15,9 +15,6 @@ module.exports = {
             nickname_failed: "Failed to change your main Characters name due to: {error}",
             dm_timeout_message: "Time expired. Please contact a staff member of {guildName} to get a new chance."
         },
-        language: {
-            success: "✅ Server language has been set to {language}."
-        },
         globalcheck: {
             no_blacklisted: "There are no blacklisted users.",
             no_blacklisted_guild: "There are no blacklisted users in the guild.",
@@ -171,10 +168,15 @@ module.exports = {
                 logging: "Logging",
                 change_language: "Change Language",
                 select_language: "Select a language",
-                select_log_channel: "Select logging channel"
-            }
+                select_log_channel: "Select logging channel",
+                select_welcome_channel: "Select welcome channel"
+            },
+            not_set: "Not set",
+            language_set: "✅ Server language has been set to {language}",
+            welcome_channel_set: "✅ Welcome channel has been set to {channel}"
         }
     },
+
     events: {
         guildMemberAdd: {
             blacklisted: "You have been blacklisted from the Guild. If you think this is a mistake, please contact the Guild staff. Or appeal at https://discord.gg/YDqBQU43Ht",

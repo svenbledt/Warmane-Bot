@@ -171,8 +171,12 @@ module.exports = {
                 logging: "Protokollierung",
                 change_language: "Sprache ändern",
                 select_language: "Sprache auswählen",
-                select_log_channel: "Protokollkanal auswählen"
-            }
+                select_log_channel: "Protokollkanal auswählen",
+                select_welcome_channel: "Willkommenskanal auswählen"
+            },
+            not_set: "Nicht gesetzt",
+            language_set: "✅ Serversprache wurde auf {language} eingestellt",
+            welcome_channel_set: "✅ Willkommenskanal wurde auf {channel} gesetzt"
         }
     },
     events: {

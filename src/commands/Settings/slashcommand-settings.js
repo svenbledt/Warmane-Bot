@@ -55,7 +55,9 @@ function createSettingsEmbed(guildSettings, language = 'en') {
     .addFields(
       {
         name: f('welcome_message.name'),
-        value: `${f('status.enabled').replace('✅', guildSettings.welcomeMessage ? '✅' : '❌')}\n${f('welcome_message.description')}`,
+        value: `${f('status.enabled').replace('✅', guildSettings.welcomeMessage ? '✅' : '❌')}\n` +
+               `${f('status.channel').replace('{channel}', guildSettings.welcomeChannel ? `<#${guildSettings.welcomeChannel}>` : t('not_set'))}\n` +
+               `${f('welcome_message.description')}`,
         inline: false
       },
       {
@@ -71,7 +73,7 @@ function createSettingsEmbed(guildSettings, language = 'en') {
       {
         name: f('logging.name'),
         value: `${f('status.enabled').replace('✅', guildSettings.enableLogging ? '✅' : '❌')}\n` +
-               `${f('status.channel').replace('{channel}', guildSettings.logChannel ? `<#${guildSettings.logChannel}>` : 'Not set')}\n` +
+               `${f('status.channel').replace('{channel}', guildSettings.logChannel ? `<#${guildSettings.logChannel}>` : t('not_set'))}\n` +
                `${f('logging.description')}`,
         inline: false
       }
@@ -83,6 +85,19 @@ function createSettingsButtons(guildSettings) {
   const components = [];
   const t = (key) => LanguageManager.getText(`commands.settings.buttons.${key}`, guildSettings.language || 'en');
   
+  // If welcome message is enabled but no channel is set, only show channel select
+  if (guildSettings.welcomeMessage && !guildSettings.welcomeChannel) {
+    const channelSelect = new ActionRowBuilder()
+      .addComponents(
+        new ChannelSelectMenuBuilder()
+          .setCustomId('set_welcomeChannel')
+          .setPlaceholder(t('select_welcome_channel'))
+          .setChannelTypes(ChannelType.GuildText)
+      );
+    components.push(channelSelect);
+    return components;
+  }
+
   // If logging is enabled but no channel is set, only show channel select
   if (guildSettings.enableLogging && !guildSettings.logChannel) {
     const channelSelect = new ActionRowBuilder()
@@ -291,13 +306,72 @@ module.exports = new ApplicationCommand({
           };
 
           await i.reply({
-            content: LanguageManager.getText('commands.language.success', newLanguage, {
+            content: LanguageManager.getText('commands.settings.language_set', newLanguage, {
               language: languageNames[newLanguage]
             }),
             flags: [MessageFlags.Ephemeral],
           });
 
           const updatedEmbed = createSettingsEmbed(guildSettings, newLanguage);
+          const updatedButtons = createSettingsButtons(guildSettings);
+          
+          await interaction.editReply({
+            embeds: [updatedEmbed],
+            components: updatedButtons
+          });
+        } catch (error) {
+          console.error(`Failed to save settings: ${error.message}`);
+          await i.reply({
+            content: t('save_failed'),
+            flags: [MessageFlags.Ephemeral],
+          });
+        }
+        return;
+      }
+
+      if (i.customId === 'toggle_welcomeMessage') {
+        guildSettings.welcomeMessage = !guildSettings.welcomeMessage;
+        
+        // Clear welcome channel when disabling welcome message
+        if (!guildSettings.welcomeMessage) {
+          guildSettings.welcomeChannel = '';
+        }
+        
+        try {
+          client.database.set("settings", settings);
+          
+          const updatedEmbed = createSettingsEmbed(guildSettings, language);
+          const updatedButtons = createSettingsButtons(guildSettings);
+          
+          await i.update({
+            embeds: [updatedEmbed],
+            components: updatedButtons
+          });
+        } catch (error) {
+          console.error(`Failed to save settings: ${error.message}`);
+          await i.reply({
+            content: t('save_failed'),
+            flags: [MessageFlags.Ephemeral],
+          });
+        }
+        return;
+      }
+
+      if (i.customId === 'set_welcomeChannel') {
+        const channel = i.values[0];
+        guildSettings.welcomeChannel = channel;
+        
+        try {
+          client.database.set("settings", settings);
+          
+          await i.reply({
+            content: LanguageManager.getText('commands.settings.welcome_channel_set', language, {
+              channel: `<#${channel}>`
+            }),
+            flags: [MessageFlags.Ephemeral],
+          });
+
+          const updatedEmbed = createSettingsEmbed(guildSettings, language);
           const updatedButtons = createSettingsButtons(guildSettings);
           
           await interaction.editReply({

@@ -171,8 +171,12 @@ module.exports = {
                 logging: "Логирование",
                 change_language: "Изменить Язык",
                 select_language: "Выберите язык",
-                select_log_channel: "Выберите канал для логов"
-            }
+                select_log_channel: "Выберите канал для логов",
+                select_welcome_channel: "Выберите канал приветствия"
+            },
+            not_set: "Не установлено",
+            language_set: "✅ Язык сервера установлен на {language}",
+            welcome_channel_set: "✅ Канал приветствия установлен на {channel}"
         }
     },
     events: {

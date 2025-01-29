@@ -161,7 +161,7 @@ module.exports = {
                 status: {
                     enabled: "✅ Activé",
                     disabled: "❌ Désactivé",
-                    channel: "Canal : {channel}"
+                    channel: "Canal: {channel}"
                 }
             },
             buttons: {
@@ -171,8 +171,12 @@ module.exports = {
                 logging: "Journalisation",
                 change_language: "Changer la Langue",
                 select_language: "Sélectionner une langue",
-                select_log_channel: "Sélectionner le canal de journalisation"
-            }
+                select_log_channel: "Sélectionner le canal de journalisation",
+                select_welcome_channel: "Sélectionner le canal de bienvenue"
+            },
+            not_set: "Non défini",
+            language_set: "✅ La langue du serveur a été définie sur {language}",
+            welcome_channel_set: "✅ Le canal de bienvenue a été défini sur {channel}"
         }
     },
     events: {
