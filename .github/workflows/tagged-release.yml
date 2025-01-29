@@ -20,7 +20,7 @@ jobs:
         with:
           configuration: ".github/config/configuration.json"
           ignorePreReleases: true
-          mode: "COMMIT"
+          mode: "HYBRID"
           token: ${{ secrets.PAT }}
 
       - name: Release
