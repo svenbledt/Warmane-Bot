@@ -527,10 +527,16 @@ module.exports = new ApplicationCommand({
                 inline: true
               },
               {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.class', lang),
+                value: character.class,
+                inline: true
+              },
+              {
                 name: LanguageManager.getText('commands.charinfo.embed.fields.realm', lang),
                 value: character.realm,
                 inline: true
               },
+
               {
                 name: LanguageManager.getText('commands.charinfo.embed.fields.online', lang),
                 value: character.online ? LanguageManager.getText('commands.charinfo.embed.fields.yes', lang) : LanguageManager.getText('commands.charinfo.embed.fields.no', lang),
