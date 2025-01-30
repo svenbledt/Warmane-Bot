@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const config = require('../config');
+const LanguageManager = require('../utils/LanguageManager');
 
 class DevLogger {
   static async log(client, guildId, options) {
@@ -31,7 +32,9 @@ class DevLogger {
       // Add additional fields if they exist
       if (options.fields && Array.isArray(options.fields)) {
         const formattedFields = options.fields.map(field => ({
-          name: field.nameKey || field.name || 'Information',
+          name: field.nameKey ? 
+            LanguageManager.getText(`logging.${field.nameKey}`, 'en', field.nameData) : 
+            field.name || 'Information',
           value: field.value || 'No value provided',
           inline: field.inline || false
         }));

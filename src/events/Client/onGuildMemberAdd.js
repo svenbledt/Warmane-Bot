@@ -220,17 +220,14 @@ async function handleNicknameChange(client, member, charName, lang, guildName) {
       fields: [
         { 
           nameKey: 'user_label', 
-          nameData: {}, // Empty object for translations without replacements
           value: member.user.tag 
         },
         { 
           nameKey: 'user_id', 
-          nameData: {}, 
           value: member.user.id 
         },
         { 
-          nameKey: 'new_nickname', 
-          nameData: {}, 
+          nameKey: 'nickname_changed.new_nickname',
           value: charName 
         }
       ]
