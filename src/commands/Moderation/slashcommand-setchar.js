@@ -3,6 +3,10 @@ const {
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
   PermissionsBitField,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
@@ -127,18 +131,68 @@ module.exports = new ApplicationCommand({
         }
       }
 
-      // If character is already assigned and user is not a developer, prevent the assignment
-      if (existingOwner && !isDeveloper) {
-        return interaction.reply({
-          content: LanguageManager.getText('commands.setchar.char_already_assigned', lang, {
-            character: charNameFormatted,
-            user: `<@${existingOwner.userId}>`
-          }),
-          flags: [MessageFlags.Ephemeral],
+      // If character is already assigned, inform the user
+      if (existingOwner) {
+        const baseMessage = LanguageManager.getText('commands.setchar.char_already_assigned', lang, {
+          character: charNameFormatted,
+          user: `<@${existingOwner.userId}>`
         });
+
+        // For developers, show confirmation buttons
+        if (isDeveloper) {
+          const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setCustomId('confirm')
+              .setLabel('Yes')
+              .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+              .setCustomId('cancel')
+              .setLabel('No')
+              .setStyle(ButtonStyle.Danger)
+          );
+
+          await interaction.reply({
+            content: `${baseMessage}\n\nAs a developer, would you like to reassign this character?`,
+            components: [row],
+            flags: [MessageFlags.Ephemeral],
+          });
+
+          try {
+            const confirmation = await interaction.channel.awaitMessageComponent({
+              filter: (i) => i.user.id === interaction.user.id && i.message.interaction.id === interaction.id,
+              time: 30000,
+              componentType: ComponentType.Button,
+            });
+
+            if (confirmation.customId === 'cancel') {
+              await confirmation.update({
+                content: 'Operation cancelled.',
+                components: [],
+              });
+              return;
+            }
+
+            await confirmation.update({
+              content: 'Processing...',
+              components: [],
+            });
+          } catch (e) {
+            await interaction.editReply({
+              content: 'No response received within 30 seconds. Operation cancelled.',
+              components: [],
+            });
+            return;
+          }
+        } else {
+          // Regular users just get informed about the existing claim
+          return interaction.reply({
+            content: baseMessage,
+            flags: [MessageFlags.Ephemeral],
+          });
+        }
       }
 
-      // If character is assigned and user is a developer, remove it from previous owner
+      // If character is assigned and developer confirmed, remove it from previous owner
       if (existingOwner) {
         const prevUserData = userChars[existingOwner.userId];
         if (existingOwner.isMain) {

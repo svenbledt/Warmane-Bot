@@ -335,10 +335,6 @@ userCharacters:
         realm: Icecrown
         addedBy: '209319089930240004'
         addedAt: '2025-01-27T13:37:08.261Z'
-      - name: Jawboned
-        realm: Lordaeron
-        addedBy: '209319089930240004'
-        addedAt: '2025-01-27T13:44:10.303Z'
   '194874349294059521':
     main:
       name: Lunareclipse
@@ -359,7 +355,15 @@ userCharacters:
       realm: Lordaeron
       addedBy: '209319089930240004'
       addedAt: '2025-01-28T14:47:21.976Z'
-    alts: []
+    alts:
+      - name: Mirafirst
+        realm: Lordaeron
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-30T10:50:53.044Z'
+      - name: Jawboned
+        realm: Lordaeron
+        addedBy: '209319089930240004'
+        addedAt: '2025-01-30T10:51:20.570Z'
   '1172952452962725908':
     main:
       name: Symsala
