@@ -173,8 +173,8 @@ module.exports = new ApplicationCommand({
             }
 
             await confirmation.update({
-              content: 'Processing...',
-              components: [],
+                content: 'Processed.',
+                components: [],
             });
           } catch (e) {
             await interaction.editReply({
@@ -185,14 +185,18 @@ module.exports = new ApplicationCommand({
           }
         } else {
           // Regular users just get informed about the existing claim
-          return interaction.reply({
+          await interaction.reply({
             content: baseMessage,
             flags: [MessageFlags.Ephemeral],
           });
+          return;
         }
+      } else {
+        // If no existing owner, proceed with the normal flow
+        await interaction.deferReply({ ephemeral: true });
       }
 
-      // If character is assigned and developer confirmed, remove it from previous owner
+      // If we get here, either there's no existing owner or developer confirmed reassignment
       if (existingOwner) {
         const prevUserData = userChars[existingOwner.userId];
         if (existingOwner.isMain) {
@@ -249,7 +253,7 @@ module.exports = new ApplicationCommand({
         });
       }
 
-      return interaction.reply({
+      await interaction.editReply({
         content: responseContent,
         flags: [MessageFlags.Ephemeral],
       });
