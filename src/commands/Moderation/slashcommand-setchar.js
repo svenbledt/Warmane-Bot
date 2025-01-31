@@ -1,6 +1,7 @@
 const {
   MessageFlags,
   ChatInputCommandInteraction,
+  MessageFlags,
   ApplicationCommandOptionType,
   PermissionsBitField,
   ActionRowBuilder,
@@ -193,7 +194,7 @@ module.exports = new ApplicationCommand({
         }
       } else {
         // If no existing owner, proceed with the normal flow
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
       }
 
       // If we get here, either there's no existing owner or developer confirmed reassignment

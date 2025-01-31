@@ -604,7 +604,7 @@ module.exports = new ApplicationCommand({
           console.error(`Failed to save settings: ${error.message}`);
           await i.reply({
             content: t('save_failed'),
-            ephemeral: true
+            flags: [MessageFlags.Ephemeral]
           });
         }
         return;
