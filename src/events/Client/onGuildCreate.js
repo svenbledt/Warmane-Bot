@@ -4,82 +4,6 @@ const config = require("../../config");
 const Logger = require("../../utils/Logger");
 const { EmbedBuilder, AuditLogEvent } = require('discord.js');
 
-async function ensureGuildSettings(guildSettings) {
-  const defaultSettings = {
-    welcomeMessage: false,
-    welcomeChannel: "",
-    CharNameAsk: false,
-    BlockList: true,
-    language: "en",  // Add default language setting
-    logChannel: "", // Add logging channel setting
-    enableLogging: false, // Add logging toggle
-    charNameAskDM:
-      "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
-    lastOwnerDM: {},
-    // Add any other default settings here
-  };
-
-  let updated = false;
-  for (const [key, value] of Object.entries(defaultSettings)) {
-    if (!guildSettings.hasOwnProperty(key)) {
-      guildSettings[key] = value;
-      updated = true;
-    }
-  }
-
-  return updated;
-}
-
-async function updateGuildSettings(client) {
-  // Get all current guild IDs from the client
-  const currentGuildIds = new Set(client.guilds.cache.keys());
-  
-  // Get all settings documents
-  const settings = await client.database_handler.find('settings', {
-    guild: { $in: Array.from(currentGuildIds) }
-  });
-
-  // Create a map of existing settings for faster lookup
-  const existingSettings = new Map(settings.map(setting => [setting.guild, setting]));
-
-  // Process each guild
-  for (const guildId of currentGuildIds) {
-    let guildSettings = existingSettings.get(guildId);
-    const guildName = client.guilds.cache.get(guildId).name;
-
-    if (!guildSettings) {
-      // Create new settings if none exist
-      guildSettings = {
-        guild: guildId,
-        guildName: guildName,
-      };
-      
-      // Ensure default settings
-      await ensureGuildSettings(guildSettings);
-      
-      // Create new document
-      await client.database_handler.create('settings', guildSettings);
-    } else {
-      // Update existing settings if needed
-      if (guildSettings.guildName !== guildName) {
-        guildSettings.guildName = guildName;
-        await client.database_handler.updateOne('settings', 
-          { guild: guildId },
-          { guildName: guildName }
-        );
-      }
-
-      // Check and update default settings
-      if (await ensureGuildSettings(guildSettings)) {
-        await client.database_handler.updateOne('settings',
-          { guild: guildId },
-          guildSettings
-        );
-      }
-    }
-  }
-}
-
 module.exports = new Event({
   event: "guildCreate",
   once: false,
@@ -87,6 +11,9 @@ module.exports = new Event({
     const announcementChannel = client.channels.cache.get(
       config.development.announcementChannel
     );
+
+    // Ensure guild settings when bot joins new guild
+    await client.database_handler.ensureGuildSettings(guild.id, guild.name);
 
     success(
       `Guild ${guild.name} (${guild.id}) has been added to the database.`
@@ -160,8 +87,5 @@ module.exports = new Event({
         ]
       });
     }
-    
-    // Update settings
-    await updateGuildSettings(client);
   },
 });

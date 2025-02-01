@@ -190,7 +190,8 @@ module.exports = {
                 message_label: "DM-Nachricht",
                 message_placeholder: "Gib die Nachricht ein, die beim Fragen nach dem Charakternamen gesendet werden soll..."
             },
-            charname_dm_updated: "✅ Charakternamen DM-Nachricht wurde aktualisiert"
+            charname_dm_updated: "✅ Charakternamen DM-Nachricht wurde aktualisiert",
+            error_occurred: "Ein Fehler ist aufgetreten: {error}"
         }
     },
     events: {

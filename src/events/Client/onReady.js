@@ -5,72 +5,6 @@ const Logger = require('../../utils/Logger');
 
 const COOLDOWN_HOURS = 24;
 
-function ensureGuildSettings(guildSettings) {
-  const defaultSettings = {
-    welcomeMessage: false,
-    welcomeChannel: "",
-    CharNameAsk: false,
-    BlockList: true,
-    language: "en",
-    logChannel: "",
-    enableLogging: false,
-    charNameAskDM:
-      "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
-    lastOwnerDM: {},
-  };
-
-  let updated = false;
-  for (const [key, value] of Object.entries(defaultSettings)) {
-    if (!guildSettings.hasOwnProperty(key)) {
-      guildSettings[key] = value;
-      updated = true;
-    }
-  }
-  return updated;
-}
-
-async function updateGuildSettings(client) {
-  const currentGuildIds = Array.from(client.guilds.cache.keys());
-  
-  // Get all settings documents for current guilds
-  const settings = await client.database_handler.find('settings', {
-    guild: { $in: currentGuildIds }
-  });
-
-  // Create a map of existing settings
-  const existingSettings = new Map(settings.map(setting => [setting.guild, setting]));
-
-  // Process each guild
-  for (const guildId of currentGuildIds) {
-    const guild = client.guilds.cache.get(guildId);
-    const guildName = guild.name;
-
-    let guildSettings = existingSettings.get(guildId);
-    
-    if (!guildSettings) {
-      // Create new settings if none exist
-      guildSettings = {
-        guild: guildId,
-        guildName: guildName
-      };
-      
-      ensureGuildSettings(guildSettings);
-      await client.database_handler.create('settings', guildSettings);
-    } else if (guildSettings.guildName !== guildName || ensureGuildSettings(guildSettings)) {
-      // Update if guild name changed or defaults need to be added
-      await client.database_handler.updateOne('settings',
-        { guild: guildId },
-        { 
-          $set: {
-            ...guildSettings,
-            guildName: guildName
-          }
-        }
-      );
-    }
-  }
-}
-
 async function updateStatus(client) {
   const guilds = client.guilds.cache.size;
   let users = 0;
@@ -240,7 +174,8 @@ module.exports = new Event({
   run: async (__client__, client) => {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    await updateGuildSettings(client);
+    // Update all guild settings on startup
+    await client.database_handler.updateAllGuildSettings(client);
     await updateStatus(client);
     await generateAndSendInvites(client);
 
@@ -258,7 +193,7 @@ module.exports = new Event({
     }, 24 * 60 * 60 * 1000);
 
     setInterval(() => {
-      updateGuildSettings(client);
+      client.database_handler.updateAllGuildSettings(client);
     }, 2 * 60 * 60 * 1000);
 
     setInterval(() => {

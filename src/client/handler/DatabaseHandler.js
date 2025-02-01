@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { error, success } = require("../../utils/Console");
+const { error, success, info, warn } = require("../../utils/Console");
 const BlacklistedUser = require('../../models/BlacklistedUser');
 const GuildSettings = require('../../models/GuildSettings');
 const UserCharacter = require('../../models/UserCharacter');
@@ -20,7 +20,10 @@ class DatabaseHandler {
     async connect() {
         try {
             await mongoose.connect(this.client.MONGODB_URI, {
-                dbName: this.client.DB_NAME
+                dbName: this.client.DB_NAME,
+                maxPoolSize: 10,
+                serverSelectionTimeoutMS: 5000,
+                socketTimeoutMS: 45000,
             });
             success('Successfully connected to MongoDB via Mongoose');
         } catch (err) {
@@ -77,10 +80,13 @@ class DatabaseHandler {
         }
     }
 
-    // Basic CRUD operations
+    // Basic CRUD operations with debugging
     async findOne(modelName, query) {
         try {
-            return await this.models[modelName].findOne(query);
+            info(`findOne operation on ${modelName}:`, query);
+            const result = await this.models[modelName].findOne(query);
+            info(`findOne result:`, result ? 'Document found' : 'No document found');
+            return result;
         } catch (err) {
             error(`Error in findOne operation for ${modelName}:`, err);
             throw err;
@@ -89,16 +95,27 @@ class DatabaseHandler {
 
     async find(modelName, query) {
         try {
-            return await this.models[modelName].find(query);
+            info(`find operation on ${modelName}:`, query);
+            const results = await this.models[modelName].find(query);
+            info(`find results: ${results.length} documents found`);
+            return results;
         } catch (err) {
             error(`Error in find operation for ${modelName}:`, err);
             throw err;
         }
     }
 
+    // Add findMany as an alias to find
+    async findMany(modelName, query) {
+        return this.find(modelName, query);
+    }
+
     async create(modelName, data) {
         try {
-            return await this.models[modelName].create(data);
+            info(`create operation on ${modelName}:`, data);
+            const result = await this.models[modelName].create(data);
+            success(`Created new document in ${modelName}`);
+            return result;
         } catch (err) {
             error(`Error in create operation for ${modelName}:`, err);
             throw err;
@@ -107,7 +124,10 @@ class DatabaseHandler {
 
     async updateOne(modelName, query, update, options = {}) {
         try {
-            return await this.models[modelName].updateOne(query, update, options);
+            info(`updateOne operation on ${modelName}:`, {query, update, options});
+            const result = await this.models[modelName].updateOne(query, update, options);
+            info(`updateOne result:`, result);
+            return result;
         } catch (err) {
             error(`Error in updateOne operation for ${modelName}:`, err);
             throw err;
@@ -116,7 +136,10 @@ class DatabaseHandler {
 
     async deleteOne(modelName, query) {
         try {
-            return await this.models[modelName].deleteOne(query);
+            warn(`deleteOne operation on ${modelName}:`, query);
+            const result = await this.models[modelName].deleteOne(query);
+            info(`deleteOne result:`, result);
+            return result;
         } catch (err) {
             error(`Error in deleteOne operation for ${modelName}:`, err);
             throw err;
@@ -168,6 +191,88 @@ class DatabaseHandler {
         } finally {
             session.endSession();
         }
+    }
+
+    async ensureGuildSettings(guildId, guildName) {
+        info(`Ensuring guild settings for ${guildName} (${guildId})`);
+        const defaultSettings = {
+            guild: guildId,
+            guildName: guildName,
+            welcomeMessage: false,
+            welcomeChannel: "",
+            CharNameAsk: false,
+            BlockList: true,
+            language: "en",
+            logChannel: "",
+            enableLogging: false,
+            charNameAskDM:
+                "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
+            lastOwnerDM: {},
+        };
+
+        const guildSettings = await this.models.settings.findOne({ guild: guildId });
+        
+        if (!guildSettings) {
+            info(`No settings found for ${guildName}, creating new settings`);
+            return await this.models.settings.create(defaultSettings);
+        }
+
+        info(`Found existing settings for ${guildName}, checking for updates`);
+        const missingSettings = {};
+        let needsUpdate = false;
+
+        for (const [key, value] of Object.entries(defaultSettings)) {
+            if (!guildSettings.hasOwnProperty(key)) {
+                info(`Missing setting: ${key} for ${guildName}`);
+                missingSettings[key] = value;
+                needsUpdate = true;
+            }
+        }
+
+        if (guildSettings.guildName !== guildName) {
+            info(`Updating guild name from ${guildSettings.guildName} to ${guildName}`);
+            missingSettings.guildName = guildName;
+            needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+            info(`Updating settings for ${guildName}`);
+            return await this.models.settings.findOneAndUpdate(
+                { guild: guildId },
+                { $set: missingSettings },
+                { new: true }
+            );
+        }
+
+        return guildSettings;
+    }
+
+    async updateAllGuildSettings(client) {
+        info('Starting updateAllGuildSettings');
+        const currentGuildIds = Array.from(client.guilds.cache.keys());
+        info(`Found ${currentGuildIds.length} guilds`);
+
+        const settings = await this.models.settings.find({
+            guild: { $in: currentGuildIds }
+        });
+        info(`Found ${settings.length} existing settings documents`);
+
+        const existingSettings = new Map(settings.map(setting => [setting.guild, setting]));
+
+        for (const guildId of currentGuildIds) {
+            const guild = client.guilds.cache.get(guildId);
+            if (!existingSettings.has(guildId)) {
+                info(`Creating new settings for ${guild.name} (${guildId})`);
+                await this.ensureGuildSettings(guildId, guild.name);
+            } else if (existingSettings.get(guildId).guildName !== guild.name) {
+                info(`Updating guild name for ${guildId}: ${existingSettings.get(guildId).guildName} -> ${guild.name}`);
+                await this.models.settings.updateOne(
+                    { guild: guildId },
+                    { $set: { guildName: guild.name } }
+                );
+            }
+        }
+        success('Finished updateAllGuildSettings');
     }
 }
 

@@ -20,8 +20,9 @@ class Logger {
       }
 
       // Then proceed with normal guild logging
-      const settings = client.database.get("settings") || [];
-      const guildSettings = settings.find(setting => setting.guild === guildId);
+      const guildSettings = await client.database_handler.findOne('settings', {
+        guild: guildId
+      });
 
       if (!guildSettings?.enableLogging || !guildSettings?.logChannel) return;
 

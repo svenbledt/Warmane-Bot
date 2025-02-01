@@ -22,43 +22,6 @@ const languageNames = {
   'ru': 'Русский'
 };
 
-async function ensureGuildSettings(client, guildId) {
-  const defaultSettings = {
-    guild: guildId,
-    welcomeMessage: false,
-    welcomeChannel: "",
-    CharNameAsk: false,
-    BlockList: true,
-    language: "en",
-    logChannel: "",
-    enableLogging: false,
-    charNameAskDM:
-      "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
-    lastOwnerDM: {},
-  };
-
-  const guildSettings = await client.database_handler.findOne('settings', { guild: guildId });
-  
-  if (!guildSettings) {
-    await client.database_handler.create('settings', defaultSettings);
-    return defaultSettings;
-  }
-
-  let needsUpdate = false;
-  for (const [key, value] of Object.entries(defaultSettings)) {
-    if (!guildSettings.hasOwnProperty(key)) {
-      guildSettings[key] = value;
-      needsUpdate = true;
-    }
-  }
-
-  if (needsUpdate) {
-    await client.database_handler.updateOne('settings', { guild: guildId }, guildSettings);
-  }
-
-  return guildSettings;
-}
-
 function createSettingsEmbed(guildSettings, language = 'en') {
   const t = (key) => LanguageManager.getText(`commands.setup.${key}`, language);
   const f = (key) => LanguageManager.getText(`commands.setup.features.${key}`, language);
@@ -201,12 +164,19 @@ module.exports = new ApplicationCommand({
       return;
     }
 
-    const guildSettings = await ensureGuildSettings(client, interaction.guild.id);
+    const guildSettings = await client.database_handler.findOne('settings', { guild: interaction.guildId });
+    if (!guildSettings) {
+      await interaction.reply({
+        content: LanguageManager.getText('commands.setup.error_occurred', 'en', { error: 'Guild settings not found' }),
+        flags: [MessageFlags.Ephemeral],
+      });
+      return;
+    }
 
     // Automatically disable logging if no channel is set
     if (guildSettings.enableLogging && !guildSettings.logChannel) {
       guildSettings.enableLogging = false;
-      await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, guildSettings);
+      await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, { $set: { enableLogging: false } });
     }
 
     const embed = createSettingsEmbed(guildSettings, guildSettings.language);

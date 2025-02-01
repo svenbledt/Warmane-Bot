@@ -1,28 +1,23 @@
 const mongoose = require('mongoose');
 
-const BlacklistedUserSchema = new mongoose.Schema({
-    id: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    reason: {
-        type: String,
-        required: true
-    }
-}, { 
+const blacklistedUserSchema = new mongoose.Schema({
+    id: { type: String, required: true, unique: true },
+    reason: { type: String, required: true },
+    moderator: { type: String, required: true },
+    date: { type: Date, default: Date.now }
+}, {
     timestamps: true,
-    collection: 'blacklisted',
-    versionKey: false
+    strict: false
 });
 
 // Transform to match YAML structure
-BlacklistedUserSchema.set('toJSON', {
+blacklistedUserSchema.set('toJSON', {
     transform: function(doc, ret) {
         delete ret._id;
         return ret;
     }
 });
 
-// Use 'Blacklisted' as the model name but force 'blacklisted' as collection name
-module.exports = mongoose.model('Blacklisted', BlacklistedUserSchema, 'blacklisted'); 
+const BlacklistedUser = mongoose.model('BlacklistedUser', blacklistedUserSchema);
+
+module.exports = BlacklistedUser; 

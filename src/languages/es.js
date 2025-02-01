@@ -186,7 +186,8 @@ module.exports = {
                 message_label: "Mensaje DM",
                 message_placeholder: "Ingrese el mensaje para enviar cuando se pregunte por el nombre del personaje..."
             },
-            charname_dm_updated: "✅ El mensaje DM del nombre del personaje ha sido actualizado"
+            charname_dm_updated: "✅ El mensaje DM del nombre del personaje ha sido actualizado",
+            error_occurred: "Ocurrió un error: {error}"
         }
     },
     events: {

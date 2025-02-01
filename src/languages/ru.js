@@ -186,7 +186,8 @@ module.exports = {
                 message_label: "Сообщение ЛС",
                 message_placeholder: "Введите сообщение, которое будет отправлено при запросе имени персонажа..."
             },
-            charname_dm_updated: "✅ Сообщение ЛС для имени персонажа обновлено"
+            charname_dm_updated: "✅ Сообщение ЛС для имени персонажа обновлено",
+            error_occurred: "Произошла ошибка: {error}"
         }
     },
     events: {
