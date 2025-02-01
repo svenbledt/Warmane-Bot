@@ -83,10 +83,7 @@ class DatabaseHandler {
     // Basic CRUD operations with debugging
     async findOne(modelName, query) {
         try {
-            info(`findOne operation on ${modelName}:`, query);
-            const result = await this.models[modelName].findOne(query);
-            info(`findOne result:`, result ? 'Document found' : 'No document found');
-            return result;
+            return await this.models[modelName].findOne(query);
         } catch (err) {
             error(`Error in findOne operation for ${modelName}:`, err);
             throw err;
@@ -95,10 +92,7 @@ class DatabaseHandler {
 
     async find(modelName, query) {
         try {
-            info(`find operation on ${modelName}:`, query);
-            const results = await this.models[modelName].find(query);
-            info(`find results: ${results.length} documents found`);
-            return results;
+            return await this.models[modelName].find(query);
         } catch (err) {
             error(`Error in find operation for ${modelName}:`, err);
             throw err;
@@ -112,10 +106,7 @@ class DatabaseHandler {
 
     async create(modelName, data) {
         try {
-            info(`create operation on ${modelName}:`, data);
-            const result = await this.models[modelName].create(data);
-            success(`Created new document in ${modelName}`);
-            return result;
+            return await this.models[modelName].create(data);
         } catch (err) {
             error(`Error in create operation for ${modelName}:`, err);
             throw err;
@@ -124,10 +115,7 @@ class DatabaseHandler {
 
     async updateOne(modelName, query, update, options = {}) {
         try {
-            info(`updateOne operation on ${modelName}:`, {query, update, options});
-            const result = await this.models[modelName].updateOne(query, update, options);
-            info(`updateOne result:`, result);
-            return result;
+            return await this.models[modelName].updateOne(query, update, options);
         } catch (err) {
             error(`Error in updateOne operation for ${modelName}:`, err);
             throw err;
@@ -136,10 +124,7 @@ class DatabaseHandler {
 
     async deleteOne(modelName, query) {
         try {
-            warn(`deleteOne operation on ${modelName}:`, query);
-            const result = await this.models[modelName].deleteOne(query);
-            info(`deleteOne result:`, result);
-            return result;
+            return await this.models[modelName].deleteOne(query);
         } catch (err) {
             error(`Error in deleteOne operation for ${modelName}:`, err);
             throw err;
