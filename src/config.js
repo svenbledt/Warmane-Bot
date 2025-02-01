@@ -1,7 +1,4 @@
 const config = {
-  database: {
-    path: "./database.yml", // The database path.
-  },
   base: {
     iconAlliance: "https://i.imgur.com/SDoVQmV.png", // The Alliance icon.
     iconHorde: "https://i.imgur.com/ap8Nran.png", // The Horde icon.
@@ -27,7 +24,7 @@ const config = {
     draeneiFemale: "https://i.imgur.com/isDVJYZ.png", // The Draenei
   },
   development: {
-    enabled: true, // If true, the bot will register all application commands to a specific guild (not globally).
+    enabled: false, // If true, the bot will register all application commands to a specific guild (not globally).
     guildId: "1254444159985651712",
     reportChannel: "1257409168265187428",
     inviteChannel: "1257459204948627638",

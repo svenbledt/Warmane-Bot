@@ -149,15 +149,22 @@ async function generateAndSendInvites(client) {
           maxUses: 1,
         });
 
-        await Logger.log(client, guild.id, {
-          titleKey: 'invite_created',
-          descData: { botName: 'Warmane Tool' },
-          color: '#0099ff',
-          fields: [
-            { nameKey: 'invite_created.channel', value: guild.systemChannel.name },
-            { nameKey: 'invite_created.created_by', value: client.user.tag }
-          ]
+        // Check if logging is enabled for this guild before attempting to log
+        const guildSettings = await client.database_handler.findOne('settings', {
+          guild: guild.id
         });
+
+        if (guildSettings?.enableLogging && guildSettings?.logChannel) {
+          await Logger.log(client, guild.id, {
+            titleKey: 'invite_created',
+            descData: { botName: 'Warmane Tool' },
+            color: '#0099ff',
+            fields: [
+              { nameKey: 'invite_created.channel', value: guild.systemChannel.name },
+              { nameKey: 'invite_created.created_by', value: client.user.tag }
+            ]
+          });
+        }
 
         inviteResults.push(`${guild.name}: ${invite.url}`);
 

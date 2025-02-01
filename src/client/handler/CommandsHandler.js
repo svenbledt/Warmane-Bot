@@ -132,7 +132,8 @@ class CommandsHandler {
       ).setToken(this.client.token);
 
       if (development.enabled) {
-        warn("Attempting to delete application commands... (this might take a while!)");
+        // In development mode, delete all commands
+        warn("Attempting to delete all application commands in development mode...");
         await rest.put(
           Routes.applicationGuildCommands(
             this.client.user.id,
@@ -146,7 +147,27 @@ class CommandsHandler {
         );
         success("Successfully deleted all application commands");
       } else {
-        success("Not in development mode, skipping deletion");
+        // In production mode, get existing commands and compare
+        warn("Fetching existing commands in production mode...");
+        const existingCommands = await rest.get(
+          Routes.applicationCommands(this.client.user.id)
+        );
+
+        const commandsToKeep = this.client.rest_application_commands_array.map(cmd => cmd.name);
+        const commandsToDelete = existingCommands.filter(cmd => !commandsToKeep.includes(cmd.name));
+
+        if (commandsToDelete.length > 0) {
+          warn(`Deleting ${commandsToDelete.length} outdated commands...`);
+          for (const cmd of commandsToDelete) {
+            await rest.delete(
+              Routes.applicationCommand(this.client.user.id, cmd.id)
+            );
+            info(`Deleted command: ${cmd.name}`);
+          }
+          success(`Successfully deleted ${commandsToDelete.length} outdated commands`);
+        } else {
+          success("No commands need to be deleted");
+        }
       }
     } catch (error) {
       error("Failed to delete application commands: " + error);
@@ -169,6 +190,7 @@ class CommandsHandler {
       ).setToken(this.client.token);
 
       if (development.enabled) {
+        // In development mode, register all commands to guild
         await rest.put(
           Routes.applicationGuildCommands(
             this.client.user.id,
@@ -176,17 +198,14 @@ class CommandsHandler {
           ),
           { body: this.client.rest_application_commands_array }
         );
-        success(
-          "Successfully registered application commands for development guild"
-        );
+        success("Successfully registered application commands for development guild");
       } else {
+        // In production mode, register commands globally
         await rest.put(
           Routes.applicationCommands(this.client.user.id),
           { body: this.client.rest_application_commands_array }
         );
-        success(
-          "Successfully registered application commands for all guilds"
-        );
+        success("Successfully registered application commands for all guilds");
       }
       success(`Successfully registered ${this.client.rest_application_commands_array.length} application commands`);
     } catch (err) {

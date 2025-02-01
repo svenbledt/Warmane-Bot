@@ -6,7 +6,6 @@ const CommandsListener = require("./handler/CommandsListener");
 const ComponentsHandler = require("./handler/ComponentsHandler");
 const ComponentsListener = require("./handler/ComponentsListener");
 const EventsHandler = require("./handler/EventsHandler");
-const { QuickYAML } = require("quick-yaml.db");
 const LanguageManager = require('../utils/LanguageManager');
 const DatabaseHandler = require('./handler/DatabaseHandler');
 
@@ -29,7 +28,6 @@ class DiscordBot extends Client {
   commands_handler = new CommandsHandler(this);
   components_handler = new ComponentsHandler(this);
   events_handler = new EventsHandler(this);
-  database = new QuickYAML(config.database.path);
 
   mongoClient = null;
   db = null;
