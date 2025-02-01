@@ -656,4 +656,4 @@ module.exports = new ApplicationCommand({
       })
       .catch((error) => console.error("Error:", error));
   },
-}).toJSON();
+})

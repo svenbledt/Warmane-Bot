@@ -79,4 +79,4 @@ module.exports = new ApplicationCommand({
       flags: [MessageFlags.Ephemeral],
     });
   }
-}).toJSON();
+})

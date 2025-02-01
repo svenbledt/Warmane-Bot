@@ -71,4 +71,4 @@ module.exports = new ApplicationCommand({
       }
     }
   },
-}).toJSON();
+})

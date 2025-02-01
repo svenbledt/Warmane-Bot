@@ -258,4 +258,4 @@ module.exports = new Event({
       updateStatus(client);
     }, 300000); // 5 minutes in milliseconds
   },
-}).toJSON();
+})

@@ -56,4 +56,4 @@ module.exports = new Component({
       console.error("Failed to send the report to the Moderation channel.");
     }
   },
-}).toJSON();
+})

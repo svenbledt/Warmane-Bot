@@ -1,5 +1,5 @@
 const { REST, Routes } = require("discord.js");
-const { info, error, success } = require("../../utils/Console");
+const { info, error, success, warn } = require("../../utils/Console");
 const { readdirSync } = require("fs");
 const DiscordBot = require("../DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
@@ -9,7 +9,6 @@ class CommandsHandler {
   client;
 
   /**
-   *
    * @param {DiscordBot} client
    */
   constructor(client) {
@@ -17,71 +16,87 @@ class CommandsHandler {
   }
 
   load = () => {
+    // Clear existing commands before loading
+    this.client.collection.message_commands.clear();
+    this.client.collection.message_commands_aliases.clear();
+    this.client.collection.application_commands.clear();
+    this.client.rest_application_commands_array = [];
+
     for (const directory of readdirSync("./src/commands/")) {
       for (const file of readdirSync("./src/commands/" + directory).filter(
         (f) => f.endsWith(".js")
       )) {
         try {
+          delete require.cache[require.resolve(`../../commands/${directory}/${file}`)];
           const filePath = `../../commands/${directory}/${file}`;
-          /**
-           * @type {ApplicationCommand['data'] | MessageCommand['data']}
-           */
+          
           const module = require(filePath);
 
-          if (!module) continue;
+          if (!module) {
+            error(`No module exported from ${file}`);
+            continue;
+          }
 
-          if (module.__type__ === 2) {
-            if (!module.command || !module.run) {
+          // Parse the module data
+          const commandData = module.toJSON ? module.toJSON() : module;
+
+          if (commandData.__type__ === 2) {
+            if (!commandData.command || !commandData.run) {
               error("Unable to load the message command " + file);
               continue;
             }
 
-            module.category = directory;
-            module.filePath = filePath;
+            commandData.category = directory;
+            commandData.filePath = filePath;
 
             this.client.collection.message_commands.set(
-              module.command.name,
-              module
+              commandData.command.name,
+              commandData
             );
 
             if (
-              module.command.aliases &&
-              Array.isArray(module.command.aliases)
+              commandData.command.aliases &&
+              Array.isArray(commandData.command.aliases)
             ) {
-              module.command.aliases.forEach((alias) => {
+              commandData.command.aliases.forEach((alias) => {
                 this.client.collection.message_commands_aliases.set(
                   alias,
-                  module.command.name
+                  commandData.command.name
                 );
               });
             }
 
             info("Loaded new message command: " + file);
-          } else if (module.__type__ === 1) {
-            if (!module.command || !module.run) {
+          } else if (commandData.__type__ === 1) {
+            if (!commandData.command || !commandData.run) {
               error("Unable to load the application command " + file);
               continue;
             }
 
-            module.category = directory;
-            module.filePath = filePath;
+            commandData.category = directory;
+            commandData.filePath = filePath;
 
+            // Store the command in the collection
             this.client.collection.application_commands.set(
-              module.command.name,
-              module
+              commandData.command.name,
+              commandData
             );
-            this.client.rest_application_commands_array.push(module.command);
+
+            // Add the command data to the registration array
+            const registrationData = { ...commandData.command };
+            delete registrationData.contexts; // Remove contexts as it's not needed for registration
+            this.client.rest_application_commands_array.push(registrationData);
 
             info("Loaded new application command: " + file);
           } else {
             error(
               "Invalid command type " +
-                module.__type__ +
+                commandData.__type__ +
                 " from command file " +
                 file
             );
           }
-        } catch (error) {
+        } catch (loadError) {
           error(
             "Unable to load a command from the path: " +
               "src/commands/" +
@@ -89,7 +104,7 @@ class CommandsHandler {
               "/" +
               file +
               "\n" +
-              error
+              loadError
           );
         }
       }
@@ -100,33 +115,39 @@ class CommandsHandler {
     );
   };
 
-  reload = () => {
-    this.client.collection.message_commands.clear();
-    this.client.collection.message_commands_aliases.clear();
-    this.client.collection.application_commands.clear();
-    this.client.rest_application_commands_array = [];
-
-    this.load();
+  reload = async () => {
+    try {
+      this.load();
+      await this.registerApplicationCommands(this.client.config.development);
+      success("Successfully reloaded all commands");
+    } catch (error) {
+      error("Failed to reload commands: " + error);
+    }
   };
 
   deleteApplicationCommands = async (development, restOptions = null) => {
-    const rest = new REST(
-      restOptions ? restOptions : { version: "10" }
-    ).setToken(this.client.token);
+    try {
+      const rest = new REST(
+        restOptions ? restOptions : { version: "10" }
+      ).setToken(this.client.token);
 
-    if (development.enabled) {
-      await rest.put(
-        Routes.applicationGuildCommands(
-          this.client.user.id,
-          development.guildId
-        ),
-        { body: [] }
-      );
-    } else {
-      await rest.put(
-        Routes.applicationCommands(this.client.user.id),
-        { body: [] }
-      );
+      if (development.enabled) {
+        await rest.put(
+          Routes.applicationGuildCommands(
+            this.client.user.id,
+            development.guildId
+          ),
+          { body: [] }
+        );
+      } else {
+        await rest.put(
+          Routes.applicationCommands(this.client.user.id),
+          { body: [] }
+        );
+      }
+      success("Successfully deleted all application commands");
+    } catch (error) {
+      error("Failed to delete application commands: " + error);
     }
   };
 
@@ -135,22 +156,34 @@ class CommandsHandler {
    * @param {Partial<import('discord.js').RESTOptions>} restOptions
    */
   registerApplicationCommands = async (development, restOptions = null) => {
-    const rest = new REST(
-      restOptions ? restOptions : { version: "10" }
-    ).setToken(this.client.token);
+    try {
+      if (!this.client.rest_application_commands_array.length) {
+        warn("No commands to register!");
+        return;
+      }
 
-    if (development.enabled) {
-      await rest.put(
-        Routes.applicationGuildCommands(
-          this.client.user.id,
-          development.guildId
-        ),
-        { body: this.client.rest_application_commands_array }
-      );
-    } else {
-      await rest.put(Routes.applicationCommands(this.client.user.id), {
-        body: this.client.rest_application_commands_array,
-      });
+      const rest = new REST(
+        restOptions ? restOptions : { version: "10" }
+      ).setToken(this.client.token);
+
+      if (development.enabled) {
+        await rest.put(
+          Routes.applicationGuildCommands(
+            this.client.user.id,
+            development.guildId
+          ),
+          { body: this.client.rest_application_commands_array }
+        );
+      } else {
+        await rest.put(
+          Routes.applicationCommands(this.client.user.id),
+          { body: this.client.rest_application_commands_array }
+        );
+      }
+      success(`Successfully registered ${this.client.rest_application_commands_array.length} application commands`);
+    } catch (err) {
+      error("Failed to register application commands:");
+      error(err);
     }
   };
 }

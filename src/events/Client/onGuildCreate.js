@@ -143,4 +143,4 @@ module.exports = new Event({
     // Update settings
     await updateGuildSettings(client);
   },
-}).toJSON();
+})

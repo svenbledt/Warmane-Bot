@@ -93,26 +93,27 @@ class DiscordBot extends Client {
       // Connect to MongoDB first
       await this.connectToMongoDB();
       
-      // Rest of the existing connect logic
+      // Login to Discord
       await this.login(process.env.CLIENT_TOKEN);
+
+      // Load handlers
       this.commands_handler.load();
       this.components_handler.load();
       this.events_handler.load();
+
+      // Initialize commands collection
       this.commands = new Collection();
-      warn(
-        "Attempting to delete application commands... (this might take a while!)"
-      );
+
+      // Delete and register application commands
+      warn("Attempting to delete application commands... (this might take a while!)");
       await this.commands_handler.deleteApplicationCommands(config.development);
-      success("Successfully deleted application commands.");
-      warn(
-        "Attempting to register application commands... (this might take a while!)"
-      );
-      await this.commands_handler.registerApplicationCommands(
-        config.development
-      );
+
+      warn("Attempting to register application commands... (this might take a while!)");
+      await this.commands_handler.registerApplicationCommands(config.development);
+
       success(
         "Successfully registered application commands. For specific guild? " +
-          (config.development.enabled ? "Yes" : "No")
+        (config.development.enabled ? "Yes" : "No")
       );
     } catch (err) {
       error("Failed to connect to services, retrying...");

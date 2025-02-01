@@ -31,4 +31,4 @@ module.exports = new Event({
       console.error("Failed to send guild deletion announcement:", error);
     }
   },
-}).toJSON();
+})

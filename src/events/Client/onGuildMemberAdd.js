@@ -910,4 +910,4 @@ module.exports = new Event({
       await handleRegularServer(client, member, guildSettings, lang);
     }
   },
-}).toJSON();
+})

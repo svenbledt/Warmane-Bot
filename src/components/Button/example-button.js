@@ -16,4 +16,4 @@ module.exports = new Component({
       flags: [MessageFlags.Ephemeral],
     });
   },
-}).toJSON();
+})
