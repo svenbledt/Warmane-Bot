@@ -229,12 +229,12 @@ module.exports = {
             channel: 'Canal',
             created_by: 'Créé par'
         },
-        user_label: 'Utilisateur',
-        user_id: 'ID Utilisateur',
         footer: 'Journaux du Serveur',
-        dm_failed: {
+        dm: {
             title: 'Échec du MP',
             description: 'Impossible d\'envoyer un MP à {username}',
+            user_label: 'Utilisateur',
+            user_id: 'ID Utilisateur',
             error_label: 'Erreur'
         },
         dm_timeout: {

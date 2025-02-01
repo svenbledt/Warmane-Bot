@@ -230,12 +230,12 @@ module.exports = {
             channel: 'Канал',
             created_by: 'Создано'
         },
-        user_label: 'Пользователь',
-        user_id: 'ID Пользователя',
         footer: 'Логи Сервера',
-        dm_failed: {
+        dm: {
             title: 'Ошибка ЛС',
             description: 'Не удалось отправить ЛС пользователю {username}',
+            user_label: 'Пользователь',
+            user_id: 'ID Пользователя',
             error_label: 'Ошибка'
         },
         dm_timeout: {

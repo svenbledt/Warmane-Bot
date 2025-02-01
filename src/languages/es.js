@@ -229,12 +229,12 @@ module.exports = {
             channel: 'Canal',
             created_by: 'Creado por'
         },
-        user_label: 'Usuario',
-        user_id: 'ID de Usuario',
         footer: 'Registros del Servidor',
-        dm_failed: {
+        dm: {
             title: 'MD Fallido',
             description: 'No se pudo enviar MD a {username}',
+            user_label: 'Usuario',
+            user_id: 'ID de Usuario',
             error_label: 'Error'
         },
         dm_timeout: {

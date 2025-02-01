@@ -66,8 +66,8 @@ module.exports = new ApplicationCommand({
           descData: { username: member.user.tag },
           color: '#00ff00',
           fields: [
-            { nameKey: 'user_label', value: member.user.tag },
-            { nameKey: 'user_id', value: member.user.id }
+            { nameKey: 'dm.user_label', value: member.user.tag },
+            { nameKey: 'dm.user_id', value: member.user.id },
           ]
         });
 
@@ -102,8 +102,8 @@ module.exports = new ApplicationCommand({
               descData: { username: member.user.tag, nickname: response },
               color: '#00ff00',
               fields: [
-                { nameKey: 'user_label', value: member.user.tag },
-                { nameKey: 'user_id', value: member.user.id },
+                { nameKey: 'dm.user_label', value: member.user.tag },
+                { nameKey: 'dm.user_id', value: member.user.id },
                 { nameKey: 'new_nickname', value: response }
               ]
             });
@@ -133,13 +133,12 @@ module.exports = new ApplicationCommand({
             descData: { username: member.user.tag },
             color: '#ff0000',
             fields: [
-              { nameKey: 'user_label', value: member.user.tag },
-              { nameKey: 'user_id', value: member.user.id }
+            { nameKey: 'dm.user_label', value: member.user.tag },
+            { nameKey: 'dm.user_id', value: member.user.id },
             ]
           });
         }
       } catch (error) {
-        console.error(`Failed to handle DM interaction: ${error.message}`);
         
         await interaction.editReply({
           content: LanguageManager.getText('commands.global_strings.dm_failed', lang, {
@@ -148,13 +147,13 @@ module.exports = new ApplicationCommand({
         });
         
         await Logger.log(client, interaction.guildId, {
-          titleKey: 'dm_failed',
+          titleKey: 'dm',
           descData: { username: member.user.tag },
           color: '#ff0000',
           fields: [
-            { nameKey: 'dm_failed.user_label', value: member.user.tag },
-            { nameKey: 'dm_failed.user_id', value: member.user.id },
-            { nameKey: 'dm_failed.error_label', value: error.message }
+            { nameKey: 'dm.user_label', value: member.user.tag },
+            { nameKey: 'dm.user_id', value: member.user.id },
+            { nameKey: 'dm.error_label', value: error.message }
           ]
         });
       }

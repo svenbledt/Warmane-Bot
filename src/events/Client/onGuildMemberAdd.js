@@ -364,7 +364,7 @@ async function handleDevServer(client, member, guildSettings, lang) {
           
           // Log failed DM
           await Logger.log(client, member.guild.id, {
-            titleKey: 'dm_failed',
+            titleKey: 'dm',
             descData: { username: member.user.tag },
             color: '#ff0000',
             fields: [

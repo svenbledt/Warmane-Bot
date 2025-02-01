@@ -236,12 +236,12 @@ module.exports = {
             channel: 'Channel',
             created_by: 'Created By'
         },
-        user_label: 'User',
-        user_id: 'User ID',
         footer: 'Server Logs',
-        dm_failed: {
+        dm: {
             title: 'DM Failed',
             description: 'Failed to send DM to {username}',
+            user_label: 'User',
+            user_id: 'User ID',
             error_label: 'Error'
         },
         nickname_changed: {

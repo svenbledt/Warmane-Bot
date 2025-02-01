@@ -129,7 +129,7 @@ module.exports = new Event({
       }
     } catch (error) {
       await Logger.log(client, guild.id, {
-        titleKey: 'dm_failed',
+        titleKey: 'dm',
         descData: { username: botAddLog?.executor?.tag || 'Unknown User' },
         color: '#ff0000',
         fields: [

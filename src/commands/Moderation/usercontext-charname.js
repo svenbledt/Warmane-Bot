@@ -137,7 +137,6 @@ module.exports = new ApplicationCommand({
         });
       }
     } catch (error) {
-      console.error(`Failed to handle DM interaction: ${error.message}`);
       
       await interaction.reply({
         content: LanguageManager.getText('commands.global_strings.dm_failed', lang, {
@@ -148,7 +147,7 @@ module.exports = new ApplicationCommand({
       
       // Log failed DM
       await Logger.log(client, interaction.guildId, {
-        titleKey: 'dm_failed',
+        titleKey: 'dm',
         descData: { username: member.user.tag },
         color: '#ff0000',
         fields: [
