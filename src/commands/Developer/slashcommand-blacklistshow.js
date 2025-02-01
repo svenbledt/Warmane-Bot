@@ -40,78 +40,102 @@ module.exports = new ApplicationCommand({
    *
    * @param {DiscordBot} client
    * @param {ChatInputCommandInteraction} interaction
-   */ run: async (client, interaction) => {
-    let obj = client.database.get("blacklisted") || [];
-    if (obj.length === 0) {
-      await interaction.reply({
-        content: `There are no blacklisted users.`,
-        flags: [MessageFlags.Ephemeral],
-      });
-      return;
-    }
-    // Create an array to hold your embeds
-    let embeds = [];
-    // Split your data into chunks of 25 and create an embed for each chunk
-    for (let i = 0; i < obj.length; i += 25) {
-      const current = obj.slice(i, i + 25);
-      const embed = new EmbedBuilder()
-        .setTitle("Blacklisted Users")
-        .setColor("#C41E3A")
-        .setThumbnail("https://i.imgur.com/VlVw8JK.png")
-        .setFooter({
-          text: `Page ${embeds.length + 1} of ${Math.ceil(obj.length / 25)}`,
-          iconURL: client.user.displayAvatarURL(),
+   */ 
+  run: async (client, interaction) => {
+    try {
+      // Defer the reply
+      await interaction.deferReply();
+
+      // Get blacklisted users from MongoDB
+      const blacklistedUsers = await client.database_handler.find('blacklisted', {});
+      
+      if (!blacklistedUsers || blacklistedUsers.length === 0) {
+        await interaction.editReply({
+          content: `There are no blacklisted users.`,
         });
-      current.forEach((member) => {
-        embed.addFields({
-          name: "Blacklisted User",
-          value: `ID: <@${member.id}>\nReason: ${member.reason}`,
-        });
-      });
-      embeds.push(embed);
-    }
-    // Create the buttons
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId("previous")
-        .setLabel("Previous")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(embeds.length === 1), // Disable if only one page
-      new ButtonBuilder()
-        .setCustomId("next")
-        .setLabel("Next")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(embeds.length === 1) // Disable if only one page
-    );
-    // Send the first embed and the buttons
-    await interaction.reply({ embeds: [embeds[0]], components: [row] });
-    let message = await interaction.fetchReply();
-    // Create a collector to listen for button clicks
-    const filter = (i) => i.customId === "previous" || i.customId === "next";
-    const collector = message.createMessageComponentCollector({
-      filter,
-      time: 60000,
-    });
-    let currentPage = 0;
-    collector.on("collect", async (interaction) => {
-      // Ensure the interaction is from the same user
-      if (interaction.user.id !== message.user.id) {
-        return interaction.reply({
-          content: "These buttons are not for you!",
-          flags: [MessageFlags.Ephemeral],
-        });
+        return;
       }
-      // Update the current page number based on the button that was clicked
-      if (interaction.customId === "previous") {
-        currentPage = currentPage > 0 ? --currentPage : embeds.length - 1;
-      } else {
-        currentPage = currentPage + 1 < embeds.length ? ++currentPage : 0;
+
+      // Create an array to hold your embeds
+      let embeds = [];
+      // Split your data into chunks of 25 and create an embed for each chunk
+      for (let i = 0; i < blacklistedUsers.length; i += 25) {
+        const current = blacklistedUsers.slice(i, i + 25);
+        const embed = new EmbedBuilder()
+          .setTitle("Blacklisted Users")
+          .setColor("#C41E3A")
+          .setThumbnail("https://i.imgur.com/VlVw8JK.png")
+          .setFooter({
+            text: `Page ${embeds.length + 1} of ${Math.ceil(blacklistedUsers.length / 25)}`,
+            iconURL: client.user.displayAvatarURL(),
+          });
+
+        current.forEach((member) => {
+          embed.addFields({
+            name: "Blacklisted User",
+            value: `ID: <@${member.id}>\nReason: ${member.reason}`,
+          });
+        });
+        embeds.push(embed);
       }
-      // Update the message to show the new page
-      await interaction.update({ embeds: [embeds[currentPage]] });
-    });
-    collector.on("end", async () => {
-      await safeMessageDelete(message);
-    });
+
+      // Create the buttons
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId("previous")
+          .setLabel("Previous")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(embeds.length === 1), // Disable if only one page
+        new ButtonBuilder()
+          .setCustomId("next")
+          .setLabel("Next")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(embeds.length === 1) // Disable if only one page
+      );
+
+      // Send the first embed and the buttons
+      await interaction.editReply({ embeds: [embeds[0]], components: [row] });
+      let message = await interaction.fetchReply();
+
+      // Create a collector to listen for button clicks
+      const collector = message.createMessageComponentCollector({
+        filter: (i) => 
+          (i.customId === "previous" || i.customId === "next") && 
+          i.user.id === interaction.user.id,
+        time: 60000,
+      });
+
+      let currentPage = 0;
+      collector.on("collect", async (i) => {
+        try {
+          // Update the current page number based on the button that was clicked
+          if (i.customId === "previous") {
+            currentPage = currentPage > 0 ? --currentPage : embeds.length - 1;
+          } else {
+            currentPage = currentPage + 1 < embeds.length ? ++currentPage : 0;
+          }
+          
+          // Update the message to show the new page
+          await i.update({ embeds: [embeds[currentPage]] });
+        } catch (error) {
+          console.error('Error handling button interaction:', error);
+        }
+      });
+
+      collector.on("end", async () => {
+        try {
+          await safeMessageDelete(message);
+        } catch (error) {
+          console.error('Error in collector end:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error in blacklist-show command:', error);
+      const reply = interaction.replied ? interaction.editReply : interaction.reply;
+      await reply.call(interaction, {
+        content: 'An error occurred while showing the blacklist.',
+        flags: [MessageFlags.Ephemeral]
+      });
+    }
   },
 }).toJSON();
