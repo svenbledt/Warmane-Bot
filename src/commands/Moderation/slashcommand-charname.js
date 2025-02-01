@@ -152,9 +152,9 @@ module.exports = new ApplicationCommand({
           descData: { username: member.user.tag },
           color: '#ff0000',
           fields: [
-            { nameKey: 'user_label', value: member.user.tag },
-            { nameKey: 'user_id', value: member.user.id },
-            { nameKey: 'error_label', value: error.message }
+            { nameKey: 'dm_failed.user_label', value: member.user.tag },
+            { nameKey: 'dm_failed.user_id', value: member.user.id },
+            { nameKey: 'dm_failed.error_label', value: error.message }
           ]
         });
       }
