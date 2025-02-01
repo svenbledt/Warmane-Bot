@@ -124,10 +124,7 @@ class CommandsHandler {
       );
     } else {
       await rest.put(
-        Routes.applicationGuildCommands(
-          this.client.user.id,
-          development.guildId
-        ),
+        Routes.applicationCommands(this.client.user.id),
         { body: [] }
       );
     }
