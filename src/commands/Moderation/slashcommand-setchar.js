@@ -1,7 +1,6 @@
 const {
   MessageFlags,
   ChatInputCommandInteraction,
-  MessageFlags,
   ApplicationCommandOptionType,
   PermissionsBitField,
   ActionRowBuilder,
