@@ -17,9 +17,9 @@ const CharacterSchema = new mongoose.Schema({
         type: String,  // Keep as string to match YAML format
         default: () => new Date().toISOString()
     }
-}, { 
+}, {
     _id: false,
-    timestamps: false
+    versionKey: false
 });
 
 const UserCharacterSchema = new mongoose.Schema({
@@ -38,15 +38,14 @@ const UserCharacterSchema = new mongoose.Schema({
     }
 }, { 
     timestamps: false,
-    _id: false,
-    collection: 'userCharacters'  // Ensure collection name matches YAML
+    collection: 'userCharacters',
+    versionKey: false
 });
 
 // Transform to match YAML structure
 UserCharacterSchema.set('toJSON', {
     transform: function(doc, ret) {
         delete ret._id;
-        delete ret.__v;
         // Convert userId to be the top-level key
         const transformed = {
             [ret.userId]: {
@@ -90,4 +89,4 @@ UserCharacterSchema.statics.getOrCreate = async function(userId, mainCharacter) 
     return user;
 };
 
-module.exports = mongoose.model('UserCharacter', UserCharacterSchema); 
+module.exports = mongoose.model('UserCharacter', UserCharacterSchema, 'userCharacters'); 
