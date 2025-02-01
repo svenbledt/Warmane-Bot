@@ -39,7 +39,45 @@ class DatabaseHandler {
         }
     }
 
-    // Helper methods for common operations
+    // Helper methods that match the YAML structure
+    async getBlacklisted() {
+        try {
+            const blacklisted = await this.models.blacklisted.find({});
+            return { blacklisted };
+        } catch (err) {
+            error('Error getting blacklisted users:', err);
+            throw err;
+        }
+    }
+
+    async getSettings() {
+        try {
+            const settings = await this.models.settings.find({});
+            return { settings };
+        } catch (err) {
+            error('Error getting settings:', err);
+            throw err;
+        }
+    }
+
+    async getUserCharacters() {
+        try {
+            const users = await this.models.userCharacters.find({});
+            const transformed = {};
+            users.forEach(user => {
+                transformed[user.userId] = {
+                    main: user.main,
+                    alts: user.alts
+                };
+            });
+            return { userCharacters: transformed };
+        } catch (err) {
+            error('Error getting user characters:', err);
+            throw err;
+        }
+    }
+
+    // Basic CRUD operations
     async findOne(modelName, query) {
         try {
             return await this.models[modelName].findOne(query);
@@ -82,6 +120,53 @@ class DatabaseHandler {
         } catch (err) {
             error(`Error in deleteOne operation for ${modelName}:`, err);
             throw err;
+        }
+    }
+
+    // Helper method for getting or creating guild settings
+    async getGuildSettings(guildId, guildName) {
+        try {
+            return await this.models.settings.getOrCreate(guildId, guildName);
+        } catch (err) {
+            error('Error getting guild settings:', err);
+            throw err;
+        }
+    }
+
+    // Helper method for getting or creating user character profile
+    async getUserCharacter(userId, mainCharacter = null) {
+        try {
+            return await this.models.userCharacters.getOrCreate(userId, mainCharacter);
+        } catch (err) {
+            error('Error getting user character:', err);
+            throw err;
+        }
+    }
+
+    // Helper method to check if a user is blacklisted
+    async isBlacklisted(userId) {
+        try {
+            const blacklisted = await this.models.blacklisted.findOne({ id: userId });
+            return !!blacklisted;
+        } catch (err) {
+            error('Error checking blacklist status:', err);
+            throw err;
+        }
+    }
+
+    // Add transaction support
+    async withTransaction(callback) {
+        const session = await mongoose.startSession();
+        try {
+            session.startTransaction();
+            const result = await callback(session);
+            await session.commitTransaction();
+            return result;
+        } catch (err) {
+            await session.abortTransaction();
+            throw err;
+        } finally {
+            session.endSession();
         }
     }
 }

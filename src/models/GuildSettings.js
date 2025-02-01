@@ -19,19 +19,14 @@ const GuildSettingsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    guildName: {
-        type: String,
-        required: true
-    },
+    guildName: String,
     charNameAskDM: String,
     lastOwnerDM: {
-        type: Map,
-        of: mongoose.Schema.Types.Mixed,
+        type: Object,
         default: {}
     },
     language: {
         type: String,
-        enum: ['en', 'de', 'ru', 'fr', 'es'],
         default: 'en'
     },
     logChannel: String,
@@ -39,6 +34,29 @@ const GuildSettingsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
+}, { 
+    timestamps: false,
+    _id: false 
 });
+
+GuildSettingsSchema.set('toJSON', {
+    transform: function(doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+    }
+});
+
+// Static method to get or create guild settings
+GuildSettingsSchema.statics.getOrCreate = async function(guildId, guildName) {
+    let settings = await this.findOne({ guild: guildId });
+    if (!settings) {
+        settings = await this.create({
+            guild: guildId,
+            guildName: guildName
+        });
+    }
+    return settings;
+};
 
 module.exports = mongoose.model('GuildSettings', GuildSettingsSchema); 
