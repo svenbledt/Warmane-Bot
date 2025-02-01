@@ -105,16 +105,8 @@ class DiscordBot extends Client {
       this.commands = new Collection();
 
       // Delete and register application commands
-      warn("Attempting to delete application commands... (this might take a while!)");
       await this.commands_handler.deleteApplicationCommands(config.development);
-
-      warn("Attempting to register application commands... (this might take a while!)");
       await this.commands_handler.registerApplicationCommands(config.development);
-
-      success(
-        "Successfully registered application commands. For specific guild? " +
-        (config.development.enabled ? "Yes" : "No")
-      );
     } catch (err) {
       error("Failed to connect to services, retrying...");
       error(err);

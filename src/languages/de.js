@@ -27,10 +27,10 @@ module.exports = {
                 NOTHING: "Nichts tun"
             },
             ACTION_RESULTS: {
-                KICKED: "%COUNT% Mitglieder erfolgreich gekickt",
-                BANNED: "%COUNT% Mitglieder erfolgreich gebannt",
+                KICKED: "{COUNT} Mitglieder erfolgreich gekickt",
+                BANNED: "{COUNT} Mitglieder erfolgreich gebannt",
                 NOTHING: "Keine Aktion durchgeführt",
-                FAILED: "Konnte %COUNT% Mitglieder nicht verarbeiten"
+                FAILED: "Konnte {COUNT} Mitglieder nicht verarbeiten"
             }
         },
         report: {
@@ -218,6 +218,7 @@ module.exports = {
         }
     },
     logging: {
+        error: 'Error',
         dm_sent: {
             title: 'DM Gesendet',
             description: 'Charakternamen-Anfrage DM an {username} gesendet'
@@ -249,6 +250,10 @@ module.exports = {
         dm_timeout: {
             title: 'DM Antwort Zeitüberschreitung',
             description: '{username} hat nicht innerhalb der Zeitbegrenzung geantwortet'
+        },
+        interaction_failed: {
+            title: 'Interaktion Fehlgeschlagen',
+            description: 'Fehlgeschlagen, um mit {username} zu interagieren: {error}'
         }
     }
 };

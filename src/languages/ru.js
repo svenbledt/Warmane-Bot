@@ -27,10 +27,10 @@ module.exports = {
                 NOTHING: "Ничего не делать"
             },
             ACTION_RESULTS: {
-                KICKED: "Успешно выгнано %COUNT% участников",
-                BANNED: "Успешно забанено %COUNT% участников",
+                KICKED: "Успешно выгнано {COUNT} участников",
+                BANNED: "Успешно забанено {COUNT} участников",
                 NOTHING: "Действия не предприняты",
-                FAILED: "Не удалось обработать %COUNT% участников"
+                FAILED: "Не удалось обработать {COUNT} участников"
             }
         },
         report: {
@@ -215,6 +215,7 @@ module.exports = {
         }
     },
     logging: {
+        error: 'Error',
         dm_sent: {
             title: 'ЛС Отправлено',
             description: 'Отправлен запрос имени персонажа в ЛС пользователю {username}'
@@ -246,6 +247,10 @@ module.exports = {
             title: 'Никнейм Изменен',
             description: 'Изменен никнейм пользователя {username} на {nickname}',
             new_nickname: 'Новый Никнейм'
+        },
+        interaction_failed: {
+            title: 'Ошибка взаимодействия',
+            description: 'Не удалось взаимодействовать с {username}: {error}'
         }
     }
 };

@@ -34,13 +34,15 @@ module.exports = new ApplicationCommand({
       : interaction.user;
     
     // Get guild settings for language
-    const settings = client.database.get("settings") || [];
-    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: interaction.guildId
+    });
     const lang = guildSettings?.language || "en";
 
     // Get user characters data
-    const userChars = client.database.get("userCharacters") || {};
-    const userData = userChars[targetUser.id];
+    const userData = await client.database_handler.findOne('userCharacters', {
+      userId: targetUser.id
+    });
 
     const embed = new EmbedBuilder()
       .setColor(0x0099FF)
@@ -79,4 +81,4 @@ module.exports = new ApplicationCommand({
       flags: [MessageFlags.Ephemeral],
     });
   }
-})
+});

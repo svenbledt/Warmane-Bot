@@ -132,6 +132,7 @@ class CommandsHandler {
       ).setToken(this.client.token);
 
       if (development.enabled) {
+        warn("Attempting to delete application commands... (this might take a while!)");
         await rest.put(
           Routes.applicationGuildCommands(
             this.client.user.id,
@@ -139,13 +140,14 @@ class CommandsHandler {
           ),
           { body: [] }
         );
-      } else {
         await rest.put(
           Routes.applicationCommands(this.client.user.id),
           { body: [] }
         );
+        success("Successfully deleted all application commands");
+      } else {
+        success("Not in development mode, skipping deletion");
       }
-      success("Successfully deleted all application commands");
     } catch (error) {
       error("Failed to delete application commands: " + error);
     }
@@ -161,7 +163,7 @@ class CommandsHandler {
         warn("No commands to register!");
         return;
       }
-
+      warn("Attempting to register application commands... (this might take a while!)");
       const rest = new REST(
         restOptions ? restOptions : { version: "10" }
       ).setToken(this.client.token);
@@ -174,10 +176,16 @@ class CommandsHandler {
           ),
           { body: this.client.rest_application_commands_array }
         );
+        success(
+          "Successfully registered application commands for development guild"
+        );
       } else {
         await rest.put(
           Routes.applicationCommands(this.client.user.id),
           { body: this.client.rest_application_commands_array }
+        );
+        success(
+          "Successfully registered application commands for all guilds"
         );
       }
       success(`Successfully registered ${this.client.rest_application_commands_array.length} application commands`);

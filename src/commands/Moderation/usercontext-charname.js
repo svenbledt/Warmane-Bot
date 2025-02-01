@@ -26,8 +26,9 @@ module.exports = new ApplicationCommand({
   run: async (client, interaction) => {
     const member = interaction.targetMember;
     // Get guild settings for language and custom DM message
-    const settings = client.database.get("settings") || [];
-    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: interaction.guildId
+    });
     const lang = guildSettings?.language || 'en';
 
     if (!interaction.member.permissions.has([REQUIRED_PERMISSION])) {
@@ -61,8 +62,8 @@ module.exports = new ApplicationCommand({
         descData: { username: member.user.tag },
         color: '#00ff00',
         fields: [
-          { nameKey: 'user_label', value: member.user.tag },
-          { nameKey: 'user_id', value: member.user.id }
+          { nameKey: 'dm.user_label', value: member.user.tag },
+          { nameKey: 'dm.user_id', value: member.user.id },
         ]
       });
 
@@ -99,9 +100,9 @@ module.exports = new ApplicationCommand({
             descData: { username: member.user.tag, nickname: response },
             color: '#00ff00',
             fields: [
-              { nameKey: 'user_label', value: member.user.tag },
-              { nameKey: 'user_id', value: member.user.id },
-              { nameKey: 'new_nickname', value: response }
+              { nameKey: 'dm.user_label', value: member.user.tag },
+              { nameKey: 'dm.user_id', value: member.user.id },
+              { nameKey: 'nickname_changed.new_nickname', value: response }
             ]
           });
           
@@ -131,13 +132,12 @@ module.exports = new ApplicationCommand({
           descData: { username: member.user.tag },
           color: '#ff0000',
           fields: [
-            { nameKey: 'user_label', value: member.user.tag },
-            { nameKey: 'user_id', value: member.user.id }
+            { nameKey: 'dm.user_label', value: member.user.tag },
+            { nameKey: 'dm.user_id', value: member.user.id },
           ]
         });
       }
     } catch (error) {
-      
       await interaction.reply({
         content: LanguageManager.getText('commands.global_strings.dm_failed', lang, {
           username: member.user.tag
@@ -151,11 +151,11 @@ module.exports = new ApplicationCommand({
         descData: { username: member.user.tag },
         color: '#ff0000',
         fields: [
-          { nameKey: 'user_label', value: member.user.tag },
-          { nameKey: 'user_id', value: member.user.id },
-          { nameKey: 'error_label', value: error.message }
+          { nameKey: 'dm.user_label', value: member.user.tag },
+          { nameKey: 'dm.user_id', value: member.user.id },
+          { nameKey: 'dm.error_label', value: error.message }
         ]
       });
     }
   },
-})
+});

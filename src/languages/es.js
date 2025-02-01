@@ -27,10 +27,10 @@ module.exports = {
                 NOTHING: "No hacer nada"
             },
             ACTION_RESULTS: {
-                KICKED: "Se expulsaron %COUNT% miembros exitosamente",
-                BANNED: "Se banearon %COUNT% miembros exitosamente",
+                KICKED: "Se expulsaron {COUNT} miembros exitosamente",
+                BANNED: "Se banearon {COUNT} miembros exitosamente",
                 NOTHING: "No se tomó ninguna acción",
-                FAILED: "No se pudieron procesar %COUNT% miembros"
+                FAILED: "No se pudieron procesar {COUNT} miembros"
             }
         },
         report: {
@@ -214,6 +214,7 @@ module.exports = {
         }
     },
     logging: {
+        error: 'Error',
         dm_sent: {
             title: 'MD Enviado',
             description: 'MD de solicitud de nombre de personaje enviado a {username}'
@@ -245,6 +246,10 @@ module.exports = {
             title: 'Apodo Modificado',
             description: 'Apodo de {username} cambiado a {nickname}',
             new_nickname: 'Nuevo Apodo'
+        },
+        interaction_failed: {
+            title: 'Interacción Fallida',
+            description: 'Fallo al interactuar con {username}: {error}'
         }
     }
 }; 

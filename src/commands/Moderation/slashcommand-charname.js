@@ -104,7 +104,7 @@ module.exports = new ApplicationCommand({
               fields: [
                 { nameKey: 'dm.user_label', value: member.user.tag },
                 { nameKey: 'dm.user_id', value: member.user.id },
-                { nameKey: 'new_nickname', value: response }
+                { nameKey: 'nickname_changed.new_nickname', value: response }
               ]
             });
             

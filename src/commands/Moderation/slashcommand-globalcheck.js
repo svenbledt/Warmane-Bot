@@ -28,8 +28,9 @@ module.exports = new ApplicationCommand({
    */
   run: async (client, interaction) => {
     // Get guild settings for language
-    const settings = client.database.get("settings") || [];
-    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: interaction.guildId
+    });
     const lang = guildSettings?.language || 'en';
 
     // Check if user is a developer or has required permissions
@@ -47,8 +48,9 @@ module.exports = new ApplicationCommand({
       return;
     }
 
-    let obj = client.database.get("blacklisted") || [];
-    if (obj.length === 0) {
+    // Get blacklisted users from database
+    const blacklistedUsers = await client.database_handler.find('blacklisted', {});
+    if (!blacklistedUsers || blacklistedUsers.length === 0) {
       await interaction.reply({
         content: LanguageManager.getText('commands.globalcheck.no_blacklisted', lang),
         flags: [MessageFlags.Ephemeral],
@@ -60,7 +62,7 @@ module.exports = new ApplicationCommand({
     const members = await interaction.guild.members.fetch();
     let blacklistedMembers = [];
     members.forEach((member) => {
-      if (obj.some((user) => user.id === member.id)) {
+      if (blacklistedUsers.some((user) => user.id === member.id)) {
         blacklistedMembers.push(member);
       }
     });
@@ -98,7 +100,7 @@ module.exports = new ApplicationCommand({
 
       const pageMembers = blacklistedMembers.slice(i, i + 5);
       pageMembers.forEach((member) => {
-        const blacklistedUser = obj.find((user) => user.id === member.id);
+        const blacklistedUser = blacklistedUsers.find((user) => user.id === member.id);
         embed.addFields({
           name: "\u200B",
           value: LanguageManager.getText('commands.globalcheck.blacklisted_user', lang, {
@@ -110,18 +112,18 @@ module.exports = new ApplicationCommand({
       embeds.push(embed);
     }
 
-    // Create the buttons
+    // Create navigation buttons
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("previous")
         .setLabel("Previous")
         .setStyle(ButtonStyle.Primary)
-        .setDisabled(embeds.length === 1), // Disable if only one page
+        .setDisabled(embeds.length === 1),
       new ButtonBuilder()
         .setCustomId("next")
         .setLabel("Next")
         .setStyle(ButtonStyle.Primary)
-        .setDisabled(embeds.length === 1) // Disable if only one page
+        .setDisabled(embeds.length === 1)
     );
 
     // Send the first embed with action buttons
@@ -219,4 +221,4 @@ module.exports = new ApplicationCommand({
       }
     });
   },
-})
+});

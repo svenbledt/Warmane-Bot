@@ -355,6 +355,40 @@ module.exports = new ApplicationCommand({
               // Remove user from blacklist
               await client.database_handler.deleteOne('blacklisted', { id: selectedId });
 
+              // Get all guilds the bot is in
+              const guilds = client.guilds.cache;
+              let unbanCount = 0;
+              let failCount = 0;
+
+              // Try to unban from each guild
+              await Promise.all(guilds.map(async (guild) => {
+                try {
+                  // Check if bot has ban permissions
+                  const botMember = guild.members.cache.get(client.user.id);
+                  if (!botMember?.permissions.has(PermissionsBitField.Flags.BanMembers)) {
+                    failCount++;
+                    return;
+                  }
+
+                  // Try to unban the user
+                  await guild.bans.remove(selectedId, 'Removed from global blacklist')
+                    .then(() => {
+                      unbanCount++;
+                    })
+                    .catch((error) => {
+                      // If error is not "Unknown Ban", count as fail
+                      if (error.code !== 10026) { // 10026 is "Unknown Ban" error code
+                        failCount++;
+                      }
+                      // If "Unknown Ban", we just ignore it as the user wasn't banned here
+                    });
+
+                } catch (error) {
+                  console.error(`Failed to unban user in guild ${guild.name}:`, error);
+                  failCount++;
+                }
+              }));
+
               // Refresh the blacklist display
               const freshBlacklistedUsers = await client.database_handler.find('blacklisted', {});
               embeds = []; // Reset embeds
@@ -384,9 +418,9 @@ module.exports = new ApplicationCommand({
                 embeds.push(embed);
               }
 
-              // Return to the main view with updated data
+              // Return to the main view with updated data and unban statistics
               await i.editReply({
-                content: `Successfully removed user ${selectedId} from the blacklist.`,
+                content: `Successfully removed user ${selectedId} from the blacklist.\n\nUnban Statistics:\n• Successfully unbanned in ${unbanCount} servers\n• Failed to unban in ${failCount} servers\n• (Servers where the user wasn't banned are not counted in the statistics)`,
                 embeds: embeds.length > 0 ? [embeds[0]] : [new EmbedBuilder()
                   .setTitle("Global Blacklist Overview")
                   .setColor("#C41E3A")

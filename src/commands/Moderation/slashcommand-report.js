@@ -27,8 +27,9 @@ module.exports = new ApplicationCommand({
    */
   run: async (client, interaction) => {
     // Get guild settings for language
-    const settings = client.database.get("settings") || [];
-    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: interaction.guildId
+    });
     const lang = guildSettings?.language || 'en';
 
     if (!interaction.guild) {
@@ -37,6 +38,7 @@ module.exports = new ApplicationCommand({
         flags: [MessageFlags.Ephemeral],
       });
     }
+
     // check if the user has ban permission on the guild
     if (
       !interaction.member.permissions.has([
@@ -50,6 +52,7 @@ module.exports = new ApplicationCommand({
       });
       return;
     }
+
     await interaction.showModal({
       custom_id: "report-modal-id",
       title: LanguageManager.getText('commands.report.modal.title', lang),
@@ -102,4 +105,4 @@ module.exports = new ApplicationCommand({
       ],
     });
   },
-})
+});

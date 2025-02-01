@@ -82,27 +82,28 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
 
     if (!isDevServer) {
       // Check if character exists in database
-      const userCharacters = client.database.get("userCharacters") || {};
-      let existingCharacter = null;
+      const userCharacter = await client.database_handler.findOne('userCharacters', {
+        $or: [
+          { 'main.name': { $regex: new RegExp(`^${response}$`, 'i') } },
+          { 'alts': { 
+            $elemMatch: { 
+              'name': { $regex: new RegExp(`^${response}$`, 'i') }
+            }
+          }}
+        ]
+      });
 
-      // Search through all users
-      for (const [userId, userData] of Object.entries(userCharacters)) {
-        if (userData.main && userData.main.name.toLowerCase() === response.toLowerCase()) {
-          existingCharacter = { ...userData.main, isMain: true, ownerId: userId };
-          break;
-        }
-        if (userData.alts) {
-          const matchingAlt = userData.alts.find(alt => 
-            alt.name.toLowerCase() === response.toLowerCase()
-          );
-          if (matchingAlt) {
-            existingCharacter = { ...matchingAlt, isAlt: true, ownerId: userId };
-            break;
-          }
-        }
-      }
+      if (userCharacter) {
+        const existingCharacter = userCharacter.main?.name.toLowerCase() === response.toLowerCase()
+          ? { ...userCharacter.main, isMain: true, ownerId: userCharacter._id }
+          : { 
+              ...userCharacter.alts.find(alt => 
+                alt.name.toLowerCase() === response.toLowerCase()
+              ),
+              isAlt: true,
+              ownerId: userCharacter._id
+            };
 
-      if (existingCharacter) {
         // Character exists in database, check specific realm
         const exists = await checkSpecificRealm(response, existingCharacter.realm);
         if (!exists) {
@@ -129,24 +130,21 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
         }
 
         // Store new character in database
-        if (!userCharacters[member.user.id]) {
-          userCharacters[member.user.id] = { alts: [] };
-        }
-        
         const characterData = {
           name: response,
           realm: result.realm,
           addedBy: member.user.id,
-          addedAt: new Date().toISOString()
+          addedAt: new Date()
         };
 
-        if (!userCharacters[member.user.id].main) {
-          userCharacters[member.user.id].main = characterData;
-        } else {
-          userCharacters[member.user.id].alts.push(characterData);
-        }
-
-        client.database.set("userCharacters", userCharacters);
+        await client.database_handler.updateOne('userCharacters',
+          { userId: member.user.id },
+          {
+            $setOnInsert: { userId: member.user.id },
+            $set: { main: characterData }
+          },
+          { upsert: true }
+        );
       }
     }
 
@@ -174,12 +172,12 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
           color: '#ff0000',
           fields: [
             { 
-              nameKey: 'user_label', 
+              nameKey: 'dm.user_label', 
               nameData: {}, 
               value: member.user.tag 
             },
             { 
-              nameKey: 'user_id', 
+              nameKey: 'dm.user_id', 
               nameData: {}, 
               value: member.user.id 
             }
@@ -398,17 +396,17 @@ async function handleDevServer(client, member, guildSettings, lang) {
       color: '#ff0000',
       fields: [
         { 
-          nameKey: 'user_label', 
+          nameKey: 'dm.user_label', 
           nameData: {}, 
           value: member.user.tag 
         },
         { 
-          nameKey: 'user_id', 
+          nameKey: 'dm.user_id', 
           nameData: {}, 
           value: member.user.id 
         },
         { 
-          nameKey: 'error', 
+          nameKey: 'dm.error', 
           nameData: {}, 
           value: error.message 
         }
@@ -471,33 +469,44 @@ async function handleRegularServer(client, member, guildSettings, lang) {
   
   try {
     const dmChannel = await member.createDM();
-    
-    // Get user's characters from both API and database
     const characters = await fetchUserCharacters(client, member.user.id);
 
-    // If no characters found, proceed with manual input
     if (!characters || characters.length === 0) {
-      await dmChannel.send(guildSettings.charNameAskDM);
-      
-      await Logger.log(client, member.guild.id, {
-        titleKey: 'dm_sent',
-        descData: { username: member.user.tag },
-        color: '#00ff00',
-        fields: [
-          { 
-            nameKey: 'user_label', 
-            nameData: {}, 
-            value: member.user.tag 
-          },
-          { 
-            nameKey: 'user_id', 
-            nameData: {}, 
-            value: member.user.id 
-          }
-        ]
-      });
-      
-      return await handleManualInput(client, member, dmChannel, guildSettings, lang);
+      try {
+        await dmChannel.send(guildSettings.charNameAskDM);
+        
+        await Logger.log(client, member.guild.id, {
+          titleKey: 'dm_sent',
+          descData: { username: member.user.tag },
+          color: '#00ff00',
+          fields: [
+            { nameKey: 'user_label', nameData: {}, value: member.user.tag },
+            { nameKey: 'user_id', nameData: {}, value: member.user.id }
+          ]
+        });
+        
+        return await handleManualInput(client, member, dmChannel, guildSettings, lang);
+      } catch (dmError) {
+        console.error(`Failed to send DM to ${member.user.tag}: ${dmError.message}`);
+        
+        // Log failed DM and send welcome message
+        await Logger.log(client, member.guild.id, {
+          titleKey: 'dm_failed',
+          descData: { username: member.user.tag },
+          color: '#ff0000',
+          fields: [
+            { nameKey: 'user_label', nameData: {}, value: member.user.tag },
+            { nameKey: 'user_id', nameData: {}, value: member.user.id },
+            { nameKey: 'error', nameData: {}, value: dmError.message }
+          ]
+        });
+
+        // Send welcome message if DM fails
+        if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+          await handleWelcomeMessage(client, member, guildSettings, lang);
+        }
+        return;
+      }
     }
 
     // Create selection menu with character information
@@ -534,16 +543,8 @@ async function handleRegularServer(client, member, guildSettings, lang) {
       descData: { username: member.user.tag },
       color: '#00ff00',
       fields: [
-        { 
-          nameKey: 'user_label', 
-          nameData: {}, 
-          value: member.user.tag 
-        },
-        { 
-          nameKey: 'user_id', 
-          nameData: {}, 
-          value: member.user.id 
-        }
+        { nameKey: 'user_label', nameData: {}, value: member.user.tag },
+        { nameKey: 'user_id', nameData: {}, value: member.user.id }
       ]
     });
 
@@ -591,30 +592,21 @@ async function handleRegularServer(client, member, guildSettings, lang) {
       }
     }
   } catch (error) {
-    console.error(`Failed to handle regular server join for ${member.user.tag}: ${error.message}`);
-    
     await Logger.log(client, member.guild.id, {
       titleKey: 'interaction_failed',
       descData: { username: member.user.tag },
       color: '#ff0000',
       fields: [
-        { 
-          nameKey: 'user_label', 
-          nameData: {}, 
-          value: member.user.tag 
-        },
-        { 
-          nameKey: 'user_id', 
-          nameData: {}, 
-          value: member.user.id 
-        },
-        { 
-          nameKey: 'error', 
-          nameData: {}, 
-          value: error.message 
-        }
+        { nameKey: 'dm.user_label', nameData: {}, value: member.user.tag },
+        { nameKey: 'dm.user_id', nameData: {}, value: member.user.id },
+        { nameKey: 'error', nameData: {}, value: error.message }
       ]
     });
+
+    // Send welcome message if overall process fails
+    if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+      await handleWelcomeMessage(client, member, guildSettings, lang);
+    }
   } finally {
     // Remove user from processed set after a delay
     setTimeout(() => {
@@ -655,8 +647,8 @@ async function createWelcomeImage(member, guildName) {
   ctx.restore();
 
   // Draw frame overlay with correct aspect ratio
-  const frameWidth = 405; // Base width
-  const frameHeight = (frameWidth * 320) / 388; // Calculate height to maintain aspect ratio
+  const frameWidth = 405;
+  const frameHeight = (frameWidth * 320) / 388;
   
   ctx.drawImage(
     frame,
@@ -674,17 +666,13 @@ async function createWelcomeImage(member, guildName) {
   ctx.textAlign = 'center';
 
   ctx.fillText(`Welcome ${displayName}`, canvas.width / 2, 400);
-
-
-  // Use fresh member data to get the current nickname
   ctx.font = '40px Sans';
   ctx.fillText(`You are member #${memberCount}`, canvas.width / 2, 450);
 
-
-
-  // Create attachment using buffer
+  // Create attachment using buffer instead of File
   const buffer = canvas.toBuffer('image/png');
   const attachment = new AttachmentBuilder(buffer, { name: 'welcome.png' });
+  
   return attachment;
 }
 
@@ -720,12 +708,16 @@ async function handleTimeout(client, member, selectMessage, row, lang) {
     );
     await selectMessage.edit({ components: [disabledRow] });
     
-    if (member.dmChannel) {
-      await member.send(
-        LanguageManager.getText('commands.charname.dm_timeout_message', lang, {
-          guildName: member.guild.name
-        })
-      );
+    try {
+      if (member.dmChannel) {
+        await member.send(
+          LanguageManager.getText('commands.charname.dm_timeout_message', lang, {
+            guildName: member.guild.name
+          })
+        );
+      }
+    } catch (dmError) {
+      console.error(`Failed to send timeout DM to ${member.user.tag}: ${dmError.message}`);
     }
     
     await Logger.log(client, member.guild.id, {
@@ -733,24 +725,35 @@ async function handleTimeout(client, member, selectMessage, row, lang) {
       descData: { username: member.user.tag },
       color: '#ff0000',
       fields: [
-        { 
-          nameKey: 'user_label', 
-          nameData: {}, 
-          value: member.user.tag 
-        },
-        { 
-          nameKey: 'user_id', 
-          nameData: {}, 
-          value: member.user.id 
-        }
+        { nameKey: 'user_label', nameData: {}, value: member.user.tag },
+        { nameKey: 'user_id', nameData: {}, value: member.user.id }
       ]
     });
+
+    // Get fresh guild settings for welcome message
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: member.guild.id
+    });
+
+    // Send welcome message on timeout
+    if (guildSettings?.welcomeMessage && guildSettings?.welcomeChannel) {
+      await handleWelcomeMessage(client, member, guildSettings, lang);
+    }
   } catch (error) {
     console.error(`Failed to handle timeout for ${member.user.tag}:`, error);
+    
+    // Attempt to send welcome message even if timeout handling fails
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: member.guild.id
+    });
+    
+    if (guildSettings?.welcomeMessage && guildSettings?.welcomeChannel) {
+      await handleWelcomeMessage(client, member, guildSettings, lang);
+    }
   }
 }
 
-// Update fetchUserCharacters function to include database characters
+// Update fetchUserCharacters function
 async function fetchUserCharacters(client, userId) {
   let characters = [];
 
@@ -766,11 +769,9 @@ async function fetchUserCharacters(client, userId) {
 
   // Get characters from database
   try {
-    const userCharacters = client.database.get("userCharacters") || {};
-    const dbUserData = userCharacters[userId];
+    const dbUserData = await client.database_handler.findOne('userCharacters', { userId });
     
     if (dbUserData) {
-      // Add main character if exists
       if (dbUserData.main) {
         const mainChar = {
           name: dbUserData.main.name,
@@ -778,7 +779,6 @@ async function fetchUserCharacters(client, userId) {
           isMain: true
         };
         
-        // Only add if not already present (same name AND realm)
         if (!characters.some(char => 
           char.name.toLowerCase() === mainChar.name.toLowerCase() && 
           char.realm.toLowerCase() === mainChar.realm.toLowerCase()
@@ -787,7 +787,6 @@ async function fetchUserCharacters(client, userId) {
         }
       }
 
-      // Add alt characters
       if (dbUserData.alts && Array.isArray(dbUserData.alts)) {
         dbUserData.alts.forEach(alt => {
           const altChar = {
@@ -796,7 +795,6 @@ async function fetchUserCharacters(client, userId) {
             isAlt: true
           };
           
-          // Only add if not already present (same name AND realm)
           if (!characters.some(char => 
             char.name.toLowerCase() === altChar.name.toLowerCase() && 
             char.realm.toLowerCase() === altChar.realm.toLowerCase()
@@ -867,19 +865,16 @@ async function validateCharacterName(charName, userChars, lang) {
   };
 }
 
+// Update main event handler
 module.exports = new Event({
   event: "guildMemberAdd",
   once: false,
   run: async (client, member) => {
     if (member.user.bot) return;
 
-    let settings = client.database.get("settings") || [];
-    let guildSettings = settings.find(setting => setting.guild === member.guild.id);
-    
-    if (!guildSettings) {
-      guildSettings = { guild: member.guild.id };
-      settings.push(guildSettings);
-    }
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: member.guild.id
+    }) || { guild: member.guild.id };
 
     const lang = guildSettings.language || "en";
 
@@ -890,8 +885,9 @@ module.exports = new Event({
 
     // Handle blacklisted users
     if (guildSettings.BlockList) {
-      const blacklistedUsers = client.database.get("blacklisted") || [];
-      const blacklistedUser = blacklistedUsers.find(u => u.id === member.id);
+      const blacklistedUser = await client.database_handler.findOne('blacklisted', {
+        id: member.id
+      });
       
       if (blacklistedUser && member.guild.id !== config.development.guildId) {
         await handleBlacklistedUser(member, blacklistedUser, lang, client);
@@ -910,4 +906,4 @@ module.exports = new Event({
       await handleRegularServer(client, member, guildSettings, lang);
     }
   },
-})
+});

@@ -20,29 +20,29 @@ const https = rateLimit(axios.create(), {
   perMilliseconds: 4000,
 });
 
-// Add this function to check character ownership
-const findCharacterOwner = (userCharacters, charName, realm) => {
-  for (const userId in userCharacters) {
-    const userData = userCharacters[userId];
-    
-    // Check main character
-    if (userData.main && 
-        userData.main.name.toLowerCase() === charName.toLowerCase() && 
-        userData.main.realm === realm) {
-      return { userId, isMain: true };
-    }
-    
-    // Check alt characters
-    const alt = userData.alts?.find(alt => 
-      alt.name.toLowerCase() === charName.toLowerCase() && 
-      alt.realm === realm
-    );
-    
-    if (alt) {
-      return { userId, isMain: false };
-    }
-  }
-  return null;
+// Update findCharacterOwner function to use async/await with Mongoose
+const findCharacterOwner = async (client, charName, realm) => {
+  const userCharacter = await client.database_handler.findOne('userCharacters', {
+    $or: [
+      { 'main.name': { $regex: new RegExp(`^${charName}$`, 'i') }, 'main.realm': realm },
+      { 'alts': { 
+        $elemMatch: { 
+          'name': { $regex: new RegExp(`^${charName}$`, 'i') },
+          'realm': realm 
+        }
+      }}
+    ]
+  });
+
+  if (!userCharacter) return null;
+
+  const isMain = userCharacter.main?.name.toLowerCase() === charName.toLowerCase() && 
+                 userCharacter.main?.realm === realm;
+
+  return {
+    userId: userCharacter.userId,
+    isMain: isMain
+  };
 };
 
 module.exports = new ApplicationCommand({
@@ -91,8 +91,11 @@ module.exports = new ApplicationCommand({
     const charName = interaction.options.getString("character", true);
     const realm = interaction.options.getString("realm", true);
     let invisible = interaction.options.getBoolean("invisible", false);
-    const settings = client.database.get("settings") || [];
-    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    
+    // Get guild settings for language
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: interaction.guildId
+    });
     const lang = guildSettings?.language || 'en';
 
     const charNameFormatted =
@@ -565,8 +568,7 @@ module.exports = new ApplicationCommand({
             ].filter(Boolean);
 
             // Add owner information if it exists
-            const userCharacters = client.database.get("userCharacters") || {};
-            const ownerInfo = findCharacterOwner(userCharacters, character.name, realm);
+            const ownerInfo = await findCharacterOwner(client, character.name, realm);
 
             if (ownerInfo) {
               embedFields.push({
