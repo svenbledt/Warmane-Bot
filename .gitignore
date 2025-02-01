@@ -1,8 +1,27 @@
+# Dependencies
 node_modules/
 .pnpm-store/
-# DO NOT REMOVE THESE FOR SECURITY
-terminal.log
-backup-commands
-.idea
+
+# Environment and Config
+.env
 database.yml
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.code-workspace
 Warmane-Bot.code-workspace
+
+# Logs and Backups
+terminal.log
+backup-commands/
+logs/
+*.log
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
