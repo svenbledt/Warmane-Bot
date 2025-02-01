@@ -238,7 +238,9 @@ module.exports = {
             description: 'Не удалось отправить ЛС пользователю {username}',
             user_label: 'Пользователь',
             user_id: 'ID Пользователя',
-            error_label: 'Ошибка'
+            error_label: 'Ошибка',
+            response: 'Ответ',
+            reason_label: 'Причина'
         },
         dm_timeout: {
             title: 'Время Ожидания ЛС Истекло',

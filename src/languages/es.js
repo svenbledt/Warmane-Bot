@@ -237,7 +237,9 @@ module.exports = {
             description: 'No se pudo enviar MD a {username}',
             user_label: 'Usuario',
             user_id: 'ID de Usuario',
-            error_label: 'Error'
+            error_label: 'Error',
+            response: 'Respuesta',
+            reason_label: 'Razón'
         },
         dm_timeout: {
             title: 'Tiempo de Respuesta MD Agotado',

@@ -237,7 +237,9 @@ module.exports = {
             description: 'Impossible d\'envoyer un MP à {username}',
             user_label: 'Utilisateur',
             user_id: 'ID Utilisateur',
-            error_label: 'Erreur'
+            error_label: 'Erreur',
+            response: 'Réponse',
+            reason_label: 'Raison'
         },
         dm_timeout: {
             title: 'Délai de Réponse MP Dépassé',

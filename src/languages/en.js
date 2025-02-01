@@ -244,7 +244,9 @@ module.exports = {
             description: 'Failed to send DM to {username}',
             user_label: 'User',
             user_id: 'User ID',
-            error_label: 'Error'
+            error_label: 'Error',
+            response: 'Response',
+            reason_label: 'Reason'
         },
         nickname_changed: {
             title: 'Nickname Changed',

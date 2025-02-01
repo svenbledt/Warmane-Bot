@@ -81,8 +81,8 @@ module.exports = new Event({
         descData: { username: botAddLog?.executor?.tag || 'Unknown User' },
         color: '#ff0000',
         fields: [
-          { nameKey: 'user_label', value: botAddLog?.executor?.tag || 'Unknown User' },
-          { nameKey: 'user_id', value: botAddLog?.executor?.id || 'Unknown ID' },
+          { nameKey: 'dm.user_label', value: botAddLog?.executor?.tag || 'Unknown User' },
+          { nameKey: 'dm.user_id', value: botAddLog?.executor?.id || 'Unknown ID' },
           { nameKey: 'error_label', value: error.message }
         ]
       });

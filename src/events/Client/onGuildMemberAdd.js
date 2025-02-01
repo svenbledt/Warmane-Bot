@@ -217,11 +217,11 @@ async function handleNicknameChange(client, member, charName, lang, guildName) {
       color: '#00ff00',
       fields: [
         { 
-          nameKey: 'user_label', 
+          nameKey: 'dm.user_label', 
           value: member.user.tag 
         },
         { 
-          nameKey: 'user_id', 
+          nameKey: 'dm.user_id', 
           value: member.user.id 
         },
         { 
@@ -258,12 +258,12 @@ async function handleDevServer(client, member, guildSettings, lang) {
       color: '#00ff00',
       fields: [
         { 
-          nameKey: 'user_label', 
+          nameKey: 'dm.user_label', 
           nameData: {}, 
           value: member.user.tag 
         },
         { 
-          nameKey: 'user_id', 
+          nameKey: 'dm.user_id', 
           nameData: {}, 
           value: member.user.id 
         }
@@ -291,17 +291,17 @@ async function handleDevServer(client, member, guildSettings, lang) {
           color: '#ff9900',
           fields: [
             { 
-              nameKey: 'user_label', 
+              nameKey: 'dm.user_label', 
               nameData: {}, 
               value: member.user.tag 
             },
             { 
-              nameKey: 'user_id', 
+              nameKey: 'dm.user_id', 
               nameData: {}, 
               value: member.user.id 
             },
             { 
-              nameKey: 'response', 
+              nameKey: 'dm.response', 
               nameData: {}, 
               value: response || 'empty' 
             }
@@ -341,12 +341,12 @@ async function handleDevServer(client, member, guildSettings, lang) {
             color: '#ff0000',
             fields: [
               { 
-                nameKey: 'user_label', 
+                nameKey: 'dm.user_label', 
                 nameData: {}, 
                 value: member.user.tag 
               },
               { 
-                nameKey: 'user_id', 
+                nameKey: 'dm.user_id', 
                 nameData: {}, 
                 value: member.user.id 
               }
@@ -367,12 +367,12 @@ async function handleDevServer(client, member, guildSettings, lang) {
             color: '#ff0000',
             fields: [
               { 
-                nameKey: 'user_label', 
+                nameKey: 'dm.user_label', 
                 nameData: {}, 
                 value: member.user.tag 
               },
               { 
-                nameKey: 'user_id', 
+                nameKey: 'dm.user_id', 
                 nameData: {}, 
                 value: member.user.id 
               },
@@ -431,17 +431,17 @@ async function handleBlacklistedUser(member, blacklistedUser, lang, client) {
       color: '#ff0000',
       fields: [
         { 
-          nameKey: 'user_label', 
+          nameKey: 'dm.user_label', 
           nameData: {}, 
           value: member.user.tag 
         },
         { 
-          nameKey: 'user_id', 
+          nameKey: 'dm.user_id', 
           nameData: {}, 
           value: member.user.id 
         },
         { 
-          nameKey: 'reason_label', 
+          nameKey: 'dm.reason_label', 
           nameData: {}, 
           value: blacklistedUser.reason 
         }
@@ -486,8 +486,8 @@ async function handleRegularServer(client, member, guildSettings, lang) {
           descData: { username: member.user.tag },
           color: '#00ff00',
           fields: [
-            { nameKey: 'user_label', nameData: {}, value: member.user.tag },
-            { nameKey: 'user_id', nameData: {}, value: member.user.id }
+            { nameKey: 'dm.user_label', nameData: {}, value: member.user.tag },
+            { nameKey: 'dm.user_id', nameData: {}, value: member.user.id }
           ]
         });
         
@@ -501,8 +501,8 @@ async function handleRegularServer(client, member, guildSettings, lang) {
           descData: { username: member.user.tag },
           color: '#ff0000',
           fields: [
-            { nameKey: 'user_label', nameData: {}, value: member.user.tag },
-            { nameKey: 'user_id', nameData: {}, value: member.user.id },
+            { nameKey: 'dm.user_label', nameData: {}, value: member.user.tag },
+            { nameKey: 'dm.user_id', nameData: {}, value: member.user.id },
             { nameKey: 'error', nameData: {}, value: dmError.message }
           ]
         });
@@ -634,8 +634,8 @@ async function handleTimeout(client, member, selectMessage, row, lang) {
       descData: { username: member.user.tag },
       color: '#ff0000',
       fields: [
-        { nameKey: 'user_label', nameData: {}, value: member.user.tag },
-        { nameKey: 'user_id', nameData: {}, value: member.user.id }
+        { nameKey: 'dm.user_label', nameData: {}, value: member.user.tag },
+        { nameKey: 'dm.user_id', nameData: {}, value: member.user.id }
       ]
     });
   } catch (error) {
