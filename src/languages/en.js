@@ -27,10 +27,10 @@ module.exports = {
                 NOTHING: "Do nothing"
             },
             ACTION_RESULTS: {
-                KICKED: "Successfully kicked %COUNT% members",
-                BANNED: "Successfully banned %COUNT% members",
+                KICKED: "Successfully kicked {COUNT} members",
+                BANNED: "Successfully banned {COUNT} members",
                 NOTHING: "No action taken",
-                FAILED: "Failed to process %COUNT% members"
+                FAILED: "Failed to process {COUNT} members"
             }
         },
         report: {
@@ -221,6 +221,7 @@ module.exports = {
         }
     },
     logging: {
+        error: 'Error',
         dm_sent: {
             title: 'DM Sent',
             description: 'Sent character name request DM to {username}'
@@ -236,12 +237,12 @@ module.exports = {
             channel: 'Channel',
             created_by: 'Created By'
         },
-        user_label: 'User',
-        user_id: 'User ID',
         footer: 'Server Logs',
-        dm_failed: {
+        dm: {
             title: 'DM Failed',
             description: 'Failed to send DM to {username}',
+            user_label: 'User',
+            user_id: 'User ID',
             error_label: 'Error'
         },
         nickname_changed: {
@@ -252,6 +253,10 @@ module.exports = {
         dm_timeout: {
             title: 'DM Response Timeout',
             description: '{username} did not respond within the time limit'
+        },
+        interaction_failed: {
+            title: 'Interaction Failed',
+            description: 'Failed to interact with {username}'
         }
     }
 };

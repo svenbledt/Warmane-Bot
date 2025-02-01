@@ -23,4 +23,4 @@ module.exports = new AutocompleteComponent({
       filteredFruits.map((fruit) => ({ name: fruit, value: fruit }))
     );
   },
-}).toJSON();
+})

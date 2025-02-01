@@ -11,53 +11,64 @@ function ensureGuildSettings(guildSettings) {
     welcomeChannel: "",
     CharNameAsk: false,
     BlockList: true,
-    language: "en",  // Add default language setting
-    logChannel: "", // Add logging channel setting
-    enableLogging: false, // Add logging toggle
+    language: "en",
+    logChannel: "",
+    enableLogging: false,
     charNameAskDM:
       "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
     lastOwnerDM: {},
-    // Add any other default settings here
   };
 
   let updated = false;
-
   for (const [key, value] of Object.entries(defaultSettings)) {
     if (!guildSettings.hasOwnProperty(key)) {
       guildSettings[key] = value;
       updated = true;
     }
   }
-
   return updated;
 }
 
 async function updateGuildSettings(client) {
-  let settings = client.database.get("settings") || [];
+  const currentGuildIds = Array.from(client.guilds.cache.keys());
+  
+  // Get all settings documents for current guilds
+  const settings = await client.database_handler.find('settings', {
+    guild: { $in: currentGuildIds }
+  });
 
-  const currentGuildIds = new Set(client.guilds.cache.keys());
+  // Create a map of existing settings
+  const existingSettings = new Map(settings.map(setting => [setting.guild, setting]));
 
-  settings = settings.filter((setting) => currentGuildIds.has(setting.guild));
-
+  // Process each guild
   for (const guildId of currentGuildIds) {
-    let guildSettings = settings.find((setting) => setting.guild === guildId);
-    const guildName = client.guilds.cache.get(guildId).name; // Hole den Gildennamen
+    const guild = client.guilds.cache.get(guildId);
+    const guildName = guild.name;
 
+    let guildSettings = existingSettings.get(guildId);
+    
     if (!guildSettings) {
-      // Erstelle eine neue Einstellung mit dem Gildennamen an erster Stelle
-      guildSettings = { guild: guildId, guildName: guildName };
-      settings.push(guildSettings);
-    } else {
-      // Aktualisiere den Gildennamen, falls er sich geändert hat
-      guildSettings.guildName = guildName;
-    }
-
-    if (ensureGuildSettings(guildSettings)) {
-      client.database.set("settings", settings);
+      // Create new settings if none exist
+      guildSettings = {
+        guild: guildId,
+        guildName: guildName
+      };
+      
+      ensureGuildSettings(guildSettings);
+      await client.database_handler.create('settings', guildSettings);
+    } else if (guildSettings.guildName !== guildName || ensureGuildSettings(guildSettings)) {
+      // Update if guild name changed or defaults need to be added
+      await client.database_handler.updateOne('settings',
+        { guild: guildId },
+        { 
+          $set: {
+            ...guildSettings,
+            guildName: guildName
+          }
+        }
+      );
     }
   }
-
-  client.database.set("settings", settings);
 }
 
 async function updateStatus(client) {
@@ -66,9 +77,7 @@ async function updateStatus(client) {
 
   for (const guild of client.guilds.cache.values()) {
     try {
-      // Fetch all members of the guild
       await guild.members.fetch();
-      // Count non-bot members
       const nonBotMembersCount = guild.members.cache.filter(
         (member) => !member.user.bot
       ).size;
@@ -98,20 +107,18 @@ const permissionTranslations = {
 async function generateAndSendInvites(client) {
   const inviteChannel = client.channels.cache.get(config.development.inviteChannel);
 
-  // Fetch all messages from the inviteChannel and delete them
+  // Fetch and delete existing messages
   const messages = await inviteChannel.messages.fetch({ limit: 100 });
   for (const message of messages.values()) {
     await message.delete();
   }
 
-  // Collect all invite information
   const inviteResults = [];
   const errorResults = [];
 
   for (const guild of client.guilds.cache.values()) {
     if (guild.systemChannel) {
       try {
-        // Check bot permissions
         const botMember = guild.members.cache.get(client.user.id);
         const requiredPermissions = ["CreateInstantInvite", "ManageGuild"];
         const missingPermissions = requiredPermissions.filter(
@@ -128,49 +135,51 @@ async function generateAndSendInvites(client) {
           };
         }
 
-        // Handle invites
         const invites = await guild.invites.fetch();
         const botInvites = invites.filter(
           (invite) => invite.inviter && invite.inviter.id === client.user.id
         );
 
-        // Delete old invites
         for (const invite of botInvites.values()) {
           await invite.delete();
         }
 
-        // Create new invite
         const invite = await guild.systemChannel.createInvite({
           maxAge: 0,
           maxUses: 1,
         });
 
-        await Logger.log(client, guild.id, {
-          titleKey: 'invite_created',
-          descData: { botName: 'Warmane Tool' },
-          color: '#0099ff',
-          fields: [
-            { nameKey: 'invite_created.channel', value: guild.systemChannel.name },
-            { nameKey: 'invite_created.created_by', value: client.user.tag }
-          ]
+        // Check if logging is enabled for this guild before attempting to log
+        const guildSettings = await client.database_handler.findOne('settings', {
+          guild: guild.id
         });
+
+        if (guildSettings?.enableLogging && guildSettings?.logChannel) {
+          await Logger.log(client, guild.id, {
+            titleKey: 'invite_created',
+            descData: { botName: 'Warmane Tool' },
+            color: '#0099ff',
+            fields: [
+              { nameKey: 'invite_created.channel', value: guild.systemChannel.name },
+              { nameKey: 'invite_created.created_by', value: client.user.tag }
+            ]
+          });
+        }
 
         inviteResults.push(`${guild.name}: ${invite.url}`);
 
       } catch (error) {
         if (error.code === 50013) {
-          // Handle permission error
           try {
             const owner = await guild.fetchOwner();
             const now = Date.now();
-            let settings = client.database.get("settings") || [];
-            let guildSettings = settings.find(
-              (setting) => setting.guild === guild.id
-            );
+            
+            const guildSettings = await client.database_handler.findOne('settings', {
+              guild: guild.id
+            });
 
             const lastDMTime = guildSettings?.lastOwnerDM?.[owner.id] || 0;
-            const cooldownExpired =
-              now - lastDMTime > COOLDOWN_HOURS * 60 * 60 * 1000;
+            const cooldownExpired = now - lastDMTime > COOLDOWN_HOURS * 60 * 60 * 1000;
 
             if (cooldownExpired) {
               const missingPerms = error.translatedPermissions
@@ -183,9 +192,14 @@ async function generateAndSendInvites(client) {
 
               errorResults.push(`${guild.name}: ${missingPerms}`);
 
+              // Update lastOwnerDM timestamp
               if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
               guildSettings.lastOwnerDM[owner.id] = now;
-              client.database.set("settings", settings);
+              
+              await client.database_handler.updateOne('settings',
+                { guild: guild.id },
+                { $set: { lastOwnerDM: guildSettings.lastOwnerDM } }
+              );
             }
           } catch (dmError) {
             console.error(`Couldn't DM owner of ${guild.name}:`, dmError);
@@ -198,7 +212,6 @@ async function generateAndSendInvites(client) {
     }
   }
 
-  // Create and send the formatted message
   let finalMessage = "**Server Invite Links**\n\n";
   
   if (inviteResults.length > 0) {
@@ -211,7 +224,6 @@ async function generateAndSendInvites(client) {
     finalMessage += errorResults.map(result => `• ${result}`).join('\n');
   }
 
-  // Split message if it exceeds Discord's limit (2000 characters)
   if (finalMessage.length > 2000) {
     const chunks = finalMessage.match(/.{1,2000}/g) || [];
     for (const chunk of chunks) {
@@ -226,14 +238,10 @@ module.exports = new Event({
   event: "ready",
   once: true,
   run: async (__client__, client) => {
-    // Wait for 5 seconds
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
-    // Update guild settings immediately after bot has connected
     await updateGuildSettings(client);
     await updateStatus(client);
-
-    // Generate and send invites
     await generateAndSendInvites(client);
 
     success(
@@ -244,18 +252,17 @@ module.exports = new Event({
         "s."
     );
 
-    // Schedule the task to run every 24 hours
+    // Schedule recurring tasks
     setInterval(() => {
       generateAndSendInvites(client);
-    }, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+    }, 24 * 60 * 60 * 1000);
 
-    // Schedule the task to run every 2 hours
     setInterval(() => {
       updateGuildSettings(client);
-    }, 2 * 60 * 60 * 1000); // 2 hours in milliseconds
+    }, 2 * 60 * 60 * 1000);
 
     setInterval(() => {
       updateStatus(client);
-    }, 300000); // 5 minutes in milliseconds
+    }, 300000);
   },
-}).toJSON();
+});

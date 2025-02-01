@@ -79,8 +79,9 @@ module.exports = new ApplicationCommand({
     const isDeveloper = config.users.developers.includes(interaction.user.id);
     
     // Get guild settings for language
-    const settings = client.database.get("settings") || [];
-    const guildSettings = settings.find(setting => setting.guild === interaction.guildId);
+    const guildSettings = await client.database_handler.findOne('settings', {
+      guild: interaction.guildId
+    });
     const lang = guildSettings?.language || "en";
 
     if (!isDeveloper && !interaction.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
@@ -109,24 +110,23 @@ module.exports = new ApplicationCommand({
       }
 
       // Get user characters data
-      let userChars = client.database.get("userCharacters") || {};
+      const allUserChars = await client.database_handler.find('userCharacters', {});
       
       // Check if character is already assigned to someone
       let existingOwner = null;
-      for (const userId in userChars) {
-        const userData = userChars[userId];
+      for (const userData of allUserChars) {
         // Check main character
         if (userData.main && 
             userData.main.name.toLowerCase() === charNameFormatted.toLowerCase() && 
             userData.main.realm === realm) {
-          existingOwner = { userId, isMain: true };
+          existingOwner = { userId: userData.userId, isMain: true };
           break;
         }
         // Check alt characters
         if (userData.alts && userData.alts.some(alt => 
             alt.name.toLowerCase() === charNameFormatted.toLowerCase() && 
             alt.realm === realm)) {
-          existingOwner = { userId, isMain: false };
+          existingOwner = { userId: userData.userId, isMain: false };
           break;
         }
       }
@@ -184,7 +184,6 @@ module.exports = new ApplicationCommand({
             return;
           }
         } else {
-          // Regular users just get informed about the existing claim
           await interaction.reply({
             content: baseMessage,
             flags: [MessageFlags.Ephemeral],
@@ -192,13 +191,12 @@ module.exports = new ApplicationCommand({
           return;
         }
       } else {
-        // If no existing owner, proceed with the normal flow
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
       }
 
       // If we get here, either there's no existing owner or developer confirmed reassignment
       if (existingOwner) {
-        const prevUserData = userChars[existingOwner.userId];
+        const prevUserData = await client.database_handler.findOne('userCharacters', { userId: existingOwner.userId });
         if (existingOwner.isMain) {
           prevUserData.main = null;
         } else {
@@ -206,11 +204,14 @@ module.exports = new ApplicationCommand({
             !(alt.name.toLowerCase() === charNameFormatted.toLowerCase() && alt.realm === realm)
           );
         }
+        await client.database_handler.updateOne('userCharacters', { userId: existingOwner.userId }, prevUserData);
       }
 
-      // Initialize user data if it doesn't exist
-      if (!userChars[user.id]) {
-        userChars[user.id] = {
+      // Get or create user data
+      let userData = await client.database_handler.findOne('userCharacters', { userId: user.id });
+      if (!userData) {
+        userData = {
+          userId: user.id,
           main: null,
           alts: []
         };
@@ -225,24 +226,24 @@ module.exports = new ApplicationCommand({
 
       if (isMain) {
         // If user already has a main character, move it to alts
-        if (userChars[user.id].main) {
-          const oldMain = userChars[user.id].main;
-          userChars[user.id].alts.push(oldMain);
+        if (userData.main) {
+          userData.alts.push(userData.main);
         }
-        userChars[user.id].main = charData;
+        userData.main = charData;
       } else {
-        userChars[user.id].alts.push(charData);
+        userData.alts.push(charData);
       }
 
-      client.database.set("userCharacters", userChars);
+      // Update or insert user data
+      await client.database_handler.updateOne('userCharacters', { userId: user.id }, userData, { upsert: true });
 
       let responseContent;
-      if (isMain && userChars[user.id].alts.length > 0) {
+      if (isMain && userData.alts.length > 0) {
         responseContent = LanguageManager.getText('commands.setchar.success_updated', lang, {
           character: charNameFormatted,
           realm: realm,
           user: `<@${user.id}>`,
-          oldCharacter: userChars[user.id].alts[userChars[user.id].alts.length - 1].name
+          oldCharacter: userData.alts[userData.alts.length - 1].name
         });
       } else {
         responseContent = LanguageManager.getText('commands.setchar.success_with_type', lang, {
@@ -259,6 +260,7 @@ module.exports = new ApplicationCommand({
       });
 
     } catch (error) {
+      console.error('Error in set-char command:', error);
       return interaction.reply({
         content: LanguageManager.getText('commands.global_strings.error_occurred', lang, {
           error: error.message
@@ -267,4 +269,4 @@ module.exports = new ApplicationCommand({
       });
     }
   },
-}).toJSON();
+});

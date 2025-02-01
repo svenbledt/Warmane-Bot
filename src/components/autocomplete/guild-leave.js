@@ -20,4 +20,4 @@ module.exports = new AutocompleteComponent({
     
     await interaction.respond(filteredChoices);
   },
-}).toJSON();
+})

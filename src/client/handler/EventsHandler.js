@@ -24,26 +24,26 @@ class EventsHandler {
         f.endsWith(".js")
       )) {
         try {
-          /**
-           * @type {Event['data']}
-           */
           const module = require("../../events/" + directory + "/" + file);
 
           if (!module) continue;
 
-          if (module.__type__ === 5) {
-            if (!module.event || !module.run) {
+          // Parse the module data
+          const eventData = module.toJSON ? module.toJSON() : module;
+
+          if (eventData.__type__ === 5) {
+            if (!eventData.event || !eventData.run) {
               error("Unable to load the event " + file);
               continue;
             }
 
-            if (module.once) {
-              this.client.once(module.event, (...args) =>
-                module.run(this.client, ...args)
+            if (eventData.once) {
+              this.client.once(eventData.event, (...args) =>
+                eventData.run(this.client, ...args)
               );
             } else {
-              this.client.on(module.event, (...args) =>
-                module.run(this.client, ...args)
+              this.client.on(eventData.event, (...args) =>
+                eventData.run(this.client, ...args)
               );
             }
 
@@ -53,7 +53,7 @@ class EventsHandler {
           } else {
             error(
               "Invalid event type " +
-                module.__type__ +
+                eventData.__type__ +
                 " from event file " +
                 file
             );
@@ -64,7 +64,9 @@ class EventsHandler {
               "src/events/" +
               directory +
               "/" +
-              file
+              file +
+              "\n" +
+              err
           );
         }
       }

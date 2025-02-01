@@ -80,4 +80,4 @@ module.exports = new ApplicationCommand({
       return;
     }
   },
-}).toJSON();
+})

@@ -21,38 +21,43 @@ class ComponentsHandler {
         (f) => f.endsWith(".js")
       )) {
         try {
-          /**
-           * @type {Component['data'] | AutocompleteComponent['data']}
-           */
           const module = require("../../components/" + directory + "/" + file);
 
           if (!module) continue;
 
-          if (module.__type__ === 3) {
-            if (!module.customId || !module.type || !module.run) {
+          // Parse the module data
+          const componentData = module.toJSON ? module.toJSON() : module;
+
+          if (!componentData) {
+            error(`No component data found in ${file}`);
+            continue;
+          }
+
+          if (componentData.__type__ === 3) {
+            if (!componentData.customId || !componentData.type || !componentData.run) {
               error("Unable to load the button/select/modal component " + file);
               continue;
             }
 
-            switch (module.type) {
+            switch (componentData.type) {
               case "modal": {
                 this.client.collection.components.modals.set(
-                  module.customId,
-                  module
+                  componentData.customId,
+                  componentData
                 );
                 break;
               }
               case "select": {
                 this.client.collection.components.selects.set(
-                  module.customId,
-                  module
+                  componentData.customId,
+                  componentData
                 );
                 break;
               }
               case "button": {
                 this.client.collection.components.buttons.set(
-                  module.customId,
-                  module
+                  componentData.customId,
+                  componentData
                 );
                 break;
               }
@@ -65,34 +70,36 @@ class ComponentsHandler {
               }
             }
 
-            info(`Loaded new component (type: ${module.type}) : ` + file);
-          } else if (module.__type__ === 4) {
-            if (!module.commandName || !module.run) {
+            info(`Loaded new component (type: ${componentData.type}) : ` + file);
+          } else if (componentData.__type__ === 4) {
+            if (!componentData.commandName || !componentData.run) {
               error("Unable to load the autocomplete component " + file);
               continue;
             }
 
             this.client.collection.components.autocomplete.set(
-              module.commandName,
-              module
+              componentData.commandName,
+              componentData
             );
 
             info(`Loaded new component (type: autocomplete) : ` + file);
           } else {
             error(
               "Invalid component type " +
-                module.__type__ +
+                componentData.__type__ +
                 " from component file " +
                 file
             );
           }
-        } catch {
+        } catch (err) {
           error(
             "Unable to load a component from the path: " +
-              "src/component/" +
+              "src/components/" +
               directory +
               "/" +
-              file
+              file +
+              "\n" +
+              err
           );
         }
       }
@@ -105,7 +112,7 @@ class ComponentsHandler {
         componentsCollection.autocomplete.size +
         componentsCollection.buttons.size +
         componentsCollection.selects.size +
-        componentsCollection.buttons.size
+        componentsCollection.modals.size
       } components.`
     );
   };

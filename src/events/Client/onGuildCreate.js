@@ -4,7 +4,7 @@ const config = require("../../config");
 const Logger = require("../../utils/Logger");
 const { EmbedBuilder, AuditLogEvent } = require('discord.js');
 
-function ensureGuildSettings(guildSettings) {
+async function ensureGuildSettings(guildSettings) {
   const defaultSettings = {
     welcomeMessage: false,
     welcomeChannel: "",
@@ -20,7 +20,6 @@ function ensureGuildSettings(guildSettings) {
   };
 
   let updated = false;
-
   for (const [key, value] of Object.entries(defaultSettings)) {
     if (!guildSettings.hasOwnProperty(key)) {
       guildSettings[key] = value;
@@ -32,31 +31,53 @@ function ensureGuildSettings(guildSettings) {
 }
 
 async function updateGuildSettings(client) {
-  let settings = client.database.get("settings") || [];
+  // Get all current guild IDs from the client
   const currentGuildIds = new Set(client.guilds.cache.keys());
+  
+  // Get all settings documents
+  const settings = await client.database_handler.find('settings', {
+    guild: { $in: Array.from(currentGuildIds) }
+  });
 
-  settings = settings.filter((setting) => currentGuildIds.has(setting.guild));
+  // Create a map of existing settings for faster lookup
+  const existingSettings = new Map(settings.map(setting => [setting.guild, setting]));
 
+  // Process each guild
   for (const guildId of currentGuildIds) {
-    let guildSettings = settings.find((setting) => setting.guild === guildId);
+    let guildSettings = existingSettings.get(guildId);
     const guildName = client.guilds.cache.get(guildId).name;
 
     if (!guildSettings) {
+      // Create new settings if none exist
       guildSettings = {
         guild: guildId,
         guildName: guildName,
       };
-      settings.push(guildSettings);
+      
+      // Ensure default settings
+      await ensureGuildSettings(guildSettings);
+      
+      // Create new document
+      await client.database_handler.create('settings', guildSettings);
     } else {
-      guildSettings.guildName = guildName;
-    }
+      // Update existing settings if needed
+      if (guildSettings.guildName !== guildName) {
+        guildSettings.guildName = guildName;
+        await client.database_handler.updateOne('settings', 
+          { guild: guildId },
+          { guildName: guildName }
+        );
+      }
 
-    if (ensureGuildSettings(guildSettings)) {
-      client.database.set("settings", settings);
+      // Check and update default settings
+      if (await ensureGuildSettings(guildSettings)) {
+        await client.database_handler.updateOne('settings',
+          { guild: guildId },
+          guildSettings
+        );
+      }
     }
   }
-
-  client.database.set("settings", settings);
 }
 
 module.exports = new Event({
@@ -70,12 +91,13 @@ module.exports = new Event({
     success(
       `Guild ${guild.name} (${guild.id}) has been added to the database.`
     );
+    
     await announcementChannel.send({
       content: `**${guild.name} (${guild.id}) has joined the Project!**`,
     });
 
     // Find who invited the bot
-    let botAddLog = null; // Declare outside try block
+    let botAddLog = null;
     try {
       const auditLogs = await guild.fetchAuditLogs({
         type: AuditLogEvent.BotAdd,
@@ -115,7 +137,6 @@ module.exports = new Event({
                 'U can also right click on a user and select "Ask for Charname" to ask for a character name'
               ].join('\n')
             },
-
             {
               name: '🔗 Need Help?',
               value: '[Join our Support Server](https://discord.gg/YDqBQU43Ht)'
@@ -129,7 +150,7 @@ module.exports = new Event({
       }
     } catch (error) {
       await Logger.log(client, guild.id, {
-        titleKey: 'dm_failed',
+        titleKey: 'dm',
         descData: { username: botAddLog?.executor?.tag || 'Unknown User' },
         color: '#ff0000',
         fields: [
@@ -143,4 +164,4 @@ module.exports = new Event({
     // Update settings
     await updateGuildSettings(client);
   },
-}).toJSON();
+});

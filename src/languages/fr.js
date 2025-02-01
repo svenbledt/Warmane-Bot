@@ -27,10 +27,10 @@ module.exports = {
                 NOTHING: "Ne rien faire"
             },
             ACTION_RESULTS: {
-                KICKED: "%COUNT% membres expulsés avec succès",
-                BANNED: "%COUNT% membres bannis avec succès",
+                KICKED: "{COUNT} membres expulsés avec succès",
+                BANNED: "{COUNT} membres bannis avec succès",
                 NOTHING: "Aucune action effectuée",
-                FAILED: "Échec du traitement de %COUNT% membres"
+                FAILED: "Échec du traitement de {COUNT} membres"
             }
         },
         report: {
@@ -214,6 +214,7 @@ module.exports = {
         }
     },
     logging: {
+        error: 'Error',
         dm_sent: {
             title: 'MP Envoyé',
             description: 'MP de demande de nom de personnage envoyé à {username}'
@@ -229,12 +230,12 @@ module.exports = {
             channel: 'Canal',
             created_by: 'Créé par'
         },
-        user_label: 'Utilisateur',
-        user_id: 'ID Utilisateur',
         footer: 'Journaux du Serveur',
-        dm_failed: {
+        dm: {
             title: 'Échec du MP',
             description: 'Impossible d\'envoyer un MP à {username}',
+            user_label: 'Utilisateur',
+            user_id: 'ID Utilisateur',
             error_label: 'Erreur'
         },
         dm_timeout: {
@@ -245,6 +246,10 @@ module.exports = {
             title: 'Surnom Modifié',
             description: 'Surnom de {username} changé en {nickname}',
             new_nickname: 'Nouveau Surnom'
+        },
+        interaction_failed: {
+            title: 'Échec de l\'interaction',
+            description: 'Échec de l\'interaction avec {username}: {error}'
         }
     }
 }; 

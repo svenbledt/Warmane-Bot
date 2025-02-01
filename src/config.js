@@ -1,7 +1,4 @@
 const config = {
-  database: {
-    path: "./database.yml", // The database path.
-  },
   base: {
     iconAlliance: "https://i.imgur.com/SDoVQmV.png", // The Alliance icon.
     iconHorde: "https://i.imgur.com/ap8Nran.png", // The Horde icon.
