@@ -18,6 +18,7 @@
     "colors": "^1.4.0",
     "discord.js": "^14.17.2",
     "dotenv": "^16.4.7",
+    "mongoose": "^8.9.6",
     "path": "^0.12.7",
     "quick-yaml.db": "^1.2.2"
   }
