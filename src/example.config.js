@@ -32,8 +32,6 @@ const config = {
     reportChannel: "1254444242823155845",
   },
   commands: {
-    prefix: "?", // For message commands, prefix is required. This can be changed by a database.
-    message_commands: true, // If true, the bot will allow users to use message (or prefix) commands.
     application_commands: {
       chat_input: true, // If true, the bot will allow users to use chat input (or slash) commands.
       user_context: true, // If true, the bot will allow users to use user context menu commands.

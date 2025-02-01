@@ -3,7 +3,6 @@ const { info, error, success, warn } = require("../../utils/Console");
 const { readdirSync } = require("fs");
 const DiscordBot = require("../DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
-const MessageCommand = require("../../structure/MessageCommand");
 
 class CommandsHandler {
   client;
@@ -17,8 +16,6 @@ class CommandsHandler {
 
   load = () => {
     // Clear existing commands before loading
-    this.client.collection.message_commands.clear();
-    this.client.collection.message_commands_aliases.clear();
     this.client.collection.application_commands.clear();
     this.client.rest_application_commands_array = [];
 
@@ -40,34 +37,7 @@ class CommandsHandler {
           // Parse the module data
           const commandData = module.toJSON ? module.toJSON() : module;
 
-          if (commandData.__type__ === 2) {
-            if (!commandData.command || !commandData.run) {
-              error("Unable to load the message command " + file);
-              continue;
-            }
-
-            commandData.category = directory;
-            commandData.filePath = filePath;
-
-            this.client.collection.message_commands.set(
-              commandData.command.name,
-              commandData
-            );
-
-            if (
-              commandData.command.aliases &&
-              Array.isArray(commandData.command.aliases)
-            ) {
-              commandData.command.aliases.forEach((alias) => {
-                this.client.collection.message_commands_aliases.set(
-                  alias,
-                  commandData.command.name
-                );
-              });
-            }
-
-            info("Loaded new message command: " + file);
-          } else if (commandData.__type__ === 1) {
+          if (commandData.__type__ === 1) {
             if (!commandData.command || !commandData.run) {
               error("Unable to load the application command " + file);
               continue;
@@ -111,7 +81,7 @@ class CommandsHandler {
     }
 
     success(
-      `Successfully loaded ${this.client.collection.application_commands.size} application commands and ${this.client.collection.message_commands.size} message commands.`
+      `Successfully loaded ${this.client.collection.application_commands.size} application commands.`
     );
   };
 
@@ -132,7 +102,6 @@ class CommandsHandler {
       ).setToken(this.client.token);
 
       if (development.enabled) {
-        // In development mode, delete all commands
         warn("Attempting to delete all application commands in development mode...");
         await rest.put(
           Routes.applicationGuildCommands(
@@ -147,7 +116,6 @@ class CommandsHandler {
         );
         success("Successfully deleted all application commands");
       } else {
-        // In production mode, get existing commands and compare
         warn("Fetching existing commands in production mode...");
         const existingCommands = await rest.get(
           Routes.applicationCommands(this.client.user.id)

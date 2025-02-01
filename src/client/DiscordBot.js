@@ -12,8 +12,6 @@ const DatabaseHandler = require('./handler/DatabaseHandler');
 class DiscordBot extends Client {
   collection = {
     application_commands: new Collection(),
-    message_commands: new Collection(),
-    message_commands_aliases: new Collection(),
     components: {
       buttons: new Collection(),
       selects: new Collection(),
