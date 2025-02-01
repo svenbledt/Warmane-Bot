@@ -84,6 +84,15 @@ module.exports = new ApplicationCommand({
     });
     const lang = guildSettings?.language || "en";
 
+    // Check if command is used in DMs
+    if (!interaction.guild) {
+      await interaction.reply({
+        content: LanguageManager.getText("commands.global_strings.guild_only", lang),
+        flags: [MessageFlags.Ephemeral],
+      });
+      return;
+    }
+
     if (!isDeveloper && !interaction.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
       await interaction.reply({
         content: LanguageManager.getText("commands.global_strings.no_permission", lang),
