@@ -3,6 +3,7 @@ const { error, success, info, warn } = require("../../utils/Console");
 const BlacklistedUser = require('../../models/BlacklistedUser');
 const GuildSettings = require('../../models/GuildSettings');
 const UserCharacter = require('../../models/UserCharacter');
+const LevelingProgress = require('../../models/LevelingProgress');
 
 class DatabaseHandler {
     /**
@@ -13,7 +14,8 @@ class DatabaseHandler {
         this.models = {
             blacklisted: BlacklistedUser,
             settings: GuildSettings,
-            userCharacters: UserCharacter
+            userCharacters: UserCharacter,
+            levelingProgress: LevelingProgress
         };
     }
 
@@ -190,6 +192,7 @@ class DatabaseHandler {
             language: "en",
             logChannel: "",
             enableLogging: false,
+            levelingSystem: false,
             charNameAskDM:
                 "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
             lastOwnerDM: {},
@@ -233,31 +236,20 @@ class DatabaseHandler {
     }
 
     async updateAllGuildSettings(client) {
-        info('Starting updateAllGuildSettings');
         const currentGuildIds = Array.from(client.guilds.cache.keys());
-        info(`Found ${currentGuildIds.length} guilds`);
 
         const settings = await this.models.settings.find({
             guild: { $in: currentGuildIds }
         });
-        info(`Found ${settings.length} existing settings documents`);
 
         const existingSettings = new Map(settings.map(setting => [setting.guild, setting]));
-
         for (const guildId of currentGuildIds) {
             const guild = client.guilds.cache.get(guildId);
             if (!existingSettings.has(guildId)) {
                 info(`Creating new settings for ${guild.name} (${guildId})`);
                 await this.ensureGuildSettings(guildId, guild.name);
-            } else if (existingSettings.get(guildId).guildName !== guild.name) {
-                info(`Updating guild name for ${guildId}: ${existingSettings.get(guildId).guildName} -> ${guild.name}`);
-                await this.models.settings.updateOne(
-                    { guild: guildId },
-                    { $set: { guildName: guild.name } }
-                );
             }
         }
-        success('Finished updateAllGuildSettings');
     }
 }
 

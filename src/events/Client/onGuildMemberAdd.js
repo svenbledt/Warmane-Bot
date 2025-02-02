@@ -1,4 +1,3 @@
-const { success } = require("../../utils/Console");
 const Event = require("../../structure/Event");
 const LanguageManager = require("../../utils/LanguageManager");
 const config = require("../../config");
