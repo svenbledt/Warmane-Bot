@@ -1,5 +1,6 @@
 const { error, success, info } = require("../../utils/Console");
 const LevelingProgress = require('../../models/LevelingProgress');
+const AccountStanding = require('../../models/accountStanding');
 
 class LevelingSystemHandler {
     /**
@@ -26,7 +27,7 @@ class LevelingSystemHandler {
      * @param {number} xpAmount Amount of XP to add
      * @returns {Promise<{newLevel: number, leveledUp: boolean, currentXP: number}>}
      */
-    async addXP(guildId, userId, xpAmount) {
+    async addXPGuild(guildId, userId, xpAmount) {
         try {
             // Find and update in one operation using findOneAndUpdate
             let userProgress = await LevelingProgress.findOneAndUpdate(
@@ -53,6 +54,40 @@ class LevelingSystemHandler {
                 );
             }
 
+            return {
+                newLevel: userProgress.level,
+                leveledUp,
+                currentXP: userProgress.xp,
+                oldLevel
+            };
+        } catch (err) {
+            error('Error adding XP:', err);
+            throw err;
+        }
+    }
+
+    async addXPAccount(userId, xpAmount) {
+        try {
+            let userProgress = await AccountStanding.findOneAndUpdate(
+                { user: userId },
+                { $inc: { xp: xpAmount } },
+                { new: true, upsert: true, setDefaultsOnInsert: true }
+            );
+
+            const oldLevel = userProgress.level;
+            let leveledUp = false;
+
+            while (userProgress.xp >= this.calculateXPForNextLevel(userProgress.level)) {
+                userProgress.xp -= this.calculateXPForNextLevel(userProgress.level);
+                userProgress.level += 1;
+                leveledUp = true;
+            }
+            if (leveledUp) {
+                await AccountStanding.findOneAndUpdate(
+                    { user: userId },
+                    { $set: { level: userProgress.level, xp: userProgress.xp } }
+                );
+            }
             return {
                 newLevel: userProgress.level,
                 leveledUp,
@@ -123,7 +158,7 @@ class LevelingSystemHandler {
      * @param {number} duration Voice duration in milliseconds
      * @returns {Promise<{xpGained: number, totalVoiceTime: number}>}
      */
-    async addVoiceTime(guildId, userId, duration) {
+    async addVoiceTimeGuild(guildId, userId, duration) {
         try {
             // Calculate XP (1 XP per minute)
             const xpGained = Math.floor(duration / (1000 * 60));
@@ -139,7 +174,7 @@ class LevelingSystemHandler {
 
             // Add XP if any gained
             if (xpGained > 0) {
-                await this.addXP(guildId, userId, xpGained);
+                await this.addXPGuild(guildId, userId, xpGained);
             }
 
             return {
@@ -152,10 +187,37 @@ class LevelingSystemHandler {
         }
     }
 
-    async addMessage(guildId, userId) {
+    async addVoiceTimeAccount(userId, duration) {
+        try {
+            const xpGained = Math.floor(duration / (1000 * 60));
+            const userProgress = await AccountStanding.findOneAndUpdate({ user: userId }, { $inc: { voiceTime: duration } }, { new: true, upsert: true, setDefaultsOnInsert: true });
+            if (xpGained > 0) {
+                await this.addXPAccount(userId, xpGained);
+            }
+            return {
+                xpGained,
+                totalVoiceTime: userProgress.voiceTime
+            };
+        } catch (err) {
+            error('Error adding voice time:', err);
+            throw err;
+        }
+    }
+
+    async addMessageGuild(guildId, userId) {
         try {
             const xpGained = 5;
-            await this.addXP(guildId, userId, xpGained);
+            await this.addXPGuild(guildId, userId, xpGained);
+        } catch (err) {
+            error('Error adding message:', err);
+            throw err;
+        }
+    }
+
+    async addMessageAccount(userId) {
+        try {
+            const xpGained = 5;
+            await this.addXPAccount(userId, xpGained);
         } catch (err) {
             error('Error adding message:', err);
             throw err;

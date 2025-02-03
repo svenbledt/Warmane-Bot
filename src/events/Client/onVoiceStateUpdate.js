@@ -32,31 +32,34 @@ module.exports = new Event({
       }
     }
 
+    // Helper function to process voice time and XP
+    async function processVoiceSession(sessionData) {
+      if (!sessionData) return;
+      
+      const duration = Date.now() - sessionData.startTime;
+      
+      // Always process account standing XP regardless of guild settings
+      await levelingSystem.addVoiceTimeAccount(userId, duration);
+
+      // Process guild-specific XP only if leveling is enabled
+      const guildSettings = await client.database_handler.findOne('settings', { guild: sessionData.guildId });
+      if (guildSettings?.levelingSystem) {
+        const oldLevelData = await client.database_handler.findOne('levelingProgress', { 
+          guild: sessionData.guildId, 
+          userId: userId 
+        });
+        const oldLevel = oldLevelData?.level || 0;
+
+        await levelingSystem.addVoiceTimeGuild(sessionData.guildId, userId, duration);
+        await handleLevelUp(sessionData.guildId, userId, oldLevel);
+      }
+    }
+
     // User leaves a voice channel
     if (oldState.channelId && !newState.channelId) {
       const sessionData = voiceSessionsMap.get(userId);
       if (sessionData) {
-        const oldGuildSettings = await client.database_handler.findOne('settings', { guild: sessionData.guildId });
-        if (oldGuildSettings?.levelingSystem) {
-          const duration = Date.now() - sessionData.startTime;
-          
-          // Get current level before adding voice time
-          const oldLevelData = await client.database_handler.findOne('levelingProgress', { 
-            guild: sessionData.guildId, 
-            userId: userId 
-          });
-          const oldLevel = oldLevelData?.level || 0;
-
-          // Add voice time and check for level up
-          await levelingSystem.addVoiceTime(
-            sessionData.guildId,
-            userId,
-            duration
-          );
-
-          // Handle level up message
-          await handleLevelUp(sessionData.guildId, userId, oldLevel);
-        }
+        await processVoiceSession(sessionData);
         voiceSessionsMap.delete(userId);
       }
     }
@@ -68,51 +71,25 @@ module.exports = new Event({
       // Process old session
       const oldSessionData = voiceSessionsMap.get(userId);
       if (oldSessionData) {
-        const oldGuildSettings = await client.database_handler.findOne('settings', { guild: oldSessionData.guildId });
-        if (oldGuildSettings?.levelingSystem) {
-          const duration = Date.now() - oldSessionData.startTime;
-
-          // Get current level before adding voice time
-          const oldLevelData = await client.database_handler.findOne('levelingProgress', { 
-            guild: oldSessionData.guildId, 
-            userId: userId 
-          });
-          const oldLevel = oldLevelData?.level || 0;
-
-          // Add voice time and check for level up
-          await levelingSystem.addVoiceTime(
-            oldSessionData.guildId,
-            userId,
-            duration
-          );
-
-          // Handle level up message
-          await handleLevelUp(oldSessionData.guildId, userId, oldLevel);
-        }
+        await processVoiceSession(oldSessionData);
         voiceSessionsMap.delete(userId);
       }
 
-      // Start new session if leveling is enabled in new guild
-      const newGuildSettings = await client.database_handler.findOne('settings', { guild: newState.guild.id });
-      if (newGuildSettings?.levelingSystem) {
-        voiceSessionsMap.set(userId, {
-          startTime: Date.now(),
-          channelId: newState.channelId,
-          guildId: newState.guild.id
-        });
-      }
+      // Start new session
+      voiceSessionsMap.set(userId, {
+        startTime: Date.now(),
+        channelId: newState.channelId,
+        guildId: newState.guild.id
+      });
     }
 
     // User joins a voice channel
     if (!oldState.channelId && newState.channelId) {
-      const newGuildSettings = await client.database_handler.findOne('settings', { guild: newState.guild.id });
-      if (newGuildSettings?.levelingSystem) {
-        voiceSessionsMap.set(userId, {
-          startTime: Date.now(),
-          channelId: newState.channelId,
-          guildId: newState.guild.id
-        });
-      }
+      voiceSessionsMap.set(userId, {
+        startTime: Date.now(),
+        channelId: newState.channelId,
+        guildId: newState.guild.id
+      });
     }
   }
 });
