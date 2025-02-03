@@ -130,7 +130,8 @@ module.exports = {
             }
         },
         level: {
-            no_progress: "Du hast noch keinen Level erreicht."
+            no_progress: "Du hast noch keinen Level erreicht.",
+            level_up: "🎉 Du hast Level {level} erreicht! Gratulation! 🎉"
         },
         setup: {
             title: "Server Einstellungen",
