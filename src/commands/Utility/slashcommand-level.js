@@ -77,7 +77,7 @@ module.exports = new ApplicationCommand({
         // Calculate XP values
         const currentXP = levelingProgress?.xp || 0;
         const level = levelingProgress?.level || 0;
-        const xpNeeded = 5 * Math.pow(level, 2) + 50 * level + 100;
+        const xpNeeded = Math.floor(100 * level * 3);
         const progress = currentXP / xpNeeded;
 
         // Draw XP bar
