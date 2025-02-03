@@ -18,16 +18,20 @@ module.exports = new Event({
     // Helper function to handle level up messages
     async function handleLevelUp(guildId, userId, oldLevel) {
       const guildSettings = await client.database_handler.findOne('settings', { guild: guildId });
-      const levelingProgress = await client.database_handler.findOne('levelingProgress', { guild: guildId, userId: userId });
+      if (!guildSettings?.levelingChannel) return;
+
+      const newLevelingProgress = await client.database_handler.findOne('levelingProgress', { 
+        guild: guildId, 
+        userId: userId 
+      });
       
-      if (levelingProgress && guildSettings?.levelingChannel && levelingProgress.level > oldLevel) {
+      if (newLevelingProgress?.level > oldLevel) {
         const levelingChannel = client.channels.cache.get(guildSettings.levelingChannel);
         if (levelingChannel) {
           const member = await client.guilds.cache.get(guildId)?.members.fetch(userId);
-          const displayName = member?.displayName || member?.user.username;
-          
+          const displayName = member?.nickname || member?.user.globalName || member?.user.username;
           await levelingChannel.send(LanguageManager.getText('level.level_up', guildSettings.language, {
-            level: levelingProgress.level,
+            level: newLevelingProgress.level,
             user: displayName
           }));
         }

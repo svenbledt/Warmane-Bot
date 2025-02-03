@@ -1,6 +1,6 @@
 const { error, success, info } = require("../../utils/Console");
 const LevelingProgress = require('../../models/LevelingProgress');
-const AccountStanding = require('../../models/accountStanding');
+const AccountStanding = require('../../models/AccountStanding');
 
 class LevelingSystemHandler {
     /**
