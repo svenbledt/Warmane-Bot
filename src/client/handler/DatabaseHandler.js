@@ -193,6 +193,7 @@ class DatabaseHandler {
             logChannel: "",
             enableLogging: false,
             levelingSystem: false,
+            levelingChannel: "",
             charNameAskDM:
                 "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
             lastOwnerDM: {},

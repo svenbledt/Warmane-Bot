@@ -10,12 +10,13 @@ const guildSettingsSchema = new mongoose.Schema({
     language: { type: String, default: "en" },
     logChannel: { type: String, default: "" },
     enableLogging: { type: Boolean, default: false },
+    levelingSystem: { type: Boolean, default: false },
+    levelingChannel: { type: String, default: "" },
     charNameAskDM: { 
         type: String, 
         default: "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server."
     },
     lastOwnerDM: { type: Map, of: Number, default: {} },
-    levelingSystem: { type: Boolean, default: false }
 }, {
     timestamps: true,
     strict: true

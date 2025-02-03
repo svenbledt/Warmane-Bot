@@ -131,8 +131,9 @@ module.exports = {
         },
         level: {
             no_progress: "Du hast noch keinen Level erreicht.",
-            level_up: "🎉 Du hast Level {level} erreicht! Gratulation! 🎉"
+            level_up: "🎉 Hey {user} du hast Level {level} erreicht! Gratulation! 🎉"
         },
+
         setup: {
             title: "Server Einstellungen",
             description: "Konfiguriere deine Server-Einstellungen durch Klicken der Schaltflächen unten. Jede Einstellung steuert verschiedene Aspekte der Bot-Funktionalität.",

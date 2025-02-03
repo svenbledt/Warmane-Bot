@@ -1,4 +1,4 @@
-const Event = require('../../Structures/Event');
+const Event = require("../../structure/Event");
 const { error } = require('../../utils/Console');
 const Logger = require('../../utils/Logger');
 
