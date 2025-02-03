@@ -131,7 +131,8 @@ module.exports = {
         },
         level: {
             no_progress: "Aún no has alcanzado ningún nivel.",
-            level_up: "🎉 Hey {user} has alcanzado el nivel {level}! ¡Felicidades! 🎉"
+            level_up: "🎉 Hey {user} has alcanzado el nivel {level}! ¡Felicidades! 🎉",
+            disabled: "El sistema de nivelación está desactivado en este servidor."
         },
 
         setup: {

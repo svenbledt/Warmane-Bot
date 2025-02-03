@@ -39,12 +39,18 @@ module.exports = new ApplicationCommand({
           guild: interaction.guildId
         });
         const lang = guildSettings?.language || "en";
-
+        if (!guildSettings.levelingSystem) {
+            return interaction.reply({
+                content: LanguageManager.getText('commands.level.disabled', lang),
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
         // Try finding with different possible field names
         const levelingProgress = await client.database_handler.findOne('levelingProgress', {
             guild: interaction.guildId,
             user: targetUser.id  // Try with 'user' instead of 'userId'
         });
+
 
         if (!levelingProgress) {
             return interaction.reply({

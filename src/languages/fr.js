@@ -131,8 +131,10 @@ module.exports = {
         },
         level: {
             no_progress: "Vous n'avez pas encore atteint de niveau.",
-            level_up: "🎉 Hey {user} vous avez atteint le niveau {level} ! Félicitations ! 🎉"
+            level_up: "🎉 Hey {user} vous avez atteint le niveau {level} ! Félicitations ! 🎉",
+            disabled: "Le système de niveau est désactivé sur ce serveur."
         },
+
 
         setup: {
             title: "Paramètres du Serveur",
