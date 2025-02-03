@@ -8,7 +8,7 @@ const {
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const LanguageManager = require("../../utils/LanguageManager");
-const Logger = require('../../utils/Logger');
+const config = require("../../config");
 
 
 module.exports = new ApplicationCommand({
