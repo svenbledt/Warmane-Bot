@@ -129,6 +129,11 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
+        level: {
+            no_progress: "Du hast noch keinen Level erreicht.",
+            level_up: "🎉 Hey {user} du hast Level {level} erreicht! Gratulation! 🎉"
+        },
+
         setup: {
             title: "Server Einstellungen",
             description: "Konfiguriere deine Server-Einstellungen durch Klicken der Schaltflächen unten. Jede Einstellung steuert verschiedene Aspekte der Bot-Funktionalität.",
@@ -168,8 +173,13 @@ module.exports = {
                     name: "🌍 Sprache",
                     description: "Ändere die Sprache, die der Bot auf deinem Server verwendet.",
                     current: "Aktuelle Sprache: {language}"
+                },
+                leveling: {
+                    name: "📊 Leveling System",
+                    description: "Konfiguriere das Leveling-System für deinen Server."
                 }
             },
+
             buttons: {
                 welcome_message: "Willkommensnachricht",
                 char_name_ask: "Charaktername Abfrage",
@@ -181,9 +191,11 @@ module.exports = {
             },
             select_log_channel: "Protokollkanal auswählen",
             select_welcome_channel: "Willkommenskanal auswählen",
+            select_leveling_channel: "Leveling-Kanal auswählen",
             log_channel_set: "✅ Protokollkanal wurde auf {channel} gesetzt",
             not_set: "Nicht eingestellt",
             language_set: "✅ Serversprache wurde auf {language} eingestellt",
+            leveling_channel_set: "✅ Leveling-Kanal wurde auf {channel} gesetzt",
             welcome_channel_set: "✅ Willkommenskanal wurde auf {channel} gesetzt",
             charname_dm_modal: {
                 title: "Charakternamen DM-Nachricht bearbeiten",
@@ -220,6 +232,10 @@ module.exports = {
     },
     logging: {
         error: 'Error',
+        leveling_progress_removed: {
+            title: 'Leveling Progress Removed',
+            description: 'Leveling progress removed for {username}, {userId}>'
+        },
         dm_sent: {
             title: 'DM Gesendet',
             description: 'Charakternamen-Anfrage DM an {username} gesendet'

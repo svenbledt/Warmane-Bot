@@ -10,30 +10,17 @@ const guildSettingsSchema = new mongoose.Schema({
     language: { type: String, default: "en" },
     logChannel: { type: String, default: "" },
     enableLogging: { type: Boolean, default: false },
+    levelingSystem: { type: Boolean, default: false },
+    levelingChannel: { type: String, default: "" },
     charNameAskDM: { 
         type: String, 
         default: "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server."
     },
-    lastOwnerDM: { type: Map, of: Number, default: {} }
+    lastOwnerDM: { type: Map, of: Number, default: {} },
 }, {
     timestamps: true,
-    strict: false  // Allow additional fields
+    strict: true
 });
-
-// Add any static methods
-guildSettingsSchema.statics.getOrCreate = async function(guildId, guildName) {
-    let settings = await this.findOne({ guild: guildId });
-    if (!settings) {
-        settings = await this.create({
-            guild: guildId,
-            guildName: guildName || guildId
-        });
-    } else if (guildName && settings.guildName !== guildName) {
-        settings.guildName = guildName;
-        await settings.save();
-    }
-    return settings;
-};
 
 const GuildSettings = mongoose.model('GuildSettings', guildSettingsSchema);
 

@@ -129,6 +129,11 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
+        level: {
+            no_progress: "Aún no has alcanzado ningún nivel.",
+            level_up: "🎉 Hey {user} has alcanzado el nivel {level}! ¡Felicidades! 🎉"
+        },
+
         setup: {
             title: "Ajustes del Servidor",
             description: "Configura los ajustes de tu servidor haciendo clic en los botones de abajo. Cada ajuste controla diferentes aspectos de la funcionalidad del bot.",
@@ -164,8 +169,13 @@ module.exports = {
                     enabled: "✅ Activado",
                     disabled: "❌ Desactivado",
                     channel: "Canal: {channel}"
+                },
+                leveling: {
+                    name: "📊 Sistema de Nivelación",
+                    description: "Configura el sistema de nivelación para tu servidor."
                 }
             },
+
             buttons: {
                 welcome_message: "Mensaje de Bienvenida",
                 char_name_ask: "Preguntar Nombre de Personaje",
@@ -177,10 +187,14 @@ module.exports = {
             },
             select_log_channel: "Seleccionar canal de registro",
             select_welcome_channel: "Seleccionar canal de bienvenida",
+            select_leveling_channel: "Seleccionar canal de nivelación",
             log_channel_set: "✅ Canal de registro establecido en {channel}",
             not_set: "No establecido",
             language_set: "✅ El idioma del servidor se ha establecido en {language}",
+            leveling_channel_set: "✅ Canal de nivelación establecido en {channel}",
             welcome_channel_set: "✅ Canal de bienvenida establecido en {channel}",
+
+
             charname_dm_modal: {
                 title: "Editar mensaje DM del nombre del personaje",
                 message_label: "Mensaje DM",
@@ -216,6 +230,10 @@ module.exports = {
     },
     logging: {
         error: 'Error',
+        leveling_progress_removed: {
+            title: 'Leveling Progress Removed',
+            description: 'Leveling progress removed for {username}, {userId}>'
+        },
         dm_sent: {
             title: 'MD Enviado',
             description: 'MD de solicitud de nombre de personaje enviado a {username}'

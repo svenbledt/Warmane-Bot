@@ -58,14 +58,23 @@ function createSettingsEmbed(guildSettings, language = 'en') {
         inline: false
       },
       {
+        name: f('leveling.name'),
+        value: `${f('status.' + (guildSettings.levelingSystem ? 'enabled' : 'disabled'))}\n` +
+               `${f('status.channel').replace('{channel}', guildSettings.levelingChannel ? `<#${guildSettings.levelingChannel}>` : t('not_set'))}\n` +
+               `${f('leveling.description')}`,
+        inline: false
+      },
+      {
         name: f('language.name'),
         value: `${f('language.current').replace('{language}', languageNames[guildSettings.language])}\n` +
+
                `${f('language.description')}`,
         inline: false
-      }
+      },
     )
     .setFooter({ text: t('footer') });
 }
+
 
 function createSettingsButtons(guildSettings) {
   const components = [];
@@ -91,6 +100,19 @@ function createSettingsButtons(guildSettings) {
         new ChannelSelectMenuBuilder()
           .setCustomId('set_logChannel')
           .setPlaceholder(LanguageManager.getText('commands.setup.select_log_channel', guildSettings.language || 'en'))
+          .setChannelTypes(ChannelType.GuildText)
+      );
+    components.push(channelSelect);
+    return components;
+  }
+
+  // If leveling is enabled but no channel is set, only show channel select
+  if (guildSettings.levelingSystem && !guildSettings.levelingChannel) {
+    const channelSelect = new ActionRowBuilder()
+      .addComponents(
+        new ChannelSelectMenuBuilder()
+          .setCustomId('set_levelingChannel')
+          .setPlaceholder(LanguageManager.getText('commands.setup.select_leveling_channel', guildSettings.language || 'en'))
           .setChannelTypes(ChannelType.GuildText)
       );
     components.push(channelSelect);
@@ -124,6 +146,11 @@ function createSettingsButtons(guildSettings) {
 
   const row2 = new ActionRowBuilder()
     .addComponents(
+      new ButtonBuilder()
+        .setCustomId('toggle_levelingSystem')
+        .setLabel(t('leveling'))
+        .setStyle(guildSettings.levelingSystem ? ButtonStyle.Success : ButtonStyle.Danger)
+        .setEmoji('📊'),
       new ButtonBuilder()
         .setCustomId('change_language')
         .setLabel(t('change_language'))
@@ -421,6 +448,36 @@ module.exports = new ApplicationCommand({
           return;
         }
 
+        // Special handling for levelingSystem toggle
+        if (feature === 'levelingSystem') {
+          if (settings.levelingSystem) {
+            // If leveling is enabled, disable it and clear the channel
+            settings.levelingSystem = false;
+            settings.levelingChannel = '';
+            await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+            
+            const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
+            const updatedButtons = createSettingsButtons(settings);
+            
+            await i.update({
+              embeds: [updatedEmbed],
+              components: updatedButtons
+            });
+          } else {
+            // If leveling is disabled, show channel selection without enabling leveling yet
+            const channelSelect = new ActionRowBuilder()
+              .addComponents(
+                new ChannelSelectMenuBuilder()
+                  .setCustomId('set_levelingChannel')
+                  .setPlaceholder(LanguageManager.getText('commands.setup.select_leveling_channel', guildSettings.language || 'en'))
+                  .setChannelTypes(ChannelType.GuildText)
+              );
+
+            await i.update({ components: [channelSelect] });
+          }
+          return;
+        }
+
         // Handle other toggles
         settings[feature] = !settings[feature];
         await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
@@ -526,6 +583,41 @@ module.exports = new ApplicationCommand({
             );
 
           await i.update({ components: [channelSelect] });
+        }
+        return;
+      }
+
+      if (i.customId === 'set_levelingChannel') {
+        // Get fresh settings before updating
+        let settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+        
+        const channelId = i.values[0];
+        settings.levelingChannel = channelId;
+        settings.levelingSystem = true;  // Enable leveling only after channel is set
+        
+        try {
+          await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+          
+          await i.reply({
+            content: LanguageManager.getText('commands.setup.leveling_channel_set', guildSettings.language, {
+              channel: `<#${channelId}>`
+            }),
+            flags: [MessageFlags.Ephemeral],
+          });
+
+          const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
+          const updatedButtons = createSettingsButtons(settings);
+          
+          await i.message.edit({
+            embeds: [updatedEmbed],
+            components: updatedButtons
+          });
+        } catch (error) {
+          console.error(`Failed to save settings: ${error.message}`);
+          await i.reply({
+            content: LanguageManager.getText('commands.setup.save_failed', guildSettings.language),
+            flags: [MessageFlags.Ephemeral],
+          });
         }
         return;
       }
