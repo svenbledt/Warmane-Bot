@@ -578,6 +578,15 @@ module.exports = new ApplicationCommand({
               });
             }
 
+            // Add talents to the embed fields
+            if (character.talents && character.talents.length > 0) {
+              embedFields.push({
+                name: LanguageManager.getText('commands.charinfo.embed.fields.talents', lang),
+                value: character.talents.join(" / "),
+                inline: true
+              });
+            }
+
             // Add missing gems and enchants after owner info (only for level 80)
             if (shouldCheckMissing) {
               if (missingGems.length > 0) {
