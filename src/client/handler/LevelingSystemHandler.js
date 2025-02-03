@@ -15,7 +15,7 @@ class LevelingSystemHandler {
      * @returns {number} XP needed for next level
      */
     calculateXPForNextLevel(level) {
-        // Basic formula: 100 * level * 1.5
+        // Basic formula: 100 * level * 3
         return Math.floor(100 * level * 3);
     }
 
