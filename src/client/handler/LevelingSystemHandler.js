@@ -131,7 +131,7 @@ class LevelingSystemHandler {
             // Update voice time and XP in one operation
             const userProgress = await LevelingProgress.findOneAndUpdate(
                 { guild: guildId, user: userId },
-                { 
+                {
                     $inc: { voiceTime: duration },
                 },
                 { new: true, upsert: true, setDefaultsOnInsert: true }
@@ -148,6 +148,16 @@ class LevelingSystemHandler {
             };
         } catch (err) {
             error('Error adding voice time:', err);
+            throw err;
+        }
+    }
+
+    async addMessage(guildId, userId) {
+        try {
+            const xpGained = 5;
+            await this.addXP(guildId, userId, xpGained);
+        } catch (err) {
+            error('Error adding message:', err);
             throw err;
         }
     }

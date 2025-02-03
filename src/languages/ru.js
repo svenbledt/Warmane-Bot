@@ -220,6 +220,10 @@ module.exports = {
     },
     logging: {
         error: 'Error',
+        leveling_progress_removed: {
+            title: 'Leveling Progress Removed',
+            description: 'Leveling progress removed for {username}, {userId}>'
+        },
         dm_sent: {
             title: 'ЛС Отправлено',
             description: 'Отправлен запрос имени персонажа в ЛС пользователю {username}'

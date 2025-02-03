@@ -223,6 +223,10 @@ module.exports = {
     },
     logging: {
         error: 'Error',
+        leveling_progress_removed: {
+            title: 'Leveling Progress Removed',
+            description: 'Leveling progress removed for {username}, {userId}>'
+        },
         dm_sent: {
             title: 'DM Gesendet',
             description: 'Charakternamen-Anfrage DM an {username} gesendet'
