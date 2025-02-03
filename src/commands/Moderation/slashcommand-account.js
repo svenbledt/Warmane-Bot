@@ -16,7 +16,7 @@ module.exports = new ApplicationCommand({
         name: "account",
         description: "Check the account of a user and display some information about it.",
         type: 1,
-        contexts: [0, 1, 2],
+        contexts: [0],
         options: [
             {
                 name: "user",
