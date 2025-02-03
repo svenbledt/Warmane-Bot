@@ -229,11 +229,11 @@ module.exports = {
                     badges_title: "🏅 Insignias",
                     
                     tiers: {
-                        veteran: "🔱 Veterano",
-                        diamond: "💎 Diamante",
-                        gold: "🥇 Oro",
-                        silver: "🥈 Plata",
-                        bronze: "🥉 Bronce"
+                        veteran: "🔱 Artefacto",
+                        diamond: "💎 Legendario",
+                        gold: "🥇 Épico",
+                        silver: "🥈 Raro",
+                        bronze: "🥉 Común"
                     }
                 },
                 footer: "Información de la Cuenta • {guildName}"

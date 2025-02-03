@@ -159,11 +159,11 @@ module.exports = {
                     badges_title: "🏅 Badges",
                     
                     tiers: {
-                        veteran: "🔱 Vétéran",
-                        diamond: "💎 Diamant",
-                        gold: "🥇 Or",
-                        silver: "🥈 Argent",
-                        bronze: "🥉 Bronze"
+                        veteran: "🔱 Artefact",
+                        diamond: "💎 Légendaire",
+                        gold: "🥇 Épique",
+                        silver: "🥈 Rare",
+                        bronze: "🥉 Commun"
                     }
                 },
                 footer: "Informations du Compte • {guildName}"
@@ -210,6 +210,7 @@ module.exports = {
                     description: "Configurez le système de niveau pour votre serveur."
                 }
             },
+
             buttons: {
                 welcome_message: "Message de Bienvenue",
                 char_name_ask: "Demande de Nom de Personnage",
@@ -227,6 +228,7 @@ module.exports = {
             language_set: "✅ La langue du serveur a été définie sur {language}",
             leveling_channel_set: "✅ Le canal de niveau a été défini sur {channel}",
             welcome_channel_set: "✅ Le canal de bienvenue a été défini sur {channel}",
+
             charname_dm_modal: {
                 title: "Modifier le message DM du nom de personnage",
                 message_label: "Message DM",

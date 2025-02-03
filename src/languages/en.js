@@ -233,11 +233,11 @@ module.exports = {
                     badges_title: "🏅 Badges",
                     
                     tiers: {
-                        veteran: "🔱 Veteran",
-                        diamond: "💎 Diamond",
-                        gold: "🥇 Gold",
-                        silver: "🥈 Silver",
-                        bronze: "🥉 Bronze"
+                        veteran: "🔱 Artifact",
+                        diamond: "💎 Legendary",
+                        gold: "🥇 Epic",
+                        silver: "🥈 Rare",
+                        bronze: "🥉 Common"
                     }
                 },
                 footer: "Account Information • {guildName}"

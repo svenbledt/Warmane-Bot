@@ -231,11 +231,11 @@ module.exports = {
                     badges_title: "🏅 Abzeichen",
                     
                     tiers: {
-                        veteran: "🔱 Veteran",
-                        diamond: "💎 Diamant",
-                        gold: "🥇 Gold",
-                        silver: "🥈 Silber",
-                        bronze: "🥉 Bronze"
+                        veteran: "🔱 Artefakt",
+                        diamond: "💎 Legendär",
+                        gold: "🥇 Episch",
+                        silver: "🥈 Selten",
+                        bronze: "🥉 Gewöhnlich"
                     }
                 },
                 footer: "Kontoinformationen • {guildName}"
