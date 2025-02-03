@@ -206,6 +206,42 @@ module.exports = {
             charname_dm_updated: "✅ Character name DM message has been updated",
             select_log_channel: "Select logging channel",
             error_occurred: "An error occurred: {error}"
+        },
+        account: {
+            embed: {
+                description: "Account information and statistics",
+                fields: {
+                    account_info_title: "👤 Account Information",
+                    username: "Username",
+                    displayName: "Display Name",
+                    id: "ID",
+                    created: "Created",
+                    joined: "Joined Server",
+                    
+                    activity_title: "📊 Activity Stats",
+                    accountStanding: "Account Standing",
+                    accountLevel: "Level",
+                    accountXP: "Experience",
+                    xpProgress: "Level Progress",
+                    voiceTime: "Voice Time",
+                    serverProgress: "Server Progress",
+                    serverLevel: "Server Level",
+                    serverXP: "Server XP",
+                    
+                    roles_title: "🎭 Roles [{count}]",
+                    
+                    badges_title: "🏅 Badges",
+                    
+                    tiers: {
+                        veteran: "🔱 Veteran",
+                        diamond: "💎 Diamond",
+                        gold: "🥇 Gold",
+                        silver: "🥈 Silver",
+                        bronze: "🥉 Bronze"
+                    }
+                },
+                footer: "Account Information • {guildName}"
+            }
         }
     },
 

@@ -205,6 +205,41 @@ module.exports = {
             },
             charname_dm_updated: "✅ Charakternamen DM-Nachricht wurde aktualisiert",
             error_occurred: "Ein Fehler ist aufgetreten: {error}"
+        },
+        account: {
+            embed: {
+                description: "Kontoinformationen und Statistiken",
+                fields: {
+                    account_info_title: "👤 Kontoinformationen",
+                    username: "Benutzername",
+                    displayName: "Anzeigename",
+                    id: "ID",
+                    created: "Erstellt",
+                    joined: "Server beigetreten",
+                    
+                    activity_title: "📊 Aktivitätsstatistiken",
+                    accountStanding: "Kontostatus",
+                    accountLevel: "Level",
+                    accountXP: "Erfahrung",
+                    xpProgress: "Level-Fortschritt",
+                    voiceTime: "Sprachzeit",
+                    serverProgress: "Server-Fortschritt",
+                    serverLevel: "Server-Level",
+                    serverXP: "Server-XP",
+                    
+                    roles_title: "🎭 Rollen [{count}]",
+                    badges_title: "🏅 Abzeichen",
+                    
+                    tiers: {
+                        veteran: "🔱 Veteran",
+                        diamond: "💎 Diamant",
+                        gold: "🥇 Gold",
+                        silver: "🥈 Silber",
+                        bronze: "🥉 Bronze"
+                    }
+                },
+                footer: "Kontoinformationen • {guildName}"
+            }
         }
     },
     events: {
