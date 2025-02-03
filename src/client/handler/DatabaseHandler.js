@@ -4,6 +4,7 @@ const BlacklistedUser = require('../../models/BlacklistedUser');
 const GuildSettings = require('../../models/GuildSettings');
 const UserCharacter = require('../../models/UserCharacter');
 const LevelingProgress = require('../../models/LevelingProgress');
+const AccountStanding = require('../../models/accountStanding');
 
 class DatabaseHandler {
     /**
@@ -15,7 +16,8 @@ class DatabaseHandler {
             blacklisted: BlacklistedUser,
             settings: GuildSettings,
             userCharacters: UserCharacter,
-            levelingProgress: LevelingProgress
+            levelingProgress: LevelingProgress,
+            accountStanding: AccountStanding
         };
     }
 
