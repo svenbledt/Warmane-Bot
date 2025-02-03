@@ -37,6 +37,15 @@ module.exports = new ApplicationCommand({
     run: async (client, interaction) => {
         await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
+        // If the interaction is not a guild interaction, return
+        if (!interaction.guildId) {
+            await interaction.editReply({
+                content: LanguageManager.getText('commands.global_strings.not_in_guild', 'en'),
+                flags: [MessageFlags.Ephemeral],
+            });
+            return;
+        }
+
         const user = interaction.options.getUser("user", true);
         const member = interaction.guild.members.cache.get(user.id);
 
