@@ -129,6 +129,9 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
+        level: {
+            no_progress: "No leveling progress found for this user."
+        },
         setup: {
             title: "Server Settings",
             description: "Configure your server settings by clicking the buttons below. Each setting controls different aspects of the bot's functionality.",

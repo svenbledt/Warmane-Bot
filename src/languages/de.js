@@ -129,6 +129,9 @@ module.exports = {
                 character_entry: "{name} - {realm}"
             }
         },
+        level: {
+            no_progress: "Du hast noch keinen Level erreicht."
+        },
         setup: {
             title: "Server Einstellungen",
             description: "Konfiguriere deine Server-Einstellungen durch Klicken der Schaltflächen unten. Jede Einstellung steuert verschiedene Aspekte der Bot-Funktionalität.",
