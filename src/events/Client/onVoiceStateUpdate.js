@@ -10,6 +10,8 @@ module.exports = new Event({
   event: "voiceStateUpdate",
   once: false,
   run: async (client, oldState, newState) => {
+    if (newState.member.user.bot || oldState.member?.user.bot) return;
+
     const userId = oldState.id || newState.id;
     const levelingSystem = new LevelingSystemHandler(client);
 
