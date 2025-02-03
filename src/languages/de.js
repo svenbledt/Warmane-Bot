@@ -173,8 +173,13 @@ module.exports = {
                     name: "🌍 Sprache",
                     description: "Ändere die Sprache, die der Bot auf deinem Server verwendet.",
                     current: "Aktuelle Sprache: {language}"
+                },
+                leveling: {
+                    name: "📊 Leveling System",
+                    description: "Konfiguriere das Leveling-System für deinen Server."
                 }
             },
+
             buttons: {
                 welcome_message: "Willkommensnachricht",
                 char_name_ask: "Charaktername Abfrage",
@@ -186,9 +191,11 @@ module.exports = {
             },
             select_log_channel: "Protokollkanal auswählen",
             select_welcome_channel: "Willkommenskanal auswählen",
+            select_leveling_channel: "Leveling-Kanal auswählen",
             log_channel_set: "✅ Protokollkanal wurde auf {channel} gesetzt",
             not_set: "Nicht eingestellt",
             language_set: "✅ Serversprache wurde auf {language} eingestellt",
+            leveling_channel_set: "✅ Leveling-Kanal wurde auf {channel} gesetzt",
             welcome_channel_set: "✅ Willkommenskanal wurde auf {channel} gesetzt",
             charname_dm_modal: {
                 title: "Charakternamen DM-Nachricht bearbeiten",

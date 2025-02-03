@@ -172,6 +172,10 @@ module.exports = {
                     enabled: "✅ Enabled",
                     disabled: "❌ Disabled",
                     channel: "Channel: {channel}"
+                },
+                leveling: {
+                    name: "📊 Leveling System",
+                    description: "Configure the leveling system for your server."
                 }
             },
             buttons: {
@@ -179,15 +183,19 @@ module.exports = {
                 char_name_ask: "Character Name Ask",
                 block_list: "Block List",
                 logging: "Logging",
+
                 change_language: "Change Language",
                 select_language: "Select a language",
-                edit_charname_dm: "Edit Character Name DM"
+                edit_charname_dm: "Edit Character Name DM",
+                leveling: "Leveling System"
             },
             select_log_channel: "Select logging channel",
             select_welcome_channel: "Select welcome channel",
+            select_leveling_channel: "Select leveling channel",
             log_channel_set: "✅ Logging channel has been set to {channel}",
             not_set: "Not set",
             language_set: "✅ Server language has been set to {language}",
+            leveling_channel_set: "✅ Leveling channel has been set to {channel}",
             welcome_channel_set: "✅ Welcome channel has been set to {channel}",
             charname_dm_modal: {
                 title: "Edit Character Name DM Message",

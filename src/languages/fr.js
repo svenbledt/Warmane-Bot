@@ -169,8 +169,13 @@ module.exports = {
                     enabled: "✅ Activé",
                     disabled: "❌ Désactivé",
                     channel: "Canal: {channel}"
+                },
+                leveling: {
+                    name: "📊 Système de Niveau",
+                    description: "Configurez le système de niveau pour votre serveur."
                 }
             },
+
             buttons: {
                 welcome_message: "Message de Bienvenue",
                 char_name_ask: "Demande de Nom de Personnage",
@@ -182,10 +187,13 @@ module.exports = {
             },
             select_log_channel: "Sélectionner le canal de journalisation",
             select_welcome_channel: "Sélectionner le canal de bienvenue",
+            select_leveling_channel: "Sélectionner le canal de niveau",
             log_channel_set: "✅ Le canal de journalisation a été défini sur {channel}",
             not_set: "Non défini",
             language_set: "✅ La langue du serveur a été définie sur {language}",
+            leveling_channel_set: "✅ Le canal de niveau a été défini sur {channel}",
             welcome_channel_set: "✅ Le canal de bienvenue a été défini sur {channel}",
+
             charname_dm_modal: {
                 title: "Modifier le message DM du nom de personnage",
                 message_label: "Message DM",
