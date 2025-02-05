@@ -1,9 +1,9 @@
-const Event = require("../../structure/Event");
+const Event = require('../../structure/Event');
 const { error } = require('../../utils/Console');
 const Logger = require('../../utils/Logger');
 
 module.exports = new Event({
-    event: "guildMemberRemove",
+    event: 'guildMemberRemove',
     run: async (client, member) => {
         // remove the member from the leveling system for the specific guild
         const levelingProgress = await client.database_handler.findOne('levelingProgress', { guild: member.guild.id, userId: member.id });
@@ -18,10 +18,10 @@ module.exports = new Event({
                     userId: member.id,
                     username: member.user.username
                 }
-            })
+            });
         } catch (err) {
             error('Error removing leveling progress:', err);
             throw err;
         }
     }
-})
+});

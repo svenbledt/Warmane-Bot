@@ -1,6 +1,6 @@
 /*eslint no-prototype-builtins: "warn"*/
 const mongoose = require('mongoose');
-const { error, success, info } = require("../../utils/Console");
+const { error, success, info } = require('../../utils/Console');
 const BlacklistedUser = require('../../models/BlacklistedUser');
 const GuildSettings = require('../../models/GuildSettings');
 const UserCharacter = require('../../models/UserCharacter');
@@ -189,16 +189,16 @@ class DatabaseHandler {
             guild: guildId,
             guildName: guildName,
             welcomeMessage: false,
-            welcomeChannel: "",
+            welcomeChannel: '',
             CharNameAsk: false,
             BlockList: true,
-            language: "en",
-            logChannel: "",
+            language: 'en',
+            logChannel: '',
             enableLogging: false,
             levelingSystem: false,
-            levelingChannel: "",
+            levelingChannel: '',
             charNameAskDM:
-                "Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.",
+                'Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.',
             lastOwnerDM: {},
         };
 

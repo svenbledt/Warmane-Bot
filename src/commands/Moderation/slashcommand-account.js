@@ -4,23 +4,23 @@ const {
     ApplicationCommandOptionType,
     PermissionsBitField,
     EmbedBuilder
-} = require("discord.js");
-const DiscordBot = require("../../client/DiscordBot");
-const ApplicationCommand = require("../../structure/ApplicationCommand");
-const LanguageManager = require("../../utils/LanguageManager");
-const config = require("../../config");
+} = require('discord.js');
+const DiscordBot = require('../../client/DiscordBot');
+const ApplicationCommand = require('../../structure/ApplicationCommand');
+const LanguageManager = require('../../utils/LanguageManager');
+const config = require('../../config');
 
 
 module.exports = new ApplicationCommand({
     command: {
-        name: "account",
-        description: "Check the account of a user and display some information about it.",
+        name: 'account',
+        description: 'Check the account of a user and display some information about it.',
         type: 1,
         contexts: [0],
         options: [
             {
-                name: "user",
-                description: "The user to check the account of.",
+                name: 'user',
+                description: 'The user to check the account of.',
                 type: ApplicationCommandOptionType.User,
                 required: true,
             }
@@ -46,7 +46,7 @@ module.exports = new ApplicationCommand({
             return;
         }
 
-        const user = interaction.options.getUser("user", true);
+        const user = interaction.options.getUser('user', true);
         const member = interaction.guild.members.cache.get(user.id);
 
         // Get guild settings for language
@@ -56,8 +56,8 @@ module.exports = new ApplicationCommand({
         const lang = guildSettings?.language || 'en';
         const isDeveloper = config.users?.developers?.includes(interaction.user.id);
         const hasPermissions = interaction.member.permissions.has([
-          PermissionsBitField.Flags.KickMembers,
-          PermissionsBitField.Flags.BanMembers,
+            PermissionsBitField.Flags.KickMembers,
+            PermissionsBitField.Flags.BanMembers,
         ]);
 
         if (!isDeveloper && !hasPermissions) {
@@ -148,7 +148,7 @@ module.exports = new ApplicationCommand({
             text: t('footer').replace('{guildName}', interaction.guild.name),
             iconURL: interaction.guild.iconURL({ dynamic: true })
         })
-        .setTimestamp();
+            .setTimestamp();
 
         await interaction.editReply({ embeds: [embed] });
     }

@@ -1,45 +1,44 @@
 /*eslint no-unused-vars: "warn"*/
-/* global __dirname */
 const {
     MessageFlags,
     ApplicationCommandOptionType,
     PermissionsBitField
-  } = require("discord.js");
-const DiscordBot = require("../../client/DiscordBot");
-const ApplicationCommand = require("../../structure/ApplicationCommand");
-const LanguageManager = require("../../utils/LanguageManager");
+} = require('discord.js');
+const DiscordBot = require('../../client/DiscordBot');
+const ApplicationCommand = require('../../structure/ApplicationCommand');
+const LanguageManager = require('../../utils/LanguageManager');
 const { createCanvas, loadImage } = require('canvas');
 const path = require('path');
 
 module.exports = new ApplicationCommand({
     command: {
-        name: "level",
-        description: "Show your level card",
+        name: 'level',
+        description: 'Show your level card',
         type: 1,
         contexts: [0], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
         options: [
-          {
-            name: "user",
-            description: "The user to show the level card for",
-            type: ApplicationCommandOptionType.User,
-            required: false,
-          }
+            {
+                name: 'user',
+                description: 'The user to show the level card for',
+                type: ApplicationCommandOptionType.User,
+                required: false,
+            }
         ],
-      },
-      options: {
+    },
+    options: {
         cooldown: 5000,
-      },
-      run: async (client, interaction) => {
+    },
+    run: async (client, interaction) => {
         // If user has ban permissions, they can view others' lists, otherwise they see their own
         const targetUser = interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers]) 
-          ? (interaction.options.getUser("user") || interaction.user)
-          : interaction.user;
+            ? (interaction.options.getUser('user') || interaction.user)
+            : interaction.user;
         
         // Get guild settings for language
         const guildSettings = await client.database_handler.findOne('settings', {
-          guild: interaction.guildId
+            guild: interaction.guildId
         });
-        const lang = guildSettings?.language || "en";
+        const lang = guildSettings?.language || 'en';
         if (!guildSettings.levelingSystem) {
             return interaction.reply({
                 content: LanguageManager.getText('commands.level.disabled', lang),
@@ -156,4 +155,4 @@ module.exports = new ApplicationCommand({
             }]
         });
     }
-})
+});

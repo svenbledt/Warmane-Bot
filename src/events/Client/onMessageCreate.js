@@ -1,13 +1,13 @@
-const Event = require("../../structure/Event");
-const LanguageManager = require("../../utils/LanguageManager");
+const Event = require('../../structure/Event');
+const LanguageManager = require('../../utils/LanguageManager');
 const { ChannelType } = require('discord.js');
 
 module.exports = new Event({
-    event: "messageCreate",
+    event: 'messageCreate',
     run: async (client, message) => {
         if (message.author.bot || !message.guild || message.channel.type !== ChannelType.GuildText) return;
 
-        const levelingSystem = client.levelingSystem_handler
+        const levelingSystem = client.levelingSystem_handler;
         const member = message.member;
         const userId = member.user.id;
         const guildId = message.guild.id;
