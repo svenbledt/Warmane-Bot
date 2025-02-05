@@ -1,4 +1,4 @@
-const { error, success, info } = require("../../utils/Console");
+const { error } = require('../../utils/Console');
 const LevelingProgress = require('../../models/LevelingProgress');
 const AccountStanding = require('../../models/AccountStanding');
 
@@ -30,7 +30,7 @@ class LevelingSystemHandler {
     async addXPGuild(guildId, userId, xpAmount) {
         try {
             // Find and update in one operation using findOneAndUpdate
-            let userProgress = await LevelingProgress.findOneAndUpdate(
+            const userProgress = await LevelingProgress.findOneAndUpdate(
                 { guild: guildId, user: userId },
                 { $inc: { xp: xpAmount } },
                 { new: true, upsert: true, setDefaultsOnInsert: true }
@@ -68,7 +68,7 @@ class LevelingSystemHandler {
 
     async addXPAccount(userId, xpAmount) {
         try {
-            let userProgress = await AccountStanding.findOneAndUpdate(
+            const userProgress = await AccountStanding.findOneAndUpdate(
                 { user: userId },
                 { $inc: { xp: xpAmount } },
                 { new: true, upsert: true, setDefaultsOnInsert: true }
@@ -109,7 +109,7 @@ class LevelingSystemHandler {
      */
     async removeXP(guildId, userId, xpAmount) {
         try {
-            let userProgress = await LevelingProgress.findOneAndUpdate(
+            const userProgress = await LevelingProgress.findOneAndUpdate(
                 { guild: guildId, user: userId },
                 { $inc: { xp: -xpAmount } },
                 { new: true }

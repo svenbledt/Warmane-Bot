@@ -1,267 +1,267 @@
 module.exports = {
     commands: {
         global_strings: {
-            no_permission: "No tienes los permisos necesarios para usar este comando.",
-            invalid_target: "¡Objetivo inválido!",
-            dm_failed: "No se pudo enviar un MD a {username}.",
-            dm_sent: "MD enviado a {username}.",
-            guild_only: "Este comando solo puede ser usado en un servidor.",
-            error_occurred: "Ocurrió un error: {error}"
+            no_permission: 'No tienes los permisos necesarios para usar este comando.',
+            invalid_target: '¡Objetivo inválido!',
+            dm_failed: 'No se pudo enviar un MD a {username}.',
+            dm_sent: 'MD enviado a {username}.',
+            guild_only: 'Este comando solo puede ser usado en un servidor.',
+            error_occurred: 'Ocurrió un error: {error}'
         },
         charname: {
-            dm_initial: "Hola, me gustaría preguntarte por el nombre de tu personaje principal.\nPor favor, responde con el nombre de tu personaje principal para el servidor.\n\nTienes 10 minutos para responder.",
-            empty_response: "Tu respuesta no puede estar vacía. Por favor, proporciona una respuesta válida.",
-            nickname_success: "El nombre de tu personaje principal ha sido cambiado exitosamente a {nickname}.",
-            nickname_failed: "No se pudo cambiar el nombre de tu personaje principal debido a: {error}",
-            dm_timeout_message: "Tiempo expirado. Por favor, contacta con un miembro del personal de {guildName} para obtener una nueva oportunidad."
+            dm_initial: 'Hola, me gustaría preguntarte por el nombre de tu personaje principal.\nPor favor, responde con el nombre de tu personaje principal para el servidor.\n\nTienes 10 minutos para responder.',
+            empty_response: 'Tu respuesta no puede estar vacía. Por favor, proporciona una respuesta válida.',
+            nickname_success: 'El nombre de tu personaje principal ha sido cambiado exitosamente a {nickname}.',
+            nickname_failed: 'No se pudo cambiar el nombre de tu personaje principal debido a: {error}',
+            dm_timeout_message: 'Tiempo expirado. Por favor, contacta con un miembro del personal de {guildName} para obtener una nueva oportunidad.'
         },
         globalcheck: {
-            no_blacklisted: "No hay usuarios en la lista negra.",
-            no_blacklisted_guild: "No hay usuarios en la lista negra en este servidor.",
-            not_for_you: "¡Estos botones no son para ti!",
-            embed_title: "Usuarios en lista negra",
-            blacklisted_user: "ID: <@{userId}>\nRazón: {reason}",
+            no_blacklisted: 'No hay usuarios en la lista negra.',
+            no_blacklisted_guild: 'No hay usuarios en la lista negra en este servidor.',
+            not_for_you: '¡Estos botones no son para ti!',
+            embed_title: 'Usuarios en lista negra',
+            blacklisted_user: 'ID: <@{userId}>\nRazón: {reason}',
             BUTTONS: {
-                KICK: "Expulsar",
-                BAN: "Banear",
-                NOTHING: "No hacer nada"
+                KICK: 'Expulsar',
+                BAN: 'Banear',
+                NOTHING: 'No hacer nada'
             },
             ACTION_RESULTS: {
-                KICKED: "Se expulsaron {COUNT} miembros exitosamente",
-                BANNED: "Se banearon {COUNT} miembros exitosamente",
-                NOTHING: "No se tomó ninguna acción",
-                FAILED: "No se pudieron procesar {COUNT} miembros"
+                KICKED: 'Se expulsaron {COUNT} miembros exitosamente',
+                BANNED: 'Se banearon {COUNT} miembros exitosamente',
+                NOTHING: 'No se tomó ninguna acción',
+                FAILED: 'No se pudieron procesar {COUNT} miembros'
             }
         },
         report: {
             modal: {
-                title: "Reportar usuario",
-                username_label: "¿Nombre de usuario del usuario reportado?",
-                username_placeholder: "¡Ingresa el nombre de usuario/ID de discord aquí!",
-                reason_label: "Razón",
-                reason_placeholder: "¡Ingresa la razón aquí!",
-                evidence_label: "Proporciona tu evidencia.",
-                evidence_placeholder: "https://imgur.com/blablabla!"
+                title: 'Reportar usuario',
+                username_label: '¿Nombre de usuario del usuario reportado?',
+                username_placeholder: '¡Ingresa el nombre de usuario/ID de discord aquí!',
+                reason_label: 'Razón',
+                reason_placeholder: '¡Ingresa la razón aquí!',
+                evidence_label: 'Proporciona tu evidencia.',
+                evidence_placeholder: 'https://imgur.com/blablabla!'
             }
         },
         poll: {
-            question_missing: "Falta la pregunta de la encuesta.",
-            answer_too_long: "Una de las respuestas excede el límite de 55 caracteres: \"{answer}\"",
-            min_answers: "Se requieren al menos dos respuestas.",
-            creation_failed: "No se pudo crear la encuesta: {error}",
-            created_pinned: "¡Tu encuesta ha sido creada y fijada!",
-            created: "¡Tu encuesta ha sido creada!"
+            question_missing: 'Falta la pregunta de la encuesta.',
+            answer_too_long: 'Una de las respuestas excede el límite de 55 caracteres: "{answer}"',
+            min_answers: 'Se requieren al menos dos respuestas.',
+            creation_failed: 'No se pudo crear la encuesta: {error}',
+            created_pinned: '¡Tu encuesta ha sido creada y fijada!',
+            created: '¡Tu encuesta ha sido creada!'
         },
         charinfo: {
-            loading: "Estamos buscando tus datos. Por favor, ten paciencia.",
-            char_not_exist: "El personaje {character} no existe.",
+            loading: 'Estamos buscando tus datos. Por favor, ten paciencia.',
+            char_not_exist: 'El personaje {character} no existe.',
             embed: {
-                title: "Información del personaje",
-                description: "Información sobre {character} - [Armería]({url})",
+                title: 'Información del personaje',
+                description: 'Información sobre {character} - [Armería]({url})',
                 fields: {
-                    character: "Personaje",
-                    realm: "Reino",
-                    online: "En línea",
-                    level: "Nivel",
-                    yes: "Sí",
-                    no: "No",
-                    gender: "Género",
-                    race: "Raza",
-                    class: "Clase",
-                    faction: "Facción",
-                    honorable_kills: "Muertes honorables",
-                    guild: "Hermandad",
-                    achievement_points: "Puntos de logro",
-                    talents: "Talentos",
-                    no_guild: "Ninguna",
-                    pvp_teams: "Equipos PvP",
-                    gearscore: "Puntuación de equipo",
-                    missing_gems: "Gemas faltantes",
-                    missing_enchants: "Encantamientos faltantes",
-                    none: "Ninguno",
-                    professions: "Profesiones",
-                    teams: "Equipos PvP ({type}): {name} (Clasificación: {rating}, Rango: {rank})",
-                    belongs_to: "Pertenece a"
+                    character: 'Personaje',
+                    realm: 'Reino',
+                    online: 'En línea',
+                    level: 'Nivel',
+                    yes: 'Sí',
+                    no: 'No',
+                    gender: 'Género',
+                    race: 'Raza',
+                    class: 'Clase',
+                    faction: 'Facción',
+                    honorable_kills: 'Muertes honorables',
+                    guild: 'Hermandad',
+                    achievement_points: 'Puntos de logro',
+                    talents: 'Talentos',
+                    no_guild: 'Ninguna',
+                    pvp_teams: 'Equipos PvP',
+                    gearscore: 'Puntuación de equipo',
+                    missing_gems: 'Gemas faltantes',
+                    missing_enchants: 'Encantamientos faltantes',
+                    none: 'Ninguno',
+                    professions: 'Profesiones',
+                    teams: 'Equipos PvP ({type}): {name} (Clasificación: {rating}, Rango: {rank})',
+                    belongs_to: 'Pertenece a'
                 }
             }
         },
         setwelcomemessage: {
-            dm_not_enabled: "El MD de bienvenida no está habilitado.",
-            updated: "El mensaje de bienvenida ha sido actualizado."
+            dm_not_enabled: 'El MD de bienvenida no está habilitado.',
+            updated: 'El mensaje de bienvenida ha sido actualizado.'
         },
         servertime: {
             embed: {
-                title: "Hora del servidor",
-                description: "La hora actual del servidor es: {time}",
-                footer: "Solicitado por: {user}"
+                title: 'Hora del servidor',
+                description: 'La hora actual del servidor es: {time}',
+                footer: 'Solicitado por: {user}'
             }
         },
         setwelcomechannel: {
-            channel_set: "El canal de bienvenida ha sido establecido en {channel}.",
-            error: "Error al establecer el canal de bienvenida: {error}"
+            channel_set: 'El canal de bienvenida ha sido establecido en {channel}.',
+            error: 'Error al establecer el canal de bienvenida: {error}'
         },
         help: {
             EMBED: {
-                TITLE: "Comandos disponibles",
-                DESCRIPTION: "Aquí hay una lista de todos los comandos disponibles y sus descripciones:",
-                FOOTER: "Solicitado por {USER_TAG}"
+                TITLE: 'Comandos disponibles',
+                DESCRIPTION: 'Aquí hay una lista de todos los comandos disponibles y sus descripciones:',
+                FOOTER: 'Solicitado por {USER_TAG}'
             },
-            NO_DESCRIPTION: "No hay descripción disponible",
+            NO_DESCRIPTION: 'No hay descripción disponible',
             BUTTONS: {
-                PREVIOUS: "Anterior",
-                NEXT: "Siguiente"
+                PREVIOUS: 'Anterior',
+                NEXT: 'Siguiente'
             }
         },
         setchar: {
-            char_not_exist: "El personaje {character} no existe en Warmane.",
-            char_already_assigned: "El personaje {character} ya está asignado a {user}.",
-            already_has_main: "{user} ya tiene un personaje principal: {character} ({realm}). Si esto es un error, contacta a un miembro del personal en nuestro [Discord](https://discord.gg/YDqBQU43Ht).",
-            success_with_type: "{character} ({realm}) ha sido establecido exitosamente como personaje {type} para {user}.",
-            success: "{character} ({realm}) ha sido establecido exitosamente como personaje principal para {user}.",
-            success_updated: "Personaje principal para {user} actualizado de {oldCharacter} a {character} ({realm})."
+            char_not_exist: 'El personaje {character} no existe en Warmane.',
+            char_already_assigned: 'El personaje {character} ya está asignado a {user}.',
+            already_has_main: '{user} ya tiene un personaje principal: {character} ({realm}). Si esto es un error, contacta a un miembro del personal en nuestro [Discord](https://discord.gg/YDqBQU43Ht).',
+            success_with_type: '{character} ({realm}) ha sido establecido exitosamente como personaje {type} para {user}.',
+            success: '{character} ({realm}) ha sido establecido exitosamente como personaje principal para {user}.',
+            success_updated: 'Personaje principal para {user} actualizado de {oldCharacter} a {character} ({realm}).'
         },
         charlist: {
             embed: {
-                title: "Personajes de {username}",
-                no_characters: "No se encontraron personajes para este usuario.",
-                main_character: "**Personaje Principal:**\n{name} - {realm}",
-                alt_characters_header: "**Personajes Alternativos:**",
-                character_entry: "{name} - {realm}"
+                title: 'Personajes de {username}',
+                no_characters: 'No se encontraron personajes para este usuario.',
+                main_character: '**Personaje Principal:**\n{name} - {realm}',
+                alt_characters_header: '**Personajes Alternativos:**',
+                character_entry: '{name} - {realm}'
             }
         },
         level: {
-            no_progress: "Aún no has alcanzado ningún nivel.",
-            level_up: "🎉 Hey {user} has alcanzado el nivel {level}! ¡Felicidades! 🎉",
-            disabled: "El sistema de nivelación está desactivado en este servidor."
+            no_progress: 'Aún no has alcanzado ningún nivel.',
+            level_up: '🎉 Hey {user} has alcanzado el nivel {level}! ¡Felicidades! 🎉',
+            disabled: 'El sistema de nivelación está desactivado en este servidor.'
         },
 
         setup: {
-            title: "Ajustes del Servidor",
-            description: "Configura los ajustes de tu servidor haciendo clic en los botones de abajo. Cada ajuste controla diferentes aspectos de la funcionalidad del bot.",
-            no_permission: "Necesitas ser administrador o desarrollador para usar este comando.",
-            no_button_permission: "Necesitas ser administrador o desarrollador para usar estos ajustes.",
-            different_user: "No puedes interactuar con el menú de ajustes de otra persona. Por favor, usa el comando /settings para abrir el tuyo.",
-            save_failed: "Error al actualizar los ajustes. Por favor, inténtalo de nuevo.",
-            menu_expired: "El menú de ajustes ha expirado.",
-            footer: "Los ajustes se guardarán automáticamente al cambiarlos • La interfaz expira después de 5 minutos",
+            title: 'Ajustes del Servidor',
+            description: 'Configura los ajustes de tu servidor haciendo clic en los botones de abajo. Cada ajuste controla diferentes aspectos de la funcionalidad del bot.',
+            no_permission: 'Necesitas ser administrador o desarrollador para usar este comando.',
+            no_button_permission: 'Necesitas ser administrador o desarrollador para usar estos ajustes.',
+            different_user: 'No puedes interactuar con el menú de ajustes de otra persona. Por favor, usa el comando /settings para abrir el tuyo.',
+            save_failed: 'Error al actualizar los ajustes. Por favor, inténtalo de nuevo.',
+            menu_expired: 'El menú de ajustes ha expirado.',
+            footer: 'Los ajustes se guardarán automáticamente al cambiarlos • La interfaz expira después de 5 minutos',
             features: {
                 welcome_message: {
-                    name: "👋 Mensaje de Bienvenida",
-                    description: "Cuando está activado, el bot enviará un mensaje de bienvenida a los nuevos miembros en el canal de bienvenida configurado."
+                    name: '👋 Mensaje de Bienvenida',
+                    description: 'Cuando está activado, el bot enviará un mensaje de bienvenida a los nuevos miembros en el canal de bienvenida configurado.'
                 },
                 char_name_ask: {
-                    name: "👤 Preguntar Nombre de Personaje",
-                    description: "Cuando está activado, el bot automáticamente enviará un MD a los nuevos miembros preguntando por su nombre de personaje y actualizará su apodo en consecuencia."
+                    name: '👤 Preguntar Nombre de Personaje',
+                    description: 'Cuando está activado, el bot automáticamente enviará un MD a los nuevos miembros preguntando por su nombre de personaje y actualizará su apodo en consecuencia.'
                 },
                 block_list: {
-                    name: "🚫 Lista Negra",
-                    description: "Cuando está activado, el bot usa la Lista Negra global para banear miembros que están en la lista."
+                    name: '🚫 Lista Negra',
+                    description: 'Cuando está activado, el bot usa la Lista Negra global para banear miembros que están en la lista.'
                 },
                 logging: {
-                    name: "📝 Registro",
-                    description: "Cuando está activado, el bot registrará eventos importantes que son ejecutados por el bot en relación con tu servidor."
+                    name: '📝 Registro',
+                    description: 'Cuando está activado, el bot registrará eventos importantes que son ejecutados por el bot en relación con tu servidor.'
                 },
                 language: {
-                    name: "🌍 Idioma",
-                    description: "Cambia el idioma que el bot usa en tu servidor.",
-                    current: "Idioma actual: {language}"
+                    name: '🌍 Idioma',
+                    description: 'Cambia el idioma que el bot usa en tu servidor.',
+                    current: 'Idioma actual: {language}'
                 },
                 status: {
-                    enabled: "✅ Activado",
-                    disabled: "❌ Desactivado",
-                    channel: "Canal: {channel}"
+                    enabled: '✅ Activado',
+                    disabled: '❌ Desactivado',
+                    channel: 'Canal: {channel}'
                 },
                 leveling: {
-                    name: "📊 Sistema de Nivelación",
-                    description: "Configura el sistema de nivelación para tu servidor."
+                    name: '📊 Sistema de Nivelación',
+                    description: 'Configura el sistema de nivelación para tu servidor.'
                 }
             },
 
             buttons: {
-                welcome_message: "Mensaje de Bienvenida",
-                char_name_ask: "Preguntar Nombre de Personaje",
-                block_list: "Lista Negra",
-                logging: "Registro",
-                change_language: "Cambiar Idioma",
-                select_language: "Seleccionar idioma",
-                edit_charname_dm: "Editar DM del nombre"
+                welcome_message: 'Mensaje de Bienvenida',
+                char_name_ask: 'Preguntar Nombre de Personaje',
+                block_list: 'Lista Negra',
+                logging: 'Registro',
+                change_language: 'Cambiar Idioma',
+                select_language: 'Seleccionar idioma',
+                edit_charname_dm: 'Editar DM del nombre'
             },
-            select_log_channel: "Seleccionar canal de registro",
-            select_welcome_channel: "Seleccionar canal de bienvenida",
-            select_leveling_channel: "Seleccionar canal de nivelación",
-            log_channel_set: "✅ Canal de registro establecido en {channel}",
-            not_set: "No establecido",
-            language_set: "✅ El idioma del servidor se ha establecido en {language}",
-            leveling_channel_set: "✅ Canal de nivelación establecido en {channel}",
-            welcome_channel_set: "✅ Canal de bienvenida establecido en {channel}",
+            select_log_channel: 'Seleccionar canal de registro',
+            select_welcome_channel: 'Seleccionar canal de bienvenida',
+            select_leveling_channel: 'Seleccionar canal de nivelación',
+            log_channel_set: '✅ Canal de registro establecido en {channel}',
+            not_set: 'No establecido',
+            language_set: '✅ El idioma del servidor se ha establecido en {language}',
+            leveling_channel_set: '✅ Canal de nivelación establecido en {channel}',
+            welcome_channel_set: '✅ Canal de bienvenida establecido en {channel}',
 
 
             charname_dm_modal: {
-                title: "Editar mensaje DM del nombre del personaje",
-                message_label: "Mensaje DM",
-                message_placeholder: "Ingrese el mensaje para enviar cuando se pregunte por el nombre del personaje..."
+                title: 'Editar mensaje DM del nombre del personaje',
+                message_label: 'Mensaje DM',
+                message_placeholder: 'Ingrese el mensaje para enviar cuando se pregunte por el nombre del personaje...'
             },
-            charname_dm_updated: "✅ El mensaje DM del nombre del personaje ha sido actualizado",
-            error_occurred: "Ocurrió un error: {error}"
+            charname_dm_updated: '✅ El mensaje DM del nombre del personaje ha sido actualizado',
+            error_occurred: 'Ocurrió un error: {error}'
         },
         account: {
             embed: {
-                description: "Información y estadísticas de la cuenta",
+                description: 'Información y estadísticas de la cuenta',
                 fields: {
-                    account_info_title: "👤 Información de la Cuenta",
-                    username: "Nombre de usuario",
-                    displayName: "Nombre mostrado",
-                    id: "ID",
-                    created: "Creado",
-                    joined: "Se unió al servidor",
+                    account_info_title: '👤 Información de la Cuenta',
+                    username: 'Nombre de usuario',
+                    displayName: 'Nombre mostrado',
+                    id: 'ID',
+                    created: 'Creado',
+                    joined: 'Se unió al servidor',
                     
-                    activity_title: "📊 Estadísticas de Actividad",
-                    accountStanding: "Posición de la Cuenta",
-                    accountLevel: "Nivel",
-                    accountXP: "Experiencia",
-                    xpProgress: "Progreso de Nivel",
-                    voiceTime: "Tiempo en Voz",
-                    serverProgress: "Progreso del Servidor",
-                    serverLevel: "Nivel del Servidor",
-                    serverXP: "XP del Servidor",
+                    activity_title: '📊 Estadísticas de Actividad',
+                    accountStanding: 'Posición de la Cuenta',
+                    accountLevel: 'Nivel',
+                    accountXP: 'Experiencia',
+                    xpProgress: 'Progreso de Nivel',
+                    voiceTime: 'Tiempo en Voz',
+                    serverProgress: 'Progreso del Servidor',
+                    serverLevel: 'Nivel del Servidor',
+                    serverXP: 'XP del Servidor',
                     
-                    roles_title: "🎭 Roles [{count}]",
-                    badges_title: "🏅 Insignias",
+                    roles_title: '🎭 Roles [{count}]',
+                    badges_title: '🏅 Insignias',
                     
                     tiers: {
-                        veteran: "🔱 Artefacto",
-                        diamond: "💎 Legendario",
-                        gold: "🥇 Épico",
-                        silver: "🥈 Raro",
-                        bronze: "🥉 Común"
+                        veteran: '🔱 Artefacto',
+                        diamond: '💎 Legendario',
+                        gold: '🥇 Épico',
+                        silver: '🥈 Raro',
+                        bronze: '🥉 Común'
                     }
                 },
-                footer: "Información de la Cuenta • {guildName}"
+                footer: 'Información de la Cuenta • {guildName}'
             }
         }
     },
     events: {
         guildMemberAdd: {
-            blacklisted: "Has sido incluido en la lista negra de la Hermandad. Si crees que esto es un error, por favor contacta al personal de la Hermandad o apela en https://discord.gg/YDqBQU43Ht",
-            invalid_response: "Tu respuesta no puede estar vacía o demasiado larga.\nPor favor, proporciona una respuesta válida.",
-            name_changed: "Tu nombre ha sido cambiado exitosamente a {nickname} para la Hermandad {guildName}.",
-            name_change_failed: "No se pudo cambiar tu nombre: {error}",
-            mod_notification: "No se pudo enviar la solicitud de nombre de personaje a {username}. Probablemente tienen los MDs desactivados.",
-            welcome_title: "¡Bienvenido a {guildName}!",
-            welcome_message: "¡Bienvenido {member} a nuestro servidor!\n\nSi tienes alguna pregunta, no dudes en preguntar en un canal público.",
-            log_kicked: "Se expulsó a {username} por estar en la lista negra.",
-            log_kick_failed: "No se pudo expulsar a {username}: {error}",
-            log_dm_failed: "No se pudo enviar un MD a {username}.",
-            log_name_changed: "Se cambió el nombre de {username} a {nickname}.",
-            log_name_change_failed: "No se pudo cambiar el nombre de {username} a {nickname}: {error}",
-            log_end_message_failed: "No se pudo enviar el mensaje final a {username}: {error}",
-            log_interaction_failed: "No se pudo interactuar con {username}: {error}",
-            log_mod_notification_failed: "No se pudo enviar la notificación a los moderadores: {error}",
-            select_character: "Selecciona uno de tus personajes",
-            assigned_chars_found: "He encontrado algunos personajes asignados a tu cuenta. Por favor, selecciona uno para usar como apodo:",
-            not_on_list_label: "No está en la lista",
-            not_on_list_description: "Ingresar otro nombre de personaje manualmente",
-            character_not_found: "No pude encontrar ese personaje. Por favor, inténtalo de nuevo con un nombre de personaje válido."
+            blacklisted: 'Has sido incluido en la lista negra de la Hermandad. Si crees que esto es un error, por favor contacta al personal de la Hermandad o apela en https://discord.gg/YDqBQU43Ht',
+            invalid_response: 'Tu respuesta no puede estar vacía o demasiado larga.\nPor favor, proporciona una respuesta válida.',
+            name_changed: 'Tu nombre ha sido cambiado exitosamente a {nickname} para la Hermandad {guildName}.',
+            name_change_failed: 'No se pudo cambiar tu nombre: {error}',
+            mod_notification: 'No se pudo enviar la solicitud de nombre de personaje a {username}. Probablemente tienen los MDs desactivados.',
+            welcome_title: '¡Bienvenido a {guildName}!',
+            welcome_message: '¡Bienvenido {member} a nuestro servidor!\n\nSi tienes alguna pregunta, no dudes en preguntar en un canal público.',
+            log_kicked: 'Se expulsó a {username} por estar en la lista negra.',
+            log_kick_failed: 'No se pudo expulsar a {username}: {error}',
+            log_dm_failed: 'No se pudo enviar un MD a {username}.',
+            log_name_changed: 'Se cambió el nombre de {username} a {nickname}.',
+            log_name_change_failed: 'No se pudo cambiar el nombre de {username} a {nickname}: {error}',
+            log_end_message_failed: 'No se pudo enviar el mensaje final a {username}: {error}',
+            log_interaction_failed: 'No se pudo interactuar con {username}: {error}',
+            log_mod_notification_failed: 'No se pudo enviar la notificación a los moderadores: {error}',
+            select_character: 'Selecciona uno de tus personajes',
+            assigned_chars_found: 'He encontrado algunos personajes asignados a tu cuenta. Por favor, selecciona uno para usar como apodo:',
+            not_on_list_label: 'No está en la lista',
+            not_on_list_description: 'Ingresar otro nombre de personaje manualmente',
+            character_not_found: 'No pude encontrar ese personaje. Por favor, inténtalo de nuevo con un nombre de personaje válido.'
         }
     },
     logging: {

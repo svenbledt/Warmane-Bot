@@ -1,103 +1,104 @@
-const DiscordBot = require("../DiscordBot");
-const config = require("../../config");
-const { error } = require("../../utils/Console");
-const { MessageFlags } = require("discord.js");
+/*eslint no-unused-vars: "warn"*/
+const DiscordBot = require('../DiscordBot');
+const config = require('../../config');
+const { error } = require('../../utils/Console');
+const { MessageFlags } = require('discord.js');
 class ComponentsListener {
-  /**
+    /**
    *
    * @param {DiscordBot} client
    */
-  constructor(client) {
-    client.on("interactionCreate", async (interaction) => {
-      const checkUserPermissions = async (component) => {
-        if (
-          component.options?.public === false &&
+    constructor(client) {
+        client.on('interactionCreate', async (interaction) => {
+            const checkUserPermissions = async (component) => {
+                if (
+                    component.options?.public === false &&
           interaction.user.id !== interaction.message.interaction.user.id
-        ) {
-          await interaction.reply({
-            content: config.messages.COMPONENT_NOT_PUBLIC,
-            flags: [MessageFlags.Ephemeral],
-          });
+                ) {
+                    await interaction.reply({
+                        content: config.messages.COMPONENT_NOT_PUBLIC,
+                        flags: [MessageFlags.Ephemeral],
+                    });
 
-          return false;
-        }
+                    return false;
+                }
 
-        return true;
-      };
+                return true;
+            };
 
-      try {
-        if (interaction.isButton()) {
-          const component = client.collection.components.buttons.get(
-            interaction.customId
-          );
+            try {
+                if (interaction.isButton()) {
+                    const component = client.collection.components.buttons.get(
+                        interaction.customId
+                    );
 
-          if (!component) return;
+                    if (!component) return;
 
-          if (!(await checkUserPermissions(component))) return;
+                    if (!(await checkUserPermissions(component))) return;
 
-          try {
-            component.run(client, interaction);
-          } catch (err) {
-            error(err);
-          }
+                    try {
+                        component.run(client, interaction);
+                    } catch (err) {
+                        error(err);
+                    }
 
-          return;
-        }
+                    return;
+                }
 
-        if (interaction.isAnySelectMenu()) {
-          const component = client.collection.components.selects.get(
-            interaction.customId
-          );
+                if (interaction.isAnySelectMenu()) {
+                    const component = client.collection.components.selects.get(
+                        interaction.customId
+                    );
 
-          if (!component) return;
+                    if (!component) return;
 
-          if (!(await checkUserPermissions(component))) return;
+                    if (!(await checkUserPermissions(component))) return;
 
-          try {
-            component.run(client, interaction);
-          } catch (err) {
-            error(err);
-          }
+                    try {
+                        component.run(client, interaction);
+                    } catch (err) {
+                        error(err);
+                    }
 
-          return;
-        }
+                    return;
+                }
 
-        if (interaction.isModalSubmit()) {
-          const component = client.collection.components.modals.get(
-            interaction.customId
-          );
+                if (interaction.isModalSubmit()) {
+                    const component = client.collection.components.modals.get(
+                        interaction.customId
+                    );
 
-          if (!component) return;
+                    if (!component) return;
 
-          try {
-            component.run(client, interaction);
-          } catch (err) {
-            error(err);
-          }
+                    try {
+                        component.run(client, interaction);
+                    } catch (err) {
+                        error(err);
+                    }
 
-          return;
-        }
+                    return;
+                }
 
-        if (interaction.isAutocomplete()) {
-          const component = client.collection.components.autocomplete.get(
-            interaction.commandName
-          );
+                if (interaction.isAutocomplete()) {
+                    const component = client.collection.components.autocomplete.get(
+                        interaction.commandName
+                    );
 
-          if (!component) return;
+                    if (!component) return;
 
-          try {
-            component.run(client, interaction);
-          } catch (err) {
-            error(err);
-          }
+                    try {
+                        component.run(client, interaction);
+                    } catch (err) {
+                        error(err);
+                    }
 
-          return;
-        }
-      } catch (err) {
-        error(err);
-      }
-    });
-  }
+                    return;
+                }
+            } catch (err) {
+                error(err);
+            }
+        });
+    }
 }
 
 module.exports = ComponentsListener;

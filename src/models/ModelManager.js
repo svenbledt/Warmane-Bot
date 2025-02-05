@@ -35,7 +35,7 @@ class ModelManager {
                 validator: {
                     $jsonSchema: this.convertSchemaToJsonSchema(schema)
                 },
-                validationLevel: "moderate"
+                validationLevel: 'moderate'
             });
         } else {
             // Update validation schema for existing collection
@@ -44,7 +44,7 @@ class ModelManager {
                 validator: {
                     $jsonSchema: this.convertSchemaToJsonSchema(schema)
                 },
-                validationLevel: "moderate"
+                validationLevel: 'moderate'
             });
         }
 
@@ -61,7 +61,7 @@ class ModelManager {
     convertSchemaToJsonSchema(schema) {
         // Convert Mongoose-style schema to MongoDB JSON Schema
         const jsonSchema = {
-            bsonType: "object",
+            bsonType: 'object',
             required: [],
             properties: {}
         };
@@ -87,20 +87,20 @@ class ModelManager {
 
     getBsonType(type) {
         switch (type) {
-            case String:
-                return "string";
-            case Number:
-                return "number";
-            case Boolean:
-                return "bool";
-            case Date:
-                return "date";
-            case Array:
-                return "array";
-            case Object:
-                return "object";
-            default:
-                return "string";
+        case String:
+            return 'string';
+        case Number:
+            return 'number';
+        case Boolean:
+            return 'bool';
+        case Date:
+            return 'date';
+        case Array:
+            return 'array';
+        case Object:
+            return 'object';
+        default:
+            return 'string';
         }
     }
 }

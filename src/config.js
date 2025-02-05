@@ -1,64 +1,64 @@
 const config = {
-  base: {
-    iconAlliance: "https://i.imgur.com/SDoVQmV.png", // The Alliance icon.
-    iconHorde: "https://i.imgur.com/ap8Nran.png", // The Horde icon.
-    humanMale: "https://i.imgur.com/70Fa4LF.png", // The Human
-    humanFemale: "https://i.imgur.com/uc1fAcR.png", // The Human
-    orcMale: "https://i.imgur.com/Yd15jZE.png", // The Orc
-    orcFemale: "https://i.imgur.com/ooWSzKw.png", // The Orc
-    dwarfMale: "https://i.imgur.com/IrPIiGr.png", // The Dwarf
-    dwarfFemale: "https://i.imgur.com/6PyAAf9.png", // The Dwarf
-    nightElfMale: "https://i.imgur.com/tsQBM10.png", // The Night Elf
-    nightElfFemale: "https://i.imgur.com/xfD8Qt4.png", // The Night Elf
-    undeadMale: "https://i.imgur.com/MYT2vmD.png", // The Undead
-    undeadFemale: "https://i.imgur.com/pXfY1mc.png", // The Undead
-    taurenMale: "https://i.imgur.com/j5aZZWY.png", // The Tauren
-    taurenFemale: "https://i.imgur.com/vd2h3pZ.png", // The Tauren
-    gnomeMale: "https://i.imgur.com/9nriTFE.png", // The Gnome
-    gnomeFemale: "https://i.imgur.com/C6lybzM.png", // The Gnome
-    trollMale: "https://i.imgur.com/dzdx2R2.png", // The Troll
-    trollFemale: "https://i.imgur.com/Ay3xgX4.png", // The Troll
-    bloodElfMale: "https://i.imgur.com/efv7ZBN.png", // The Blood Elf
-    bloodElfFemale: "https://i.imgur.com/mwwUcgP.png", // The Blood Elf
-    draeneiMale: "https://i.imgur.com/LXidUlc.png", // The Draenei
-    draeneiFemale: "https://i.imgur.com/isDVJYZ.png", // The Draenei
-  },
-  development: {
-    enabled: false, // If true, the bot will register all application commands to a specific guild (not globally).
-    guildId: "1254444159985651712",
-    reportChannel: "1257409168265187428",
-    inviteChannel: "1257459204948627638",
-    announcementChannel: "1257409143724310609",
-    staffAnnouncementChannel: "1257409165769314435",
-    logChannel: "1333610717630300210",
-  },
-  commands: {
-    application_commands: {
-      chat_input: true, // If true, the bot will allow users to use chat input (or slash) commands.
-      user_context: true, // If true, the bot will allow users to use user context menu commands.
-      message_context: true, // If true, the bot will allow users to use message context menu commands.
+    base: {
+        iconAlliance: 'https://i.imgur.com/SDoVQmV.png', // The Alliance icon.
+        iconHorde: 'https://i.imgur.com/ap8Nran.png', // The Horde icon.
+        humanMale: 'https://i.imgur.com/70Fa4LF.png', // The Human
+        humanFemale: 'https://i.imgur.com/uc1fAcR.png', // The Human
+        orcMale: 'https://i.imgur.com/Yd15jZE.png', // The Orc
+        orcFemale: 'https://i.imgur.com/ooWSzKw.png', // The Orc
+        dwarfMale: 'https://i.imgur.com/IrPIiGr.png', // The Dwarf
+        dwarfFemale: 'https://i.imgur.com/6PyAAf9.png', // The Dwarf
+        nightElfMale: 'https://i.imgur.com/tsQBM10.png', // The Night Elf
+        nightElfFemale: 'https://i.imgur.com/xfD8Qt4.png', // The Night Elf
+        undeadMale: 'https://i.imgur.com/MYT2vmD.png', // The Undead
+        undeadFemale: 'https://i.imgur.com/pXfY1mc.png', // The Undead
+        taurenMale: 'https://i.imgur.com/j5aZZWY.png', // The Tauren
+        taurenFemale: 'https://i.imgur.com/vd2h3pZ.png', // The Tauren
+        gnomeMale: 'https://i.imgur.com/9nriTFE.png', // The Gnome
+        gnomeFemale: 'https://i.imgur.com/C6lybzM.png', // The Gnome
+        trollMale: 'https://i.imgur.com/dzdx2R2.png', // The Troll
+        trollFemale: 'https://i.imgur.com/Ay3xgX4.png', // The Troll
+        bloodElfMale: 'https://i.imgur.com/efv7ZBN.png', // The Blood Elf
+        bloodElfFemale: 'https://i.imgur.com/mwwUcgP.png', // The Blood Elf
+        draeneiMale: 'https://i.imgur.com/LXidUlc.png', // The Draenei
+        draeneiFemale: 'https://i.imgur.com/isDVJYZ.png', // The Draenei
     },
-  },
-  users: {
-    ownerId: "209319089930240004", // The bot owner ID, which is you.
-    developers: ["209319089930240004", "992028601308422326"], // The bot developers, remember to include your account ID with the other account IDs.
-    url: "https://armory.warmane.com/", // The character URL for the API.
-  },
-  messages: {
+    development: {
+        enabled: false, // If true, the bot will register all application commands to a specific guild (not globally).
+        guildId: '1254444159985651712',
+        reportChannel: '1257409168265187428',
+        inviteChannel: '1257459204948627638',
+        announcementChannel: '1257409143724310609',
+        staffAnnouncementChannel: '1257409165769314435',
+        logChannel: '1333610717630300210',
+    },
+    commands: {
+        application_commands: {
+            chat_input: true, // If true, the bot will allow users to use chat input (or slash) commands.
+            user_context: true, // If true, the bot will allow users to use user context menu commands.
+            message_context: true, // If true, the bot will allow users to use message context menu commands.
+        },
+    },
+    users: {
+        ownerId: '209319089930240004', // The bot owner ID, which is you.
+        developers: ['209319089930240004', '992028601308422326'], // The bot developers, remember to include your account ID with the other account IDs.
+        url: 'https://armory.warmane.com/', // The character URL for the API.
+    },
+    messages: {
     // Messages configuration for application commands and message commands handler.
-    NOT_BOT_OWNER:
-      "You do not have the permission to run this command because you're not the owner of me!",
-    NOT_BOT_DEVELOPER:
-      "This function is limited to Staff only! Please contact a Staff member if you need this function.",
-    NOT_GUILD_OWNER:
-      "You do not have the permission to run this command because you\re not the guild owner!",
-    CHANNEL_NOT_NSFW: "You cannot run this command in a non-NSFW channel!",
-    MISSING_PERMISSIONS:
-      "You do not have the permission to run this command, missing permissions.",
-    COMPONENT_NOT_PUBLIC: "You are not the author of this button!",
-    GUILD_COOLDOWN:
-      "You are currently in cooldown, you have the ability to re-use this command again in `%cooldown%s`.",
-  },
+        NOT_BOT_OWNER:
+      'You do not have the permission to run this command because you\'re not the owner of me!',
+        NOT_BOT_DEVELOPER:
+      'This function is limited to Staff only! Please contact a Staff member if you need this function.',
+        NOT_GUILD_OWNER:
+      'You do not have the permission to run this command because you\re not the guild owner!',
+        CHANNEL_NOT_NSFW: 'You cannot run this command in a non-NSFW channel!',
+        MISSING_PERMISSIONS:
+      'You do not have the permission to run this command, missing permissions.',
+        COMPONENT_NOT_PUBLIC: 'You are not the author of this button!',
+        GUILD_COOLDOWN:
+      'You are currently in cooldown, you have the ability to re-use this command again in `%cooldown%s`.',
+    },
 };
 
 module.exports = config;

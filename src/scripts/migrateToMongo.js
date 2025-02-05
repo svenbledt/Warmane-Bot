@@ -1,7 +1,7 @@
 require('dotenv').config();
-const { QuickYAML } = require("quick-yaml.db");
+const { QuickYAML } = require('quick-yaml.db');
 const mongoose = require('mongoose');
-const { success, error, info, warn } = require("../utils/Console");
+const { success, error, info, warn } = require('../utils/Console');
 
 // Import models
 const BlacklistedUser = require('../models/BlacklistedUser');
