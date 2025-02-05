@@ -8,6 +8,7 @@ const ComponentsListener = require("./handler/ComponentsListener");
 const EventsHandler = require("./handler/EventsHandler");
 const LanguageManager = require('../utils/LanguageManager');
 const DatabaseHandler = require('./handler/DatabaseHandler');
+const LevelingSystemHandler = require('./handler/LevelingSystemHandler');
 
 class DiscordBot extends Client {
   collection = {
@@ -71,6 +72,9 @@ class DiscordBot extends Client {
     LanguageManager.loadLanguage('fr');
     LanguageManager.loadLanguage('es');
 
+    // Create LevelingSystemHandler
+    this.levelingSystem_handler = new LevelingSystemHandler(this)
+
     // Initialize MongoDB connection URL and DB name
     this.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
     this.DB_NAME = process.env.DB_NAME || 'warmane_bot';
@@ -86,6 +90,7 @@ class DiscordBot extends Client {
       throw err;
     }
   }
+
 
   connect = async () => {
     warn(

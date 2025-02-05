@@ -1,6 +1,5 @@
 const Event = require("../../structure/Event");
 const { Collection } = require('discord.js');
-const LevelingSystemHandler = require('../../client/handler/LevelingSystemHandler');
 const LanguageManager = require("../../utils/LanguageManager");
 
 // Store voice session data outside the event to persist between calls
@@ -13,7 +12,7 @@ module.exports = new Event({
     if (newState.member.user.bot || oldState.member?.user.bot) return;
 
     const userId = oldState.id || newState.id;
-    const levelingSystem = new LevelingSystemHandler(client);
+    const levelingSystem = client.levelingSystem_handler
 
     // Helper function to handle level up messages
     async function handleLevelUp(guildId, userId, oldLevel) {

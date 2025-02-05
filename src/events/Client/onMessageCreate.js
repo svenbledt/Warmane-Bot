@@ -1,5 +1,4 @@
 const Event = require("../../structure/Event");
-const LevelingSystemHandler = require('../../client/handler/LevelingSystemHandler');
 const LanguageManager = require("../../utils/LanguageManager");
 const { ChannelType } = require('discord.js');
 
@@ -8,7 +7,7 @@ module.exports = new Event({
     run: async (client, message) => {
         if (message.author.bot || !message.guild || message.channel.type !== ChannelType.GuildText) return;
 
-        const levelingSystem = new LevelingSystemHandler(client);
+        const levelingSystem = client.levelingSystem_handler
         const member = message.member;
         const userId = member.user.id;
         const guildId = message.guild.id;
