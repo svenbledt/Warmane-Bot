@@ -1,6 +1,8 @@
+/*eslint no-unused-vars: "warn"*/
+/* global Buffer */
+
 const {
   MessageFlags,
-  ChatInputCommandInteraction,
   AttachmentBuilder,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");

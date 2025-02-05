@@ -1,3 +1,4 @@
+/* global process */
 require("colors");
 const fs = require("fs");
 const path = require("path");
@@ -10,7 +11,7 @@ const writeToLog = (timeStamp, level, color, messages) => {
     try {
       fileContent = fs.readFileSync(LOG_FILE, "utf-8");
     } catch (err) {
-      // File doesn't exist yet, that's ok
+      console.error("Failed to read log file:", err);
     }
 
     const logMessage = [`[${timeStamp}]`.gray, `[${level}]`[color], messages.join(" ")];

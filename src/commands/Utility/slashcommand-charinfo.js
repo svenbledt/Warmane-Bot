@@ -1,9 +1,8 @@
+/*eslint no-unused-vars: "warn"*/
 const {
   MessageFlags,
   EmbedBuilder,
-  ChatInputCommandInteraction,
   ApplicationCommandOptionType,
-  ApplicationIntegrationType,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
@@ -226,6 +225,7 @@ module.exports = new ApplicationCommand({
             achievementPoints: data.achievementpoints,
             talents: data.talents.map((talent) => talent.tree),
             professions: data.professions,
+            totalGearScore: totalGearScoreString
           };
 
           // Check if the character has a guild
@@ -563,6 +563,11 @@ module.exports = new ApplicationCommand({
               character.achievementPoints > 0 && {
                 name: LanguageManager.getText('commands.charinfo.embed.fields.achievement_points', lang),
                 value: character.achievementPoints.toString(),
+                inline: true
+              },
+              character.totalGearScore > 0 && character.level > 60  && {
+                name: LanguageManager.getText('commands.charinfo.embed.fields.gearscore', lang),
+                value: character.totalGearScore.toString(),
                 inline: true
               }
             ].filter(Boolean);

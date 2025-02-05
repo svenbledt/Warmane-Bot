@@ -204,7 +204,6 @@ module.exports = {
                 message_placeholder: "Enter the message to send when asking for character name..."
             },
             charname_dm_updated: "✅ Character name DM message has been updated",
-            select_log_channel: "Select logging channel",
             error_occurred: "An error occurred: {error}"
         },
         account: {

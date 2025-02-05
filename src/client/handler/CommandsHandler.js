@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const { REST, Routes } = require("discord.js");
 const { info, error, success, warn } = require("../../utils/Console");
 const { readdirSync } = require("fs");

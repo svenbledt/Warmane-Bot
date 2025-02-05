@@ -1,5 +1,6 @@
+/*eslint no-prototype-builtins: "warn"*/
 const mongoose = require('mongoose');
-const { error, success, info, warn } = require("../../utils/Console");
+const { error, success, info } = require("../../utils/Console");
 const BlacklistedUser = require('../../models/BlacklistedUser');
 const GuildSettings = require('../../models/GuildSettings');
 const UserCharacter = require('../../models/UserCharacter');

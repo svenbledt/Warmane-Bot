@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const {
   MessageFlags,
   PermissionsBitField,
@@ -559,14 +560,14 @@ module.exports = new ApplicationCommand({
       }
 
       if (i.customId === 'toggle_enableLogging') {
-        if (settings.enableLogging) {
+        if (guildSettings.enableLogging) {
           // If logging is enabled, disable it and clear the channel
-          settings.enableLogging = false;
-          settings.logChannel = '';
-          await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+          guildSettings.enableLogging = false;
+          guildSettings.logChannel = '';
+          await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, guildSettings);
           
-          const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
-          const updatedButtons = createSettingsButtons(settings);
+          const updatedEmbed = createSettingsEmbed(guildSettings, guildSettings.language);
+          const updatedButtons = createSettingsButtons(guildSettings);
           
           await i.update({
             embeds: [updatedEmbed],
@@ -625,18 +626,18 @@ module.exports = new ApplicationCommand({
       const settingName = i.customId.replace('toggle_', '');
       
       if (settingName === 'enableLogging') {
-        settings[settingName] = !settings[settingName];
+        guildSettings[settingName] = !guildSettings[settingName];
         
         // Clear log channel when disabling logging
-        if (!settings.enableLogging) {
-          settings.logChannel = '';
+        if (!guildSettings.enableLogging) {
+          guildSettings.logChannel = '';
         }
         
         try {
-          await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+          await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, guildSettings);
           
-          const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
-          const updatedButtons = createSettingsButtons(settings);
+          const updatedEmbed = createSettingsEmbed(guildSettings, guildSettings.language);
+          const updatedButtons = createSettingsButtons(guildSettings);
           
           await i.update({
             embeds: [updatedEmbed],
@@ -653,13 +654,13 @@ module.exports = new ApplicationCommand({
       }
 
       // Handle other settings toggles
-      settings[settingName] = !settings[settingName];
+      guildSettings[settingName] = !guildSettings[settingName];
 
       try {
-        await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+        await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, guildSettings);
         
-        const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
-        const updatedButtons = createSettingsButtons(settings);
+        const updatedEmbed = createSettingsEmbed(guildSettings, guildSettings.language);
+        const updatedButtons = createSettingsButtons(guildSettings);
         
         await i.update({
           embeds: [updatedEmbed],
@@ -681,6 +682,7 @@ module.exports = new ApplicationCommand({
           await response.delete().catch(() => {});
         }
       } catch (error) {
+        console.error('Failed to delete settings message:', error);
         try {
           const disabledButtons = createSettingsButtons(guildSettings);
           disabledButtons.components.forEach(button => button.setDisabled(true));

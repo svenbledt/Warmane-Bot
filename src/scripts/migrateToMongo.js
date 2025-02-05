@@ -1,3 +1,4 @@
+/* global process */
 require('dotenv').config();
 const { QuickYAML } = require("quick-yaml.db");
 const mongoose = require('mongoose');

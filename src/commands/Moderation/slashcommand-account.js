@@ -1,6 +1,6 @@
+/*eslint no-unused-vars: "warn"*/
 const {
     MessageFlags,
-    ChatInputCommandInteraction,
     ApplicationCommandOptionType,
     PermissionsBitField,
     EmbedBuilder

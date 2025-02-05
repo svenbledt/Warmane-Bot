@@ -1,3 +1,4 @@
+/* global __dirname */
 const Event = require("../../structure/Event");
 const LanguageManager = require("../../utils/LanguageManager");
 const config = require("../../config");
@@ -34,6 +35,7 @@ async function checkSpecificRealm(charName, realm) {
     const exists = response.data && response.data.name;
     return exists;
   } catch (error) {
+    console.log(error.message)
     return false;
   }
 }
@@ -153,7 +155,7 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
 
     // Send welcome message after nickname is set
     if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-      await handleWelcomeMessage(client, member, guildSettings, lang);
+      await handleWelcomeMessage(client, member, guildSettings);
     }
   });
 
@@ -185,7 +187,7 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
 
         // Send welcome message with current nickname if timeout
         if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-          await handleWelcomeMessage(client, member, guildSettings, lang);
+          await handleWelcomeMessage(client, member, guildSettings);
         }
       } catch (error) {
         console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
@@ -199,7 +201,7 @@ async function handleNicknameChange(client, member, charName, lang, guildName) {
   // Get fresh database content from database_handler instead of direct database access
   const userChars = await client.database_handler.findMany('userCharacters') || {};
   
-  const validation = await validateCharacterName(charName, userChars, lang);
+  const validation = await validateCharacterName(client, charName, userChars, lang);
   if (!validation.valid) {
     return validation.message;
   }
@@ -318,7 +320,7 @@ async function handleDevServer(client, member, guildSettings, lang) {
 
       // Send welcome message after nickname is set
       if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-        await handleWelcomeMessage(client, member, guildSettings, lang);
+        await handleWelcomeMessage(client, member, guildSettings);
       }
     });
 
@@ -354,7 +356,7 @@ async function handleDevServer(client, member, guildSettings, lang) {
 
           // Send welcome message with current nickname if timeout
           if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-            await handleWelcomeMessage(client, member, guildSettings, lang);
+            await handleWelcomeMessage(client, member, guildSettings);
           }
         } catch (error) {
           console.error(`Failed to send timeout message to ${member.user.tag}:`, error);
@@ -471,7 +473,7 @@ async function handleRegularServer(client, member, guildSettings, lang) {
     // Case 3: Could not reach user via DM
     if (!dmChannel) {
       if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-        await handleWelcomeMessage(client, member, guildSettings, lang);
+        await handleWelcomeMessage(client, member, guildSettings);
       }
       return;
     }
@@ -508,7 +510,7 @@ async function handleRegularServer(client, member, guildSettings, lang) {
 
         // Case 3: Failed to send DM
         if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-          await handleWelcomeMessage(client, member, guildSettings, lang);
+          await handleWelcomeMessage(client, member, guildSettings);
         }
         return;
       }
@@ -546,20 +548,20 @@ async function handleRegularServer(client, member, guildSettings, lang) {
         const disabledRow = new ActionRowBuilder().addComponents(
           StringSelectMenuBuilder.from(row.components[0])
             .setDisabled(true)
-            .setPlaceholder(`Selected: ${charName}`)
+            .setPlaceholder(`Selected: ${charName}|${realm}`)
         );
         await selectMessage.edit({ components: [disabledRow] });
 
         // Case 1: Successfully set nickname
         if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-          await handleWelcomeMessage(client, member, guildSettings, lang);
+          await handleWelcomeMessage(client, member, guildSettings);
         }
       }
     } catch (error) {
       console.error(`Selection menu timeout for ${member.user.tag}:`, error);
       // Case 2: User reached but timed out
       if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
-        await handleWelcomeMessage(client, member, guildSettings, lang);
+        await handleWelcomeMessage(client, member, guildSettings);
       }
       await handleTimeout(client, member, selectMessage, row, lang);
     }
@@ -701,7 +703,7 @@ async function fetchUserCharacters(client, userId) {
 }
 
 // Update validateCharacterName function
-async function validateCharacterName(charName, userChars, lang) {
+async function validateCharacterName(client, charName, userChars, lang) {
   if (!charName || charName.length > MAX_CHAR_LENGTH) {
     return {
       valid: false,
@@ -710,12 +712,12 @@ async function validateCharacterName(charName, userChars, lang) {
   }
 
   if (!userChars || Object.keys(userChars).length === 0) {
-    userChars = client.database.get("userCharacters") || {};
+    userChars = client.database_handler.get("userCharacters") || {};
   }
 
   const charNameLower = charName.toLowerCase();
 
-  for (const [userId, userData] of Object.entries(userChars)) {
+  for (const [userData] of Object.entries(userChars)) {
     if (userData.main && userData.main.name.toLowerCase() === charNameLower) {
       return { 
         valid: true, 
@@ -755,7 +757,7 @@ async function validateCharacterName(charName, userChars, lang) {
 }
 
 // Update createWelcomeImage function
-async function createWelcomeImage(member, guildName) {
+async function createWelcomeImage(member) {
   // Fetch fresh member data to get updated nickname
   const freshMember = await member.guild.members.fetch(member.id);
   
@@ -816,12 +818,12 @@ async function createWelcomeImage(member, guildName) {
 }
 
 // Update the welcome message to use the canvas
-async function handleWelcomeMessage(client, member, guildSettings, lang) {
+async function handleWelcomeMessage(client, member, guildSettings) {
   try {
     const welcomeChannel = member.guild.channels.cache.get(guildSettings.welcomeChannel);
     if (!welcomeChannel) return;
 
-    const welcomeMessage = await createWelcomeImage(member, member.guild.name);
+    const welcomeMessage = await createWelcomeImage(member);
     await welcomeChannel.send({ 
       files: [welcomeMessage] 
     });
@@ -852,7 +854,7 @@ module.exports = new Event({
 
     // Only send welcome message immediately if CharNameAsk is disabled
     if (guildSettings.welcomeMessage && guildSettings.welcomeChannel && !guildSettings.CharNameAsk) {
-      await handleWelcomeMessage(client, member, guildSettings, lang);
+      await handleWelcomeMessage(client, member, guildSettings);
     }
 
     // Handle blacklisted users

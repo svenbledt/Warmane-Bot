@@ -1,9 +1,7 @@
 const {
   MessageFlags,
-  ModalSubmitInteraction,
   EmbedBuilder,
 } = require("discord.js");
-const DiscordBot = require("../../client/DiscordBot");
 const Component = require("../../structure/Component");
 const config = require("../../config");
 

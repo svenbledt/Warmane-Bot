@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const DiscordBot = require("../DiscordBot");
 const config = require("../../config");
 const { error } = require("../../utils/Console");

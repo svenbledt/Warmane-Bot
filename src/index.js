@@ -1,3 +1,4 @@
+/* global process */
 require("dotenv").config();
 const fs = require("fs");
 const DiscordBot = require("./client/DiscordBot");

@@ -6,7 +6,9 @@
   "scripts": {
     "test": "node ./src/test.js",
     "start": "node .",
-    "migrate": "node ./src/scripts/migrateToMongo.js"
+    "migrate": "node ./src/scripts/migrateToMongo.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [],
   "author": "svenbledt",
@@ -21,5 +23,10 @@
     "dotenv": "^16.4.7",
     "mongoose": "^8.9.6",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0"
   }
 }

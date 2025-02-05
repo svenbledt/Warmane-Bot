@@ -1,7 +1,6 @@
+/*eslint no-unused-vars: "warn"*/
 const {
   MessageFlags,
-  ChatInputCommandInteraction,
-  ApplicationCommandOptionType,
   PermissionsBitField,
 } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");

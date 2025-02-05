@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const DiscordBot = require("../client/DiscordBot");
 
 class AutocompleteComponent {

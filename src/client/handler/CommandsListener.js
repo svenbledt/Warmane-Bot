@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const { PermissionsBitField } = require("discord.js");
 const DiscordBot = require("../DiscordBot");
 const config = require("../../config");

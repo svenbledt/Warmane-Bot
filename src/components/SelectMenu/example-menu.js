@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const DiscordBot = require("../../client/DiscordBot");
 const Component = require("../../structure/Component");
 const { MessageFlags } = require("discord.js");

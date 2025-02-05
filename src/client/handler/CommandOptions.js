@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const { error } = require("../../utils/Console");
 const { PermissionsBitField, MessageFlags } = require("discord.js");
 const config = require("../../config");

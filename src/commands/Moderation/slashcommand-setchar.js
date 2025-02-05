@@ -1,6 +1,6 @@
+/*eslint no-unused-vars: "warn"*/
 const {
   MessageFlags,
-  ChatInputCommandInteraction,
   ApplicationCommandOptionType,
   PermissionsBitField,
   ActionRowBuilder,
@@ -187,7 +187,7 @@ module.exports = new ApplicationCommand({
             });
           } catch (e) {
             await interaction.editReply({
-              content: 'No response received within 30 seconds. Operation cancelled.',
+              content: `No response received within 30 seconds. Operation cancelled. ${e}`,
               components: [],
             });
             return;

@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "warn"*/
 const { info, error, success } = require("../../utils/Console");
 const { readdirSync } = require("fs");
 const DiscordBot = require("../DiscordBot");

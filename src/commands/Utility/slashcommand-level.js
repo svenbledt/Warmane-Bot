@@ -1,9 +1,10 @@
+/*eslint no-unused-vars: "warn"*/
+/* global __dirname */
 const {
-    EmbedBuilder,
     MessageFlags,
     ApplicationCommandOptionType,
     PermissionsBitField
-} = require("discord.js");
+  } = require("discord.js");
 const DiscordBot = require("../../client/DiscordBot");
 const ApplicationCommand = require("../../structure/ApplicationCommand");
 const LanguageManager = require("../../utils/LanguageManager");

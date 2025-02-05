@@ -1,5 +1,4 @@
 const AutocompleteComponent = require("../../structure/AutocompleteComponent");
-const config = require("../../config");
 
 module.exports = new AutocompleteComponent({
   commandName: "guild-leave",

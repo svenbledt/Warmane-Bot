@@ -1,6 +1,6 @@
+/*eslint no-unused-vars: "warn"*/
 const {
   MessageFlags,
-  ChatInputCommandInteraction,
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
@@ -163,15 +163,9 @@ module.exports = new ApplicationCommand({
             let banCount = 0;
             let failCount = 0;
             let notFoundCount = 0;
-            let skippedCount = 0;
 
             await Promise.all(guilds.map(async (guild) => {
               try {
-                if (guild.id === config.development.guildId) {
-                  skippedCount++;
-                  return;
-                }
-
                 const botMember = guild.members.cache.get(client.user.id);
                 if (!botMember?.permissions.has(PermissionsBitField.Flags.BanMembers)) {
                   failCount++;
