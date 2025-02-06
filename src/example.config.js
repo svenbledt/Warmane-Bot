@@ -1,7 +1,4 @@
 const config = {
-    database: {
-        path: './database.yml', // The database path.
-    },
     base: {
         iconAlliance: 'https://i.imgur.com/SDoVQmV.png', // The Alliance icon.
         iconHorde: 'https://i.imgur.com/ap8Nran.png', // The Horde icon.
@@ -27,9 +24,13 @@ const config = {
         draeneiFemale: 'https://i.imgur.com/isDVJYZ.png', // The Draenei
     },
     development: {
-        enabled: true, // If true, the bot will register all application commands to a specific guild (not globally).
+        enabled: false, // If true, the bot will register all application commands to a specific guild (not globally).
         guildId: '1254444159985651712',
-        reportChannel: '1254444242823155845',
+        reportChannel: '1257409168265187428',
+        inviteChannel: '1257459204948627638',
+        announcementChannel: '1257409143724310609',
+        staffAnnouncementChannel: '1257409165769314435',
+        logChannel: '1333610717630300210',
     },
     commands: {
         application_commands: {
@@ -40,28 +41,23 @@ const config = {
     },
     users: {
         ownerId: '209319089930240004', // The bot owner ID, which is you.
-        developers: [
-            '209319089930240004',
-            '766356454281183304',
-            '277488011241979904',
-            '992028601308422326',
-        ], // The bot developers, remember to include your account ID with the other account IDs.
+        developers: ['209319089930240004', '992028601308422326'], // The bot developers, remember to include your account ID with the other account IDs.
         url: 'https://armory.warmane.com/', // The character URL for the API.
     },
     messages: {
-    // Messages configuration for application commands and message commands handler.
+        // Messages configuration for application commands and message commands handler.
         NOT_BOT_OWNER:
-      'You do not have the permission to run this command because you\'re not the owner of me!',
+    'You do not have the permission to run this command because you\'re not the owner of me!',
         NOT_BOT_DEVELOPER:
-      'This function is at the moment limited to developers of the bot for testing purposes!',
+    'This function is limited to Staff only! Please contact a Staff member if you need this function.',
         NOT_GUILD_OWNER:
-      'You do not have the permission to run this command because you\re not the guild owner!',
+    'You do not have the permission to run this command because you\re not the guild owner!',
         CHANNEL_NOT_NSFW: 'You cannot run this command in a non-NSFW channel!',
         MISSING_PERMISSIONS:
-      'You do not have the permission to run this command, missing permissions.',
+    'You do not have the permission to run this command, missing permissions.',
         COMPONENT_NOT_PUBLIC: 'You are not the author of this button!',
         GUILD_COOLDOWN:
-      'You are currently in cooldown, you have the ability to re-use this command again in `%cooldown%s`.',
+    'You are currently in cooldown, you have the ability to re-use this command again in `%cooldown%s`.',
     },
 };
 
