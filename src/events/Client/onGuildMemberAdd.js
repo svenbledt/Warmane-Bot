@@ -69,6 +69,12 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
     });
 
     collector.on('collect', async (collected) => {
+        const isMemberPresent = await member.guild.members.fetch(member.id).catch(() => null);
+        if (!isMemberPresent) {
+            collector.stop('member-left');
+            return;
+        }
+
         let response = collected.content.trim().replace(/[^a-zA-Z ]/g, '');
     
         if (!response || response.length > MAX_CHAR_LENGTH) {
@@ -152,13 +158,35 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
         await dmChannel.send(message);
         collector.stop('valid-response');
 
-        // Send welcome message after nickname is set
-        if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+        // Check member presence again before sending welcome message
+        const isMemberStillPresent = await member.guild.members.fetch(member.id).catch(() => null);
+        if (isMemberStillPresent && guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
             await handleWelcomeMessage(client, member, guildSettings);
         }
     });
 
     collector.on('end', async (collected, reason) => {
+        if (reason === 'member-left') {
+            await Logger.log(client, member.guild.id, {
+                titleKey: 'member_left_during_dm',
+                descData: { username: member.user.tag },
+                color: '#ff0000',
+                fields: [
+                    { 
+                        nameKey: 'dm.user_label', 
+                        nameData: {}, 
+                        value: member.user.tag 
+                    },
+                    { 
+                        nameKey: 'dm.user_id', 
+                        nameData: {}, 
+                        value: member.user.id 
+                    }
+                ]
+            });
+            return;
+        }
+
         if (reason !== 'valid-response' && member.dmChannel) {
             try {
                 await member.send(
@@ -184,8 +212,9 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
                     ]
                 });
 
-                // Send welcome message with current nickname if timeout
-                if (guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
+                // Check member presence before sending welcome message on timeout
+                const isMemberPresent = await member.guild.members.fetch(member.id).catch(() => null);
+                if (isMemberPresent && guildSettings.welcomeMessage && guildSettings.welcomeChannel) {
                     await handleWelcomeMessage(client, member, guildSettings);
                 }
             } catch (error) {
@@ -819,7 +848,16 @@ async function createWelcomeImage(member) {
 // Update the welcome message to use the canvas
 async function handleWelcomeMessage(client, member, guildSettings) {
     try {
-        const welcomeChannel = member.guild.channels.cache.get(guildSettings.welcomeChannel);
+        // Check if member is still in the guild
+        const guild = member.guild;
+        const isMemberPresent = await guild.members.fetch(member.id).catch(() => null);
+        
+        if (!isMemberPresent) {
+            console.log(`Member ${member.user.tag} left the server before welcome message could be sent`);
+            return;
+        }
+
+        const welcomeChannel = guild.channels.cache.get(guildSettings.welcomeChannel);
         if (!welcomeChannel) return;
 
         const welcomeMessage = await createWelcomeImage(member);
