@@ -8,7 +8,7 @@ module.exports = new Event({
     run: async (client, guild) => {
         try {
             // Remove guild settings
-            await client.database_handler.deleteOne('settings', { guild: guild.id });
+            await client.getDatabaseHandler().deleteOne('settings', { guild: guild.id });
 
             success(
                 `Guild ${guild.name} (${guild.id}) has been removed from the database.`

@@ -12,14 +12,14 @@ module.exports = new Event({
         if (newState.member.user.bot || oldState.member?.user.bot) return;
 
         const userId = oldState.id || newState.id;
-        const levelingSystem = client.levelingSystem_handler;
+        const levelingSystem = client.getLevelingSystemHandler();
 
         // Helper function to handle level up messages
         async function handleLevelUp(guildId, userId, oldLevel) {
-            const guildSettings = await client.database_handler.findOne('settings', { guild: guildId });
+            const guildSettings = await client.getDatabaseHandler().findOne('settings', { guild: guildId });
             if (!guildSettings?.levelingChannel) return;
 
-            const newLevelingProgress = await client.database_handler.findOne('levelingProgress', { 
+            const newLevelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', { 
                 guild: guildId, 
                 userId: userId 
             });
@@ -47,9 +47,9 @@ module.exports = new Event({
             await levelingSystem.addVoiceTimeAccount(userId, duration);
 
             // Process guild-specific XP only if leveling is enabled
-            const guildSettings = await client.database_handler.findOne('settings', { guild: sessionData.guildId });
+            const guildSettings = await client.getDatabaseHandler().findOne('settings', { guild: sessionData.guildId });
             if (guildSettings?.levelingSystem) {
-                const oldLevelData = await client.database_handler.findOne('levelingProgress', { 
+                const oldLevelData = await client.getDatabaseHandler().findOne('levelingProgress', { 
                     guild: sessionData.guildId, 
                     userId: userId 
                 });

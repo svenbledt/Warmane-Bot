@@ -50,7 +50,7 @@ module.exports = new ApplicationCommand({
         const member = interaction.guild.members.cache.get(user.id);
 
         // Get guild settings for language
-        const guildSettings = await client.database_handler.findOne('settings', {
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
             guild: interaction.guildId
         });
         const lang = guildSettings?.language || 'en';
@@ -72,12 +72,12 @@ module.exports = new ApplicationCommand({
 
 
         // Get account standing data
-        const accountStanding = await client.database_handler.findOne('accountStanding', {
+        const accountStanding = await client.getDatabaseHandler().findOne('accountStanding', {
             user: user.id
         });
 
         // Get guild leveling progress
-        const levelingProgress = await client.database_handler.findOne('levelingProgress', {
+        const levelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', {
             guild: interaction.guildId,
             userId: user.id
         });

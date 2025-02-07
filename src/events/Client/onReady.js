@@ -84,7 +84,7 @@ async function generateAndSendInvites(client) {
                 });
 
                 // Check if logging is enabled for this guild before attempting to log
-                const guildSettings = await client.database_handler.findOne('settings', {
+                const guildSettings = await client.getDatabaseHandler().findOne('settings', {
                     guild: guild.id
                 });
 
@@ -108,7 +108,7 @@ async function generateAndSendInvites(client) {
                         const owner = await guild.fetchOwner();
                         const now = Date.now();
             
-                        const guildSettings = await client.database_handler.findOne('settings', {
+                        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
                             guild: guild.id
                         });
 
@@ -130,7 +130,7 @@ async function generateAndSendInvites(client) {
                             if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
                             guildSettings.lastOwnerDM[owner.id] = now;
               
-                            await client.database_handler.updateOne('settings',
+                            await client.getDatabaseHandler().updateOne('settings',
                                 { guild: guild.id },
                                 { $set: { lastOwnerDM: guildSettings.lastOwnerDM } }
                             );
@@ -175,7 +175,7 @@ module.exports = new Event({
         await new Promise((resolve) => setTimeout(resolve, 5000));
 
         // Update all guild settings on startup
-        await client.database_handler.updateAllGuildSettings(client);
+        await client.getDatabaseHandler().updateAllGuildSettings(client);
         await updateStatus(client);
         await generateAndSendInvites(client);
 
@@ -193,7 +193,7 @@ module.exports = new Event({
         }, 24 * 60 * 60 * 1000);
 
         setInterval(() => {
-            client.database_handler.updateAllGuildSettings(client);
+            client.getDatabaseHandler().updateAllGuildSettings(client);
         }, 2 * 60 * 60 * 1000);
 
         setInterval(() => {

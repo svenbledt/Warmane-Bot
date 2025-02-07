@@ -36,7 +36,7 @@ module.exports = new ApplicationCommand({
 
         try {
             // Get guild settings for language
-            const guildSettings = await client.database_handler.findOne('settings', {
+            const guildSettings = await client.getDatabaseHandler().findOne('settings', {
                 guild: interaction.guildId
             });
             const lang = guildSettings?.language || 'en';
@@ -50,7 +50,7 @@ module.exports = new ApplicationCommand({
             }
 
             // Get all blacklisted users
-            const blacklistedUsers = await client.database_handler.find('blacklisted', {});
+            const blacklistedUsers = await client.getDatabaseHandler().find('blacklisted', {});
             if (!blacklistedUsers || blacklistedUsers.length === 0) {
                 await interaction.editReply({
                     content: LanguageManager.getText('commands.globalcheck.no_blacklisted', lang),
@@ -142,7 +142,7 @@ module.exports = new ApplicationCommand({
                         const user = await client.users.fetch(userId);
 
                         // Check if user is already blacklisted
-                        const existingBlacklist = await client.database_handler.findOne('blacklisted', { id: userId });
+                        const existingBlacklist = await client.getDatabaseHandler().findOne('blacklisted', { id: userId });
                         if (existingBlacklist) {
                             await modalInteraction.editReply({
                                 content: 'This user is already blacklisted.',
@@ -151,7 +151,7 @@ module.exports = new ApplicationCommand({
                         }
 
                         // Add user to blacklist
-                        await client.database_handler.updateOne(
+                        await client.getDatabaseHandler().updateOne(
                             'blacklisted',
                             { id: userId },
                             { $set: { id: userId, reason: reason } },
@@ -195,7 +195,7 @@ module.exports = new ApplicationCommand({
                         }));
 
                         // Refresh the blacklist display
-                        const freshBlacklistedUsers = await client.database_handler.find('blacklisted', {});
+                        const freshBlacklistedUsers = await client.getDatabaseHandler().find('blacklisted', {});
                         embeds = [];
             
                         // Recreate embeds with fresh data
@@ -261,7 +261,7 @@ module.exports = new ApplicationCommand({
                     }
                     else if (i.customId === 'refresh') {
                         // Reload the blacklist and recreate embeds
-                        const freshBlacklistedUsers = await client.database_handler.find('blacklisted', {});
+                        const freshBlacklistedUsers = await client.getDatabaseHandler().find('blacklisted', {});
                         embeds = []; // Reset embeds
             
                         // Recreate embeds with fresh data
@@ -304,7 +304,7 @@ module.exports = new ApplicationCommand({
                             await i.deferUpdate();
 
                             // Get fresh data
-                            const freshBlacklistedUsers = await client.database_handler.find('blacklisted', {});
+                            const freshBlacklistedUsers = await client.getDatabaseHandler().find('blacklisted', {});
               
                             // Get users from current page using fresh data
                             const pageUsers = freshBlacklistedUsers.slice(currentPage * 5, (currentPage * 5) + 5);
@@ -347,7 +347,7 @@ module.exports = new ApplicationCommand({
                             const selectedId = i.values[0];
               
                             // Remove user from blacklist
-                            await client.database_handler.deleteOne('blacklisted', { id: selectedId });
+                            await client.getDatabaseHandler().deleteOne('blacklisted', { id: selectedId });
 
                             // Get all guilds the bot is in
                             const guilds = client.guilds.cache;
@@ -384,7 +384,7 @@ module.exports = new ApplicationCommand({
                             }));
 
                             // Refresh the blacklist display
-                            const freshBlacklistedUsers = await client.database_handler.find('blacklisted', {});
+                            const freshBlacklistedUsers = await client.getDatabaseHandler().find('blacklisted', {});
                             embeds = []; // Reset embeds
               
                             // Recreate embeds with fresh data

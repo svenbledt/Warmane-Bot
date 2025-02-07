@@ -79,7 +79,7 @@ module.exports = new ApplicationCommand({
         const isDeveloper = config.users.developers.includes(interaction.user.id);
     
         // Get guild settings for language
-        const guildSettings = await client.database_handler.findOne('settings', {
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
             guild: interaction.guildId
         });
         const lang = guildSettings?.language || 'en';
@@ -119,7 +119,7 @@ module.exports = new ApplicationCommand({
             }
 
             // Get user characters data
-            const allUserChars = await client.database_handler.find('userCharacters', {});
+            const allUserChars = await client.getDatabaseHandler().find('userCharacters', {});
       
             // Check if character is already assigned to someone
             let existingOwner = null;
@@ -205,7 +205,7 @@ module.exports = new ApplicationCommand({
 
             // If we get here, either there's no existing owner or developer confirmed reassignment
             if (existingOwner) {
-                const prevUserData = await client.database_handler.findOne('userCharacters', { userId: existingOwner.userId });
+                const prevUserData = await client.getDatabaseHandler().findOne('userCharacters', { userId: existingOwner.userId });
                 if (existingOwner.isMain) {
                     prevUserData.main = null;
                 } else {
@@ -213,11 +213,11 @@ module.exports = new ApplicationCommand({
                         !(alt.name.toLowerCase() === charNameFormatted.toLowerCase() && alt.realm === realm)
                     );
                 }
-                await client.database_handler.updateOne('userCharacters', { userId: existingOwner.userId }, prevUserData);
+                await client.getDatabaseHandler().updateOne('userCharacters', { userId: existingOwner.userId }, prevUserData);
             }
 
             // Get or create user data
-            let userData = await client.database_handler.findOne('userCharacters', { userId: user.id });
+            let userData = await client.getDatabaseHandler().findOne('userCharacters', { userId: user.id });
             if (!userData) {
                 userData = {
                     userId: user.id,
@@ -244,7 +244,7 @@ module.exports = new ApplicationCommand({
             }
 
             // Update or insert user data
-            await client.database_handler.updateOne('userCharacters', { userId: user.id }, userData, { upsert: true });
+            await client.getDatabaseHandler().updateOne('userCharacters', { userId: user.id }, userData, { upsert: true });
 
             let responseContent;
             if (isMain && userData.alts.length > 0) {

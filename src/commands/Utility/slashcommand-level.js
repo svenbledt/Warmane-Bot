@@ -35,7 +35,7 @@ module.exports = new ApplicationCommand({
             : interaction.user;
         
         // Get guild settings for language
-        const guildSettings = await client.database_handler.findOne('settings', {
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
             guild: interaction.guildId
         });
         const lang = guildSettings?.language || 'en';
@@ -46,7 +46,7 @@ module.exports = new ApplicationCommand({
             });
         }
         // Try finding with different possible field names
-        const levelingProgress = await client.database_handler.findOne('levelingProgress', {
+        const levelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', {
             guild: interaction.guildId,
             user: targetUser.id  // Try with 'user' instead of 'userId'
         });

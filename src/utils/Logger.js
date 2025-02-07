@@ -20,7 +20,7 @@ class Logger {
             }
 
             // Then proceed with normal guild logging
-            const guildSettings = await client.database_handler.findOne('settings', {
+            const guildSettings = await client.getDatabaseHandler().findOne('settings', {
                 guild: guildId
             });
 

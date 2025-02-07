@@ -7,7 +7,7 @@ module.exports = new Event({
     run: async (client, message) => {
         if (message.author.bot || !message.guild || message.channel.type !== ChannelType.GuildText) return;
 
-        const levelingSystem = client.levelingSystem_handler;
+        const levelingSystem = client.getLevelingSystemHandler();
         const member = message.member;
         const userId = member.user.id;
         const guildId = message.guild.id;
@@ -21,11 +21,11 @@ module.exports = new Event({
         await levelingSystem.addMessageAccount(userId);
 
         // Process guild-specific XP only if leveling is enabled
-        const guildSettings = await client.database_handler.findOne('settings', { guild: guildId });
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', { guild: guildId });
         if (!guildSettings?.levelingSystem) return;
 
         // Get current level before adding XP
-        const levelingProgress = await client.database_handler.findOne('levelingProgress', { 
+        const levelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', { 
             guild: guildId, 
             userId: userId
         });
@@ -36,7 +36,7 @@ module.exports = new Event({
 
         // Send level up message if channel is configured
         if (guildSettings.levelingChannel) {
-            const newLevelingProgress = await client.database_handler.findOne('levelingProgress', { 
+            const newLevelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', { 
                 guild: guildId, 
                 userId: userId 
             });

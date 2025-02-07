@@ -1,0 +1,43 @@
+Tech Stack:
+
+Backend: Node.js
+
+Database: MongoDB with Mongoose ODM
+
+Authentication: Discord Token
+
+Version Control: Git
+
+Deployment: Node.js
+
+Precision in User Requirements:
+
+Strictly adhere to specified user flow and game rules.
+
+Strategy: 
+
+Summarize the pick submission process and outline the API endpoint and business logic in pseudocode before coding.
+
+Strategic Planning with Pseudocode:
+
+Begin each feature with detailed pseudocode.
+
+Example: Provide pseudocode for the weekly scoring process, detailing steps from game result input to entry status updates.
+
+Code Quality:
+
+Ensure secure, efficient code following Discord.js best practices.
+
+Implement proper error handling and input validation.
+
+Always ensure the functionality remains the same as the original.
+
+Try to optimize the code for performance and readability.
+
+Always use the latest version of Discord.js.
+
+Always use the latest version of Node.js.
+
+Always use the latest version of MongoDB.
+
+Always use the latest version of Mongoose.
