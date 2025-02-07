@@ -39,14 +39,12 @@ module.exports = new ApplicationCommand({
         });
         const lang = guildSettings?.language || 'en';
 
-        // Fetch all application commands to get their IDs, considering development mode
         const applicationCommands = config.development.enabled ?
             await interaction.guild.commands.fetch() :
             await client.application.commands.fetch();
 
         const command = interaction.options.getString('command');
 
-        // Create categories for commands
         const categories = {
             Information: [],
             Utility: [],
@@ -54,14 +52,11 @@ module.exports = new ApplicationCommand({
             Settings: [],
         };
 
-        // Convert Map to Array and sort commands into categories
         Array.from(client.collection.application_commands.values()).forEach(cmd => {
-            // Skip developer commands and context menu commands
             if (cmd.options?.botDevelopers || cmd.command.type !== 1) {
                 return;
             }
 
-            // Get category from command file path
             let category = 'Utility';
             const filePath = cmd.filePath;
             if (filePath) {
@@ -71,11 +66,9 @@ module.exports = new ApplicationCommand({
                 }
             }
 
-            // Only add to category if it exists in our categories object
             categories[category]?.push(cmd);
         });
 
-        // Category emojis
         const categoryEmojis = {
             Information: '📚',
             Utility: '🛠️',
@@ -137,9 +130,7 @@ module.exports = new ApplicationCommand({
             })
             .setTimestamp();
 
-        // Add fields for each category
         Object.entries(categories).forEach(([category, commands]) => {
-            // Only show categories that have commands and exist
             if (commands && commands.length > 0) {
                 embed.addFields({
                     name: `${categoryEmojis[category]} ${category}`,
@@ -147,7 +138,6 @@ module.exports = new ApplicationCommand({
                         const commandId = applicationCommands.find(c => c.name === cmd.command.name)?.id;
                         let cmdStr;
                         
-                        // Handle commands with subcommands
                         if (cmd.command.options?.some(opt => opt.type === ApplicationCommandOptionType.Subcommand)) {
                             const subcommands = cmd.command.options
                                 .filter(opt => opt.type === ApplicationCommandOptionType.Subcommand)
@@ -165,7 +155,7 @@ module.exports = new ApplicationCommand({
                             return `${cmdStr}\n> └ *${cmd.command.description}*`;
                         }
                     }).join('\n\n')
-                    + '\n\u200b' // Add empty line after each category
+                    + '\n\u200b'
                 });
             }
         });
