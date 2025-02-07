@@ -83,8 +83,9 @@ module.exports = new ApplicationCommand({
                 });
         
                 commands1.forEach(cmd => {
+                    const commandId = client.application.commands.cache.find(c => c.name === cmd.command.name)?.id;
                     embed.addFields({
-                        name: `/${cmd.command.name}`,
+                        name: commandId ? `</command:${commandId}>` : `/${cmd.command.name}`,
                         value: cmd.command.description || LanguageManager.getText('commands.help.NO_DESCRIPTION', lang),
                         inline: true
                     });
@@ -104,8 +105,9 @@ module.exports = new ApplicationCommand({
                     });
           
                     commands2.forEach(cmd => {
+                        const commandId = client.application.commands.cache.find(c => c.name === cmd.command.name)?.id;
                         embed.addFields({
-                            name: `/${cmd.command.name}`,
+                            name: commandId ? `</command:${commandId}>` : `/${cmd.command.name}`,
                             value: cmd.command.description || LanguageManager.getText('commands.help.NO_DESCRIPTION', lang),
                             inline: true
                         });

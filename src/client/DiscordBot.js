@@ -1,4 +1,4 @@
-const { Client, Collection, Partials, GatewayIntentBits } = require('discord.js');
+const { Client, Partials, GatewayIntentBits } = require('discord.js');
 const CommandsHandler = require('./handler/CommandsHandler');
 const { warn, error, info, success } = require('../utils/Console');
 const config = require('../config');
