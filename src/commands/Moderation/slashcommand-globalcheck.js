@@ -28,7 +28,7 @@ module.exports = new ApplicationCommand({
    */
     run: async (client, interaction) => {
     // Get guild settings for language
-        const guildSettings = await client.database_handler.findOne('settings', {
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
             guild: interaction.guildId
         });
         const lang = guildSettings?.language || 'en';
@@ -49,7 +49,7 @@ module.exports = new ApplicationCommand({
         }
 
         // Get blacklisted users from database
-        const blacklistedUsers = await client.database_handler.find('blacklisted', {});
+        const blacklistedUsers = await client.getDatabaseHandler().find('blacklisted', {});
         if (!blacklistedUsers || blacklistedUsers.length === 0) {
             await interaction.reply({
                 content: LanguageManager.getText('commands.globalcheck.no_blacklisted', lang),

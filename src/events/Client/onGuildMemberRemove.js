@@ -6,11 +6,11 @@ module.exports = new Event({
     event: 'guildMemberRemove',
     run: async (client, member) => {
         // remove the member from the leveling system for the specific guild
-        const levelingProgress = await client.database_handler.findOne('levelingProgress', { guild: member.guild.id, userId: member.id });
+        const levelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', { guild: member.guild.id, userId: member.id });
         if (!levelingProgress) return;
 
         try {
-            await client.database_handler.deleteOne('levelingProgress', { guild: member.guild.id, userId: member.id });
+            await client.getDatabaseHandler().deleteOne('levelingProgress', { guild: member.guild.id, userId: member.id });
             // log the removal onn the dev logger
             Logger.log(client, member.guild.id, {
                 titleKey: 'leveling_progress_removed',

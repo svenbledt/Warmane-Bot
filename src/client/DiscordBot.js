@@ -11,27 +11,21 @@ const DatabaseHandler = require('./handler/DatabaseHandler');
 const LevelingSystemHandler = require('./handler/LevelingSystemHandler');
 
 class DiscordBot extends Client {
+    // Use private fields for better encapsulation
+    #loginAttempts = 0;
+    #databaseHandler = null;
+    #levelingSystemHandler = null;
+
+    // Simplified collection structure using Map for better performance
     collection = {
-        application_commands: new Collection(),
+        application_commands: new Map(),
         components: {
-            buttons: new Collection(),
-            selects: new Collection(),
-            modals: new Collection(),
-            autocomplete: new Collection(),
+            buttons: new Map(),
+            selects: new Map(),
+            modals: new Map(),
+            autocomplete: new Map(),
         },
     };
-    rest_application_commands_array = [];
-    login_attempts = 0;
-    login_timestamp = 0;
-
-    commands_handler = new CommandsHandler(this);
-    components_handler = new ComponentsHandler(this);
-    events_handler = new EventsHandler(this);
-
-    mongoClient = null;
-    db = null;
-
-    database_handler = null;
 
     constructor() {
         super({
@@ -45,45 +39,48 @@ class DiscordBot extends Client {
                 GatewayIntentBits.DirectMessageReactions,
                 GatewayIntentBits.GuildVoiceStates
             ],
-            partials: [
-                Partials.Channel,
-                Partials.GuildMember,
-                Partials.Message,
-                Partials.Reaction,
-                Partials.User,
-            ],
+            partials: Object.values(Partials).filter(partial => 
+                ['Channel', 'GuildMember', 'Message', 'Reaction', 'User'].includes(partial)
+            ),
             presence: {
-                activities: [
-                    {
-                        name: 'keep this empty',
-                        type: 4,
-                        state: 'Watching some cool stuff',
-                    },
-                ],
+                activities: [{
+                    name: 'keep this empty',
+                    type: 4,
+                    state: 'Watching some cool stuff',
+                }],
             },
         });
 
+        this.initializeHandlers();
+        this.loadLanguages();
+        this.initializeEnvironmentVariables();
+    }
+
+    // Split initialization logic into separate methods
+    initializeHandlers() {
+        this.commands_handler = new CommandsHandler(this);
+        this.components_handler = new ComponentsHandler(this);
+        this.events_handler = new EventsHandler(this);
         new CommandsListener(this);
         new ComponentsListener(this);
+        this.#levelingSystemHandler = new LevelingSystemHandler(this);
+    }
 
-        LanguageManager.loadLanguage('en');
-        LanguageManager.loadLanguage('de');
-        LanguageManager.loadLanguage('ru');
-        LanguageManager.loadLanguage('fr');
-        LanguageManager.loadLanguage('es');
+    loadLanguages() {
+        ['en', 'de', 'ru', 'fr', 'es'].forEach(lang => 
+            LanguageManager.loadLanguage(lang)
+        );
+    }
 
-        // Create LevelingSystemHandler
-        this.levelingSystem_handler = new LevelingSystemHandler(this);
-
-        // Initialize MongoDB connection URL and DB name
+    initializeEnvironmentVariables() {
         this.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
         this.DB_NAME = process.env.DB_NAME || 'warmane_bot';
     }
 
     async connectToMongoDB() {
         try {
-            this.database_handler = new DatabaseHandler(this);
-            await this.database_handler.connect();
+            this.#databaseHandler = new DatabaseHandler(this);
+            await this.#databaseHandler.connect();
             success('Successfully connected to MongoDB and initialized database.');
         } catch (err) {
             error('MongoDB connection error:', err);
@@ -91,49 +88,53 @@ class DiscordBot extends Client {
         }
     }
 
-
-    connect = async () => {
-        warn(
-            `Attempting to connect to the Discord bot... (${this.login_attempts + 1})`
-        );
-
-        this.login_timestamp = Date.now();
+    async connect() {
+        warn(`Attempting to connect to the Discord bot... (${this.#loginAttempts + 1})`);
 
         try {
-            // Connect to MongoDB first
             await this.connectToMongoDB();
-      
-            // Login to Discord
             await this.login(process.env.CLIENT_TOKEN);
-
-            // Load handlers
-            this.commands_handler.load();
-            this.components_handler.load();
-            this.events_handler.load();
-
-            // Initialize commands collection
-            this.commands = new Collection();
-
-            // Delete and register application commands
-            await this.commands_handler.deleteApplicationCommands(config.development);
-            await this.commands_handler.registerApplicationCommands(config.development);
+            await this.initializeBot();
         } catch (err) {
             error('Failed to connect to services, retrying...');
             error(err);
-            this.login_attempts++;
-            setTimeout(this.connect, 5000);
+            this.#loginAttempts++;
+            setTimeout(() => this.connect(), 5000);
         }
-    };
+    }
 
-    // Add a cleanup method for proper shutdown
+    // Separate initialization logic
+    async initializeBot() {
+        this.commands_handler.load();
+        this.components_handler.load();
+        this.events_handler.load();
+        this.commands = new Map(); // Using Map instead of Collection
+
+        await this.commands_handler.deleteApplicationCommands(config.development);
+        await this.commands_handler.registerApplicationCommands(config.development);
+    }
+
     async disconnect() {
-        if (this.database_handler) {
-            await this.database_handler.disconnect();
+        try {
+            if (this.#databaseHandler) {
+                await this.#databaseHandler.disconnect();
+            }
+            if (this.isReady()) {
+                await this.destroy();
+                info('Discord bot connection closed.');
+            }
+        } catch (err) {
+            error('Error during disconnect:', err);
         }
-        if (this.isReady()) {
-            await this.destroy();
-            info('Discord bot connection closed.');
-        }
+    }
+
+    // Add getters for private handlers
+    getDatabaseHandler() {
+        return this.#databaseHandler;
+    }
+
+    getLevelingSystemHandler() {
+        return this.#levelingSystemHandler;
     }
 }
 

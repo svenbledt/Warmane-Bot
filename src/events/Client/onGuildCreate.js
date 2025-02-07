@@ -13,7 +13,7 @@ module.exports = new Event({
         );
 
         // Ensure guild settings when bot joins new guild
-        await client.database_handler.ensureGuildSettings(guild.id, guild.name);
+        await client.getDatabaseHandler().ensureGuildSettings(guild.id, guild.name);
 
         success(
             `Guild ${guild.name} (${guild.id}) has been added to the database.`

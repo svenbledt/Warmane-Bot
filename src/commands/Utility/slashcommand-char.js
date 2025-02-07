@@ -23,7 +23,7 @@ const https = rateLimit(axios.create(), {
 
 // Update findCharacterOwner function to use async/await with Mongoose
 const findCharacterOwner = async (client, charName, realm) => {
-    const userCharacter = await client.database_handler.findOne('userCharacters', {
+    const userCharacter = await client.getDatabaseHandler().findOne('userCharacters', {
         $or: [
             { 'main.name': { $regex: new RegExp(`^${charName}$`, 'i') }, 'main.realm': realm },
             { 'alts': { 
@@ -121,7 +121,7 @@ module.exports = new ApplicationCommand({
         const subcommand = interaction.options.getSubcommand();
 
         // Get guild settings for language
-        const guildSettings = await client.database_handler.findOne('settings', {
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
             guild: interaction.guildId
         });
         const lang = guildSettings?.language || 'en';
@@ -830,7 +830,7 @@ module.exports = new ApplicationCommand({
                 ? (interaction.options.getUser('user') || interaction.user)
                 : interaction.user;
 
-            const userData = await client.database_handler.findOne('userCharacters', {
+            const userData = await client.getDatabaseHandler().findOne('userCharacters', {
                 userId: targetUser.id
             });
 

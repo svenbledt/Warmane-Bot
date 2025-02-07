@@ -46,7 +46,7 @@ module.exports = new ApplicationCommand({
             await interaction.deferReply();
 
             // Get blacklisted users from MongoDB
-            const blacklistedUsers = await client.database_handler.find('blacklisted', {});
+            const blacklistedUsers = await client.getDatabaseHandler().find('blacklisted', {});
       
             if (!blacklistedUsers || blacklistedUsers.length === 0) {
                 await interaction.editReply({

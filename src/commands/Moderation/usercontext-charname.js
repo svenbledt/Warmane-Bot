@@ -26,7 +26,7 @@ module.exports = new ApplicationCommand({
     run: async (client, interaction) => {
         const member = interaction.targetMember;
         // Get guild settings for language and custom DM message
-        const guildSettings = await client.database_handler.findOne('settings', {
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
             guild: interaction.guildId
         });
         const lang = guildSettings?.language || 'en';

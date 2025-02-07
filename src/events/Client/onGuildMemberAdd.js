@@ -88,7 +88,7 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
 
         if (!isDevServer) {
             // Check if character exists in database
-            const userCharacter = await client.database_handler.findOne('userCharacters', {
+            const userCharacter = await client.getDatabaseHandler().findOne('userCharacters', {
                 $or: [
                     { 'main.name': { $regex: new RegExp(`^${response}$`, 'i') } },
                     { 'alts': { 
@@ -143,7 +143,7 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
                     addedAt: new Date()
                 };
 
-                await client.database_handler.updateOne('userCharacters',
+                await client.getDatabaseHandler().updateOne('userCharacters',
                     { userId: member.user.id },
                     {
                         $setOnInsert: { userId: member.user.id },
@@ -226,8 +226,8 @@ async function handleManualInput(client, member, dmChannel, guildSettings, lang)
 
 // Update handleNicknameChange function
 async function handleNicknameChange(client, member, charName, lang, guildName) {
-    // Get fresh database content from database_handler instead of direct database access
-    const userChars = await client.database_handler.findMany('userCharacters') || {};
+    // Get fresh database content from client.getDatabaseHandler() instead of direct database access
+    const userChars = await client.getDatabaseHandler().findMany('userCharacters') || {};
   
     const validation = await validateCharacterName(client, charName, userChars, lang);
     if (!validation.valid) {
@@ -688,7 +688,7 @@ async function fetchUserCharacters(client, userId) {
 
     // Get characters from database
     try {
-        const dbUserData = await client.database_handler.findOne('userCharacters', { userId });
+        const dbUserData = await client.getDatabaseHandler().findOne('userCharacters', { userId });
     
         if (dbUserData) {
             if (dbUserData.main) {
@@ -740,7 +740,7 @@ async function validateCharacterName(client, charName, userChars, lang) {
     }
 
     if (!userChars || Object.keys(userChars).length === 0) {
-        userChars = client.database_handler.get('userCharacters') || {};
+        userChars = client.getDatabaseHandler().get('userCharacters') || {};
     }
 
     const charNameLower = charName.toLowerCase();
@@ -883,7 +883,7 @@ module.exports = new Event({
     run: async (client, member) => {
         if (member.user.bot) return;
 
-        const guildSettings = await client.database_handler.findOne('settings', {
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
             guild: member.guild.id
         }) || { guild: member.guild.id };
 
@@ -896,7 +896,7 @@ module.exports = new Event({
 
         // Handle blacklisted users
         if (guildSettings.BlockList) {
-            const blacklistedUser = await client.database_handler.findOne('blacklisted', {
+            const blacklistedUser = await client.getDatabaseHandler().findOne('blacklisted', {
                 id: member.id
             });
       

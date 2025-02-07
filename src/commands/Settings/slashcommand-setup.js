@@ -182,7 +182,7 @@ module.exports = new ApplicationCommand({
         const isAdmin = interaction.member?.permissions?.has([PermissionsBitField.Flags.Administrator]);
     
         if (!isDeveloper && !isAdmin) {
-            const guildSettings = await client.database_handler.findOne('settings', { guild: interaction.guildId });
+            const guildSettings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guildId });
             const lang = guildSettings?.language || 'en';
       
             await interaction.reply({
@@ -192,7 +192,7 @@ module.exports = new ApplicationCommand({
             return;
         }
 
-        const guildSettings = await client.database_handler.findOne('settings', { guild: interaction.guildId });
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guildId });
         if (!guildSettings) {
             await interaction.reply({
                 content: LanguageManager.getText('commands.setup.error_occurred', 'en', { error: 'Guild settings not found' }),
@@ -204,7 +204,7 @@ module.exports = new ApplicationCommand({
         // Automatically disable logging if no channel is set
         if (guildSettings.enableLogging && !guildSettings.logChannel) {
             guildSettings.enableLogging = false;
-            await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, { $set: { enableLogging: false } });
+            await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, { $set: { enableLogging: false } });
         }
 
         const embed = createSettingsEmbed(guildSettings, guildSettings.language);
@@ -236,7 +236,7 @@ module.exports = new ApplicationCommand({
             if (i.customId === 'change_language') {
                 try {
                     // Get fresh settings to ensure we have the current language
-                    const settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+                    const settings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guild.id });
           
                     const languageSelect = new ActionRowBuilder()
                         .addComponents(
@@ -291,12 +291,12 @@ module.exports = new ApplicationCommand({
             // Handle language selection
             if (i.customId === 'set_language') {
                 // Get fresh settings before updating
-                const settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+                const settings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guild.id });
         
                 const newLanguage = i.values[0];
                 // Only update the language value while preserving all other settings
                 settings.language = newLanguage;
-                await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
 
                 await i.reply({
                     content: LanguageManager.getText('commands.setup.language_set', newLanguage, {
@@ -319,7 +319,7 @@ module.exports = new ApplicationCommand({
             if (i.customId === 'edit_charname_dm') {
                 try {
                     // Get fresh settings to show current value
-                    const settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+                    const settings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guild.id });
 
                     await i.showModal({
                         custom_id: 'charname-dm-modal',
@@ -357,7 +357,7 @@ module.exports = new ApplicationCommand({
                         settings.charNameAskDM = message;
             
                         // Save to database
-                        await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                        await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
 
                         await modalSubmit.reply({
                             content: LanguageManager.getText('commands.setup.charname_dm_updated', guildSettings.language),
@@ -385,7 +385,7 @@ module.exports = new ApplicationCommand({
             // For all toggle buttons (welcomeMessage, CharNameAsk, BlockList, enableLogging)
             if (i.customId.startsWith('toggle_')) {
                 // Get fresh settings before toggle
-                const settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+                const settings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guild.id });
         
                 const feature = i.customId.replace('toggle_', '');
         
@@ -395,7 +395,7 @@ module.exports = new ApplicationCommand({
                         // If logging is enabled, disable it and clear the channel
                         settings.enableLogging = false;
                         settings.logChannel = '';
-                        await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                        await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
             
                         const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
                         const updatedButtons = createSettingsButtons(settings);
@@ -425,7 +425,7 @@ module.exports = new ApplicationCommand({
                         // If welcome message is enabled, disable it and clear the channel
                         settings.welcomeMessage = false;
                         settings.welcomeChannel = '';
-                        await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                        await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
             
                         const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
                         const updatedButtons = createSettingsButtons(settings);
@@ -455,7 +455,7 @@ module.exports = new ApplicationCommand({
                         // If leveling is enabled, disable it and clear the channel
                         settings.levelingSystem = false;
                         settings.levelingChannel = '';
-                        await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                        await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
             
                         const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
                         const updatedButtons = createSettingsButtons(settings);
@@ -481,7 +481,7 @@ module.exports = new ApplicationCommand({
 
                 // Handle other toggles
                 settings[feature] = !settings[feature];
-                await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
         
                 const updatedEmbed = createSettingsEmbed(settings, guildSettings.language);
                 const updatedButtons = createSettingsButtons(settings);
@@ -495,14 +495,14 @@ module.exports = new ApplicationCommand({
 
             if (i.customId === 'set_welcomeChannel') {
                 // Get fresh settings before updating
-                const settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+                const settings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guild.id });
         
                 const channel = i.values[0];
                 settings.welcomeChannel = channel;
                 settings.welcomeMessage = true;  // Enable welcome message only after channel is set
         
                 try {
-                    await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                    await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
           
                     await i.reply({
                         content: LanguageManager.getText('commands.setup.welcome_channel_set', guildSettings.language, {
@@ -530,7 +530,7 @@ module.exports = new ApplicationCommand({
 
             if (i.customId === 'set_logChannel') {
                 // Get fresh settings before updating
-                const settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+                const settings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guild.id });
         
                 // Get the selected channel ID
                 const channelId = i.values[0];
@@ -540,7 +540,7 @@ module.exports = new ApplicationCommand({
                 settings.enableLogging = true;  // Enable logging only after channel is set
         
                 // Save updated settings
-                await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
 
                 await i.reply({
                     content: LanguageManager.getText('commands.setup.log_channel_set', guildSettings.language, {
@@ -564,7 +564,7 @@ module.exports = new ApplicationCommand({
                     // If logging is enabled, disable it and clear the channel
                     guildSettings.enableLogging = false;
                     guildSettings.logChannel = '';
-                    await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, guildSettings);
+                    await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, guildSettings);
           
                     const updatedEmbed = createSettingsEmbed(guildSettings, guildSettings.language);
                     const updatedButtons = createSettingsButtons(guildSettings);
@@ -590,14 +590,14 @@ module.exports = new ApplicationCommand({
 
             if (i.customId === 'set_levelingChannel') {
                 // Get fresh settings before updating
-                const settings = await client.database_handler.findOne('settings', { guild: interaction.guild.id });
+                const settings = await client.getDatabaseHandler().findOne('settings', { guild: interaction.guild.id });
         
                 const channelId = i.values[0];
                 settings.levelingChannel = channelId;
                 settings.levelingSystem = true;  // Enable leveling only after channel is set
         
                 try {
-                    await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, settings);
+                    await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, settings);
           
                     await i.reply({
                         content: LanguageManager.getText('commands.setup.leveling_channel_set', guildSettings.language, {
@@ -634,7 +634,7 @@ module.exports = new ApplicationCommand({
                 }
         
                 try {
-                    await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, guildSettings);
+                    await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, guildSettings);
           
                     const updatedEmbed = createSettingsEmbed(guildSettings, guildSettings.language);
                     const updatedButtons = createSettingsButtons(guildSettings);
@@ -657,7 +657,7 @@ module.exports = new ApplicationCommand({
             guildSettings[settingName] = !guildSettings[settingName];
 
             try {
-                await client.database_handler.updateOne('settings', { guild: interaction.guild.id }, guildSettings);
+                await client.getDatabaseHandler().updateOne('settings', { guild: interaction.guild.id }, guildSettings);
         
                 const updatedEmbed = createSettingsEmbed(guildSettings, guildSettings.language);
                 const updatedButtons = createSettingsButtons(guildSettings);
