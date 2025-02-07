@@ -74,7 +74,7 @@ async function handleDMResponse(client, interaction, dmChannel, member, timeout,
         }
 
         await updateNickname(client, interaction, member, response, lang);
-    } catch (timeoutError) {
+    } catch (error) {
         await handleDMTimeout(client, interaction, dmChannel, member, lang);
     }
 }
@@ -338,7 +338,6 @@ async function processAndDisplayCharacterInfo(client, interaction, summary, armo
         });
     }
 
-    const items = summary.equipment.map((item) => item.item);
     const itemsMap = new Map(itemsDB.items.map((item) => [item.itemID, item]));
     const totalGearScore = CharacterUtils.calculateGearScore(summary.equipment, itemsMap);
 
@@ -439,7 +438,14 @@ function setCharacterAppearance(character) {
     const portraits = {
         'Human': { 'Female': config.base.humanFemale, 'Male': config.base.humanMale },
         'Orc': { 'Female': config.base.orcFemale, 'Male': config.base.orcMale },
-        // ... add other races similarly
+        'Dwarf': { 'Female': config.base.dwarfFemale, 'Male': config.base.dwarfMale },
+        'Night Elf': { 'Female': config.base.nightelfFemale, 'Male': config.base.nightelfMale },
+        'Undead': { 'Female': config.base.undeadFemale, 'Male': config.base.undeadMale },
+        'Tauren': { 'Female': config.base.taurenFemale, 'Male': config.base.taurenMale },
+        'Gnome': { 'Female': config.base.gnomeFemale, 'Male': config.base.gnomeMale },
+        'Troll': { 'Female': config.base.trollFemale, 'Male': config.base.trollMale },
+        'Blood Elf': { 'Female': config.base.bloodElfFemale, 'Male': config.base.bloodElfMale },
+        'Draenei': { 'Female': config.base.draeneiFemale, 'Male': config.base.draeneiMale }
     };
     character.portrait = portraits[character.race]?.[character.gender] || config.base.defaultPortrait;
 }

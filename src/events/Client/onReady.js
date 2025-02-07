@@ -171,7 +171,7 @@ async function generateAndSendInvites(client) {
 module.exports = new Event({
     event: 'ready',
     once: true,
-    run: async (__client__, client) => {
+    run: async (client) => {
         await new Promise((resolve) => setTimeout(resolve, 5000));
 
         // Update all guild settings on startup
@@ -180,11 +180,7 @@ module.exports = new Event({
         await generateAndSendInvites(client);
 
         success(
-            'Logged in as ' +
-        client.user.displayName +
-        ', took ' +
-        (Date.now() - __client__.login_timestamp) / 1000 +
-        's.'
+            `Logged in as ${client.user.tag}, took ${((Date.now() - client.getLoginTime()) / 1000).toFixed(2)}s.`
         );
 
         // Schedule recurring tasks

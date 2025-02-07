@@ -13,6 +13,7 @@ const LevelingSystemHandler = require('./handler/LevelingSystemHandler');
 class DiscordBot extends Client {
     // Use private fields for better encapsulation
     #loginAttempts = 0;
+    #loginTime = 0;
     #databaseHandler = null;
     #levelingSystemHandler = null;
 
@@ -90,6 +91,7 @@ class DiscordBot extends Client {
 
     async connect() {
         warn(`Attempting to connect to the Discord bot... (${this.#loginAttempts + 1})`);
+        this.#loginTime = Date.now();
 
         try {
             await this.connectToMongoDB();
@@ -135,6 +137,10 @@ class DiscordBot extends Client {
 
     getLevelingSystemHandler() {
         return this.#levelingSystemHandler;
+    }
+
+    getLoginTime() {
+        return this.#loginTime;
     }
 }
 
