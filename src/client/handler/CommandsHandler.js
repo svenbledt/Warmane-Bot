@@ -158,9 +158,10 @@ class CommandsHandler {
                 restOptions ? restOptions : { version: '10' }
             ).setToken(this.client.token);
 
+            let registeredCommands;
             if (development.enabled) {
                 // In development mode, register all commands to guild
-                await rest.put(
+                registeredCommands = await rest.put(
                     Routes.applicationGuildCommands(
                         this.client.user.id,
                         development.guildId
@@ -170,12 +171,21 @@ class CommandsHandler {
                 success('Successfully registered application commands for development guild');
             } else {
                 // In production mode, register commands globally
-                await rest.put(
+                registeredCommands = await rest.put(
                     Routes.applicationCommands(this.client.user.id),
                     { body: this.client.rest_application_commands_array }
                 );
                 success('Successfully registered application commands for all guilds');
             }
+
+            // Store command IDs
+            registeredCommands.forEach(cmd => {
+                const command = this.client.collection.application_commands.get(cmd.name);
+                if (command) {
+                    command.command.id = cmd.id;
+                }
+            });
+
             success(`Successfully registered ${this.client.rest_application_commands_array.length} application commands`);
         } catch (err) {
             error('Failed to register application commands:');

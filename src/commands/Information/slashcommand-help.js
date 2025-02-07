@@ -4,189 +4,175 @@ const {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle
+    ButtonStyle,
+    ApplicationCommandOptionType
 } = require('discord.js');
 const DiscordBot = require('../../client/DiscordBot');
 const ApplicationCommand = require('../../structure/ApplicationCommand');
 const LanguageManager = require('../../utils/LanguageManager');
+const config = require('../../config');
 
 module.exports = new ApplicationCommand({
     command: {
         name: 'help',
-        description: 'Replies with a list of available application commands.',
+        description: 'Shows all commands',
         type: 1,
-        contexts: [0, 2],
-        options: [],
+        options: [
+            {
+                name: 'command',
+                description: 'Get information about a specific command',
+                type: ApplicationCommandOptionType.String,
+                required: false,
+            },
+        ],
     },
     options: {
         cooldown: 10000,
     },
     /**
-   * @param {DiscordBot} client
-   * @param {ChatInputCommandInteraction} interaction
-   */
+     * @param {DiscordBot} client
+     * @param {ChatInputCommandInteraction} interaction
+     */
     run: async (client, interaction) => {
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
+            guild: interaction.guildId
+        });
+        const lang = guildSettings?.language || 'en';
 
-        try {
-            // Get guild settings for language from MongoDB
-            const guildSettings = await client.getDatabaseHandler().findOne('settings', {
-                guild: interaction.guildId
-            });
-            const lang = guildSettings?.language || 'en';
+        // Fetch all application commands to get their IDs, considering development mode
+        const applicationCommands = config.development.enabled ?
+            await interaction.guild.commands.fetch() :
+            await client.application.commands.fetch();
 
-            // Group commands by category
-            const commandsByCategory = new Map();
-      
-            client.collection.application_commands
-                .filter(cmd => 
-                    cmd.command.name !== 'help' && 
-          cmd.command.name !== 'Ask for Charname' &&
-          cmd.command.type === 1 &&
-          cmd.category !== 'Developer'
-                )
-                .forEach(cmd => {
-                    const category = cmd.category || 'Other';
-          
-                    if (!commandsByCategory.has(category)) {
-                        commandsByCategory.set(category, []);
-                    }
-          
-                    commandsByCategory.get(category).push(cmd);
-                });
+        const command = interaction.options.getString('command');
 
-            // Create embeds array
-            const embeds = [];
-            const categories = Array.from(commandsByCategory.entries());
-      
-            // Process categories in pairs
-            for (let i = 0; i < categories.length; i += 2) {
-                const embed = new EmbedBuilder()
-                    .setColor('#2B2D31')
-                    .setTitle(LanguageManager.getText('commands.help.EMBED.TITLE', lang))
-                    .setDescription(LanguageManager.getText('commands.help.EMBED.DESCRIPTION', lang))
-                    .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
-                    .setTimestamp()
-                    .setFooter({ 
-                        text: LanguageManager.getText('commands.help.EMBED.FOOTER', lang, { 
-                            USER_TAG: interaction.user.tag 
-                        }),
-                        iconURL: interaction.user.displayAvatarURL()
-                    });
+        // Create categories for commands
+        const categories = {
+            Information: [],
+            Utility: [],
+            Moderation: [],
+            Settings: [],
+        };
 
-                // Add first category
-                const [category1, commands1] = categories[i];
-                embed.addFields({ 
-                    name: `__${category1}__`, 
-                    value: '\u200b',
-                    inline: false 
-                });
-        
-                commands1.forEach(cmd => {
-                    const commandId = client.application.commands.cache.find(c => c.name === cmd.command.name)?.id;
-                    embed.addFields({
-                        name: commandId ? `</${cmd.command.name}:${commandId}>` : `/${cmd.command.name}`,
-                        value: cmd.command.description || LanguageManager.getText('commands.help.NO_DESCRIPTION', lang),
-                        inline: true
-                    });
-                });
-
-                // Add second category if it exists
-                if (i + 1 < categories.length) {
-                    const [category2, commands2] = categories[i + 1];
-          
-                    // Add spacer between categories
-                    embed.addFields({ name: '\u200b', value: '\u200b', inline: false });
-          
-                    embed.addFields({ 
-                        name: `__${category2}__`, 
-                        value: '\u200b',
-                        inline: false 
-                    });
-          
-                    commands2.forEach(cmd => {
-                        const commandId = client.application.commands.cache.find(c => c.name === cmd.command.name)?.id;
-                        embed.addFields({
-                            name: commandId ? `</${cmd.command.name}:${commandId}>` : `/${cmd.command.name}`,
-                            value: cmd.command.description || LanguageManager.getText('commands.help.NO_DESCRIPTION', lang),
-                            inline: true
-                        });
-                    });
-                }
-
-                embeds.push(embed);
-            }
-
-            // If there's only one page, send it without buttons
-            if (embeds.length === 1) {
-                await interaction.editReply({
-                    embeds: [embeds[0]]
-                });
+        // Convert Map to Array and sort commands into categories
+        Array.from(client.collection.application_commands.values()).forEach(cmd => {
+            // Skip developer commands and context menu commands
+            if (cmd.options?.botDevelopers || cmd.command.type !== 1) {
                 return;
             }
 
-            // Create navigation buttons with localized labels
+            // Get category from command file path
+            let category = 'Utility';
+            const filePath = cmd.filePath;
+            if (filePath) {
+                const match = filePath.match(/commands\/([^/]+)\//);
+                if (match && match[1]) {
+                    category = match[1];
+                }
+            }
+
+            // Only add to category if it exists in our categories object
+            categories[category]?.push(cmd);
+        });
+
+        // Category emojis
+        const categoryEmojis = {
+            Information: '📚',
+            Utility: '🛠️',
+            Moderation: '🛡️',
+            Settings: '⚙️'
+        };
+
+        if (command) {
+            const cmd = Array.from(client.collection.application_commands.values())
+                .find(cmd => cmd.command.name.toLowerCase() === command.toLowerCase());
+
+            if (!cmd) {
+                return interaction.reply({
+                    content: LanguageManager.getText('commands.help.command_not_found', lang),
+                    flags: [MessageFlags.Ephemeral],
+                });
+            }
+
+            const embed = new EmbedBuilder()
+                .setTitle(`🔍 Command: /${cmd.command.name}`)
+                .setDescription(cmd.command.description)
+                .setColor('#0099ff')
+                .setFooter({ 
+                    text: `Requested by ${interaction.user.tag}`,
+                    iconURL: interaction.user.displayAvatarURL()
+                })
+                .setTimestamp();
+
+            if (cmd.command.options?.length > 0) {
+                embed.addFields({
+                    name: LanguageManager.getText('commands.help.options', lang),
+                    value: cmd.command.options.map(option => 
+                        `> • \`${option.name}\`\n> └ *${option.description}*`
+                    ).join('\n')
+                });
+            }
+
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
-                    .setCustomId('previous')
-                    .setLabel(LanguageManager.getText('commands.help.BUTTONS.PREVIOUS', lang))
-                    .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                    .setCustomId('next')
-                    .setLabel(LanguageManager.getText('commands.help.BUTTONS.NEXT', lang))
-                    .setStyle(ButtonStyle.Primary)
+                    .setCustomId('back')
+                    .setLabel('Back to Overview')
+                    .setStyle(ButtonStyle.Secondary)
             );
 
-            // Send initial embed with buttons
-            const response = await interaction.editReply({
-                embeds: [embeds[0]],
-                components: [row]
-            });
-
-            let currentPage = 0;
-
-            // Create button collector
-            const collector = response.createMessageComponentCollector({
-                filter: i => i.user.id === interaction.user.id,
-                time: 60000,
-            });
-
-            collector.on('collect', async (i) => {
-                try {
-                    // Update current page based on button pressed
-                    if (i.customId === 'previous') {
-                        currentPage = currentPage > 0 ? --currentPage : embeds.length - 1;
-                    } else if (i.customId === 'next') {
-                        currentPage = currentPage + 1 < embeds.length ? ++currentPage : 0;
-                    }
-
-                    // Update embed
-                    await i.update({
-                        embeds: [embeds[currentPage]],
-                        components: [row],
-                    });
-                } catch (error) {
-                    console.error('Error handling button interaction:', error);
-                }
-            });
-
-            collector.on('end', async () => {
-                try {
-                    // Remove buttons when collector expires
-                    await interaction.editReply({
-                        embeds: [embeds[currentPage]],
-                        components: []
-                    });
-                } catch (error) {
-                    console.error('Error removing components:', error);
-                }
-            });
-        } catch (error) {
-            console.error('Error in help command:', error);
-            await interaction.editReply({
-                content: 'An error occurred while fetching the help information.',
-                embeds: []
+            return interaction.reply({
+                embeds: [embed],
+                components: [row],
+                flags: [MessageFlags.Ephemeral],
             });
         }
+
+        const embed = new EmbedBuilder()
+            .setTitle('📋 Available Commands')
+            .setColor('#0099ff')
+            .setDescription('> Use `/help <command>` to get detailed information about a specific command.\n\u200b')
+            .setFooter({ 
+                text: `Requested by ${interaction.user.tag}`,
+                iconURL: interaction.user.displayAvatarURL()
+            })
+            .setTimestamp();
+
+        // Add fields for each category
+        Object.entries(categories).forEach(([category, commands]) => {
+            // Only show categories that have commands and exist
+            if (commands && commands.length > 0) {
+                embed.addFields({
+                    name: `${categoryEmojis[category]} ${category}`,
+                    value: commands.map(cmd => {
+                        const commandId = applicationCommands.find(c => c.name === cmd.command.name)?.id;
+                        let cmdStr;
+                        
+                        // Handle commands with subcommands
+                        if (cmd.command.options?.some(opt => opt.type === ApplicationCommandOptionType.Subcommand)) {
+                            const subcommands = cmd.command.options
+                                .filter(opt => opt.type === ApplicationCommandOptionType.Subcommand)
+                                .map(sub => {
+                                    return commandId ? 
+                                        `> • </${cmd.command.name} ${sub.name}:${commandId}>\n> └ *${sub.description}*` :
+                                        `> • /${cmd.command.name} ${sub.name}\n> └ *${sub.description}*`;
+                                })
+                                .join('\n\n');
+                            return `\n📎 **${cmd.command.name}** - *${cmd.command.description}*\n${subcommands}\n`;
+                        } else {
+                            cmdStr = commandId ? 
+                                `> • </${cmd.command.name}:${commandId}>` : 
+                                `> • /${cmd.command.name}`;
+                            return `${cmdStr}\n> └ *${cmd.command.description}*`;
+                        }
+                    }).join('\n\n')
+                    + '\n\u200b' // Add empty line after each category
+                });
+            }
+        });
+
+        return interaction.reply({
+            embeds: [embed],
+            flags: [MessageFlags.Ephemeral],
+        });
     },
 });
