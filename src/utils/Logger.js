@@ -36,7 +36,7 @@ class Logger {
                 if (error.code === 10003) {
                     await client.getDatabaseHandler().updateOne('settings', 
                         { guild: guildId },
-                        { $unset: { logChannel: '' } }
+                        { $set: { logChannel: '' } }
                     );
                 }
                 console.error(`Failed to fetch log channel for guild ${guildId}: ${error.message}`);
