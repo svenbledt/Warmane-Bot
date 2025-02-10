@@ -18,18 +18,33 @@ class Logger {
                     fields: options.fields
                 });
             }
-
+    
             // Then proceed with normal guild logging
             const guildSettings = await client.getDatabaseHandler().findOne('settings', {
                 guild: guildId
             });
-
+    
             if (!guildSettings?.enableLogging || !guildSettings?.logChannel) return;
-
+    
             const lang = guildSettings.language || 'en';
-            const channel = await client.channels.fetch(guildSettings.logChannel);
+            
+            let channel;
+            try {
+                channel = await client.channels.fetch(guildSettings.logChannel);
+            } catch (error) {
+                // If channel doesn't exist, update database to remove invalid channel
+                if (error.code === 10003) {
+                    await client.getDatabaseHandler().updateOne('settings', 
+                        { guild: guildId },
+                        { $unset: { logChannel: '' } }
+                    );
+                }
+                console.error(`Failed to fetch log channel for guild ${guildId}: ${error.message}`);
+                return;
+            }
+    
             if (!channel) return;
-
+    
             const embed = new EmbedBuilder()
                 .setColor(options.color || '#0099ff')
                 .setTitle(LanguageManager.getText(`logging.${options.titleKey}.title`, lang, options.titleData))
@@ -54,7 +69,7 @@ class Logger {
 
             await channel.send({ embeds: [embed] });
         } catch (error) {
-            console.error('Logging failed:', error);
+            console.error('Error in Logger:', error);
         }
     }
 }
