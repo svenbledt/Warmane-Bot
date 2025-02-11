@@ -9,35 +9,27 @@ class CharacterUtils {
 
     static async verifyCharacter(charName, realm) {
         const url = `${config.users.url}/api/character/${charName}/${realm}/summary`;
-        try {
-            const response = await this.makeRequest(url);
-            return response.data?.name ? response.data : null;
-        } catch (error) {
-            throw error;
-        }
+        const response = await this.makeRequest(url);
+        return response.data?.name ? response.data : null;
     }
 
     static async fetchCharacterData(charName, realm) {
-        try {
-            const summaryUrl = `${config.users.url}/api/character/${charName}/${realm}/summary`;
-            const armoryUrl = `${config.users.url}/character/${charName}/${realm}/`;
+        const summaryUrl = `${config.users.url}/api/character/${charName}/${realm}/summary`;
+        const armoryUrl = `${config.users.url}/character/${charName}/${realm}/`;
 
-            const [summaryResponse, armoryResponse] = await Promise.all([
-                this.makeRequest(summaryUrl),
-                this.makeRequest(armoryUrl)
-            ]);
+        const [summaryResponse, armoryResponse] = await Promise.all([
+            this.makeRequest(summaryUrl),
+            this.makeRequest(armoryUrl)
+        ]);
 
-            if (summaryResponse.data?.error === 'Too many requests.') {
-                throw new Error('Rate limited by Warmane API. Please try again in a few seconds.');
-            }
-
-            return {
-                summary: summaryResponse.data,
-                armory: armoryResponse.data
-            };
-        } catch (error) {
-            throw error;
+        if (summaryResponse.data?.error === 'Too many requests.') {
+            throw new Error('Rate limited by Warmane API. Please try again in a few seconds.');
         }
+
+        return {
+            summary: summaryResponse.data,
+            armory: armoryResponse.data
+        };
     }
 
     static calculateGearScore(equipment, itemsMap) {

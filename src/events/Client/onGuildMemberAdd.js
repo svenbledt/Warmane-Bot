@@ -872,7 +872,7 @@ async function handleWelcomeMessage(client, member, guildSettings) {
             try {
                 const owner = await guild.fetchOwner();
                 await owner.send({
-                    content: `I don't have the required permissions to send welcome messages in the configured welcome channel. Please ensure I have the following permissions: View Channel, Send Messages, and Attach Files.`
+                    content: 'I don\'t have the required permissions to send welcome messages in the configured welcome channel. Please ensure I have the following permissions: View Channel, Send Messages, and Attach Files.'
                 });
             } catch (dmError) {
                 console.warn(`Could not notify guild owner about missing welcome channel permissions in ${guild.id}`);
