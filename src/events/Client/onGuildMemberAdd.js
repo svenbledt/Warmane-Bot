@@ -839,7 +839,10 @@ async function createWelcomeImage(member) {
     ctx.fillText(`You are member #${memberCount}`, canvas.width / 2, 450);
 
     // Create attachment using AttachmentBuilder
-    const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'welcome.png' });
+    const attachment = new AttachmentBuilder(canvas.toBuffer(), { 
+        name: 'welcome.png',
+        description: 'Welcome image'
+    });
     return attachment;
 }
 

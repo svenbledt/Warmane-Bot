@@ -149,7 +149,10 @@ module.exports = new ApplicationCommand({
         ctx.fillText(`Level ${level}`, barX + 10, barY + 55);
 
         // Send the response
-        const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'level-card.png' });
+        const attachment = new AttachmentBuilder(canvas.toBuffer(), { 
+            name: 'level-card.png',
+            description: 'Level card image'
+        });
         await interaction.reply({
             files: [attachment]
         });
