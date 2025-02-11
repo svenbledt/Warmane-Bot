@@ -8,21 +8,36 @@ class CharacterUtils {
     }
 
     static async verifyCharacter(charName, realm) {
-        const response = await https.get(
-            `${config.users.url}/api/character/${charName}/${realm}/summary`
-        );
-        return response.data?.name ? response.data : null;
+        const url = `${config.users.url}/api/character/${charName}/${realm}/summary`;
+        try {
+            const response = await this.makeRequest(url);
+            return response.data?.name ? response.data : null;
+        } catch (error) {
+            throw error;
+        }
     }
 
     static async fetchCharacterData(charName, realm) {
-        const [summaryData, armoryData] = await Promise.all([
-            https.get(`${config.users.url}/api/character/${charName}/${realm}/summary`),
-            https.get(`${config.users.url}/character/${charName}/${realm}/`)
-        ]);
-        return {
-            summary: summaryData.data,
-            armory: armoryData.data
-        };
+        try {
+            const summaryUrl = `${config.users.url}/api/character/${charName}/${realm}/summary`;
+            const armoryUrl = `${config.users.url}/character/${charName}/${realm}/`;
+
+            const [summaryResponse, armoryResponse] = await Promise.all([
+                this.makeRequest(summaryUrl),
+                this.makeRequest(armoryUrl)
+            ]);
+
+            if (summaryResponse.data?.error === 'Too many requests.') {
+                throw new Error('Rate limited by Warmane API. Please try again in a few seconds.');
+            }
+
+            return {
+                summary: summaryResponse.data,
+                armory: armoryResponse.data
+            };
+        } catch (error) {
+            throw error;
+        }
     }
 
     static calculateGearScore(equipment, itemsMap) {
@@ -76,10 +91,15 @@ class CharacterUtils {
     static async makeRequest(url) {
         try {
             const response = await https.get(url);
+            
+            if (response.data?.error === 'Too many requests.') {
+                await new Promise((resolve) => setTimeout(resolve, 4000));
+                return this.makeRequest(url);
+            }
+            
             return response;
         } catch (error) {
-            if (error.response && error.response.status === 429) {
-                console.log('Too many requests, retrying after 4 seconds...');
+            if (error.response?.status === 429) {
                 await new Promise((resolve) => setTimeout(resolve, 4000));
                 return this.makeRequest(url);
             }

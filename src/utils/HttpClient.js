@@ -2,9 +2,13 @@
 const axios = require('axios');
 const rateLimit = require('axios-rate-limit');
 
-const https = rateLimit(axios.create(), {
+const https = axios.create({
     maxRequests: 1,
     perMilliseconds: 4000,
+    headers: {
+        'User-Agent': 'Warmane-Tool/1.0',
+        'Accept': 'application/json, text/html',
+    },
 });
 
 module.exports = { https }; 
