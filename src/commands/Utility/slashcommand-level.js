@@ -2,7 +2,8 @@
 const {
     MessageFlags,
     ApplicationCommandOptionType,
-    PermissionsBitField
+    PermissionsBitField,
+    AttachmentBuilder
 } = require('discord.js');
 const DiscordBot = require('../../client/DiscordBot');
 const ApplicationCommand = require('../../structure/ApplicationCommand');
@@ -148,11 +149,9 @@ module.exports = new ApplicationCommand({
         ctx.fillText(`Level ${level}`, barX + 10, barY + 55);
 
         // Send the response
+        const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'level-card.png' });
         await interaction.reply({
-            files: [{
-                attachment: canvas.toBuffer(),
-                name: 'level-card.png'
-            }]
+            files: [attachment]
         });
     }
 });

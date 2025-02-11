@@ -838,10 +838,8 @@ async function createWelcomeImage(member) {
     ctx.font = '40px Sans';
     ctx.fillText(`You are member #${memberCount}`, canvas.width / 2, 450);
 
-    // Create attachment using buffer instead of File
-    const buffer = canvas.toBuffer('image/png');
-    const attachment = new AttachmentBuilder(buffer, { name: 'welcome.png' });
-  
+    // Create attachment using AttachmentBuilder
+    const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'welcome.png' });
     return attachment;
 }
 
