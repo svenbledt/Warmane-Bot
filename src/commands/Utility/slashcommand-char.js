@@ -213,41 +213,9 @@ async function handleCommandError(interaction, error, lang) {
     }
 }
 
-// Set command helpers
-async function validateSetCommandPermissions(interaction, lang) {
-    const isDeveloper = config.users.developers.includes(interaction.user.id);
-
-    if (!interaction.guild) {
-        await interaction.deferReply({
-            flags: [MessageFlags.Ephemeral]
-        });
-        await interaction.editReply({
-            content: LanguageManager.getText('commands.global_strings.guild_only', lang),
-        });
-        return false;
-    }
-
-    if (!isDeveloper && !interaction.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
-        await interaction.deferReply({
-            flags: [MessageFlags.Ephemeral]
-        });
-        await interaction.editReply({
-            content: LanguageManager.getText('commands.global_strings.no_permission', lang),
-        });
-        return false;
-    }
-
-    return true;
-}
-
 async function handleSetCommand(client, interaction, lang) {
     try {
-        // First defer the reply
-        await interaction.deferReply({
-            flags: [MessageFlags.Ephemeral]
-        });
-
-        // Check permissions
+        // Check permissions first, before deferring
         if (!await validateSetCommandPermissions(interaction, lang)) {
             return;
         }
@@ -257,14 +225,36 @@ async function handleSetCommand(client, interaction, lang) {
         const realm = interaction.options.getString('realm', true);
         const charType = interaction.options.getString('type', true);
         const isMain = charType === 'main';
-
         const charNameFormatted = CharacterUtils.formatCharacterName(charName);
 
-        try {
-            await processSetCommand(client, interaction, user, charNameFormatted, realm, isMain, lang);
-        } catch (error) {
-            await handleSetCommandError(interaction, error, lang);
+        // Verify character exists before deferring
+        const characterData = await CharacterUtils.verifyCharacter(charNameFormatted, realm);
+        if (!characterData) {
+            return interaction.reply({
+                content: LanguageManager.getText('commands.setchar.char_not_exist', lang, {
+                    character: charNameFormatted
+                }),
+                flags: [MessageFlags.Ephemeral],
+            });
         }
+
+        // Check existing ownership
+        const existingOwner = await checkExistingOwner(client, charNameFormatted, realm);
+        
+        // If there's an existing owner, handle the confirmation dialog
+        if (existingOwner) {
+            const shouldContinue = await handleExistingOwner(interaction, existingOwner, charNameFormatted, lang);
+            if (!shouldContinue) return;
+        } else {
+            // If no existing owner, defer the reply
+            await interaction.deferReply({
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+
+        // Process the command
+        await updateCharacterOwnership(client, interaction, user, charNameFormatted, realm, isMain, existingOwner, lang);
+
     } catch (error) {
         console.error('Error in set command:', error);
         if (!interaction.replied && !interaction.deferred) {
@@ -284,22 +274,26 @@ async function handleSetCommand(client, interaction, lang) {
     }
 }
 
-async function handleSetCommandError(interaction, error, lang) {
-    console.error('Error in set-char command:', error);
-    if (!interaction.replied && !interaction.deferred) {
-        return interaction.reply({
-            content: LanguageManager.getText('commands.global_strings.error_occurred', lang, {
-                error: error.message
-            }),
-            flags: [MessageFlags.Ephemeral],
+async function validateSetCommandPermissions(interaction, lang) {
+    const isDeveloper = config.users.developers.includes(interaction.user.id);
+
+    if (!interaction.guild) {
+        await interaction.reply({
+            content: LanguageManager.getText('commands.global_strings.guild_only', lang),
+            flags: [MessageFlags.Ephemeral]
         });
-    } else {
-        return interaction.editReply({
-            content: LanguageManager.getText('commands.global_strings.error_occurred', lang, {
-                error: error.message
-            })
-        });
+        return false;
     }
+
+    if (!isDeveloper && !interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers])) {
+        await interaction.reply({
+            content: LanguageManager.getText('commands.global_strings.no_permission', lang),
+            flags: [MessageFlags.Ephemeral]
+        });
+        return false;
+    }
+
+    return true;
 }
 
 // Helper functions for command handlers
@@ -1004,3 +998,4 @@ module.exports = new ApplicationCommand({
         }
     },
 });
+
