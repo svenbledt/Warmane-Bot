@@ -63,7 +63,7 @@ module.exports = new ApplicationCommand({
                             type: 4,
                             custom_id: 'report-modal-id-field-1',
                             label: LanguageManager.getText('commands.report.modal.username_label', lang),
-                            max_length: 15,
+                            max_length: 20,
                             min_length: 2,
                             placeholder: LanguageManager.getText('commands.report.modal.username_placeholder', lang),
                             style: 1,

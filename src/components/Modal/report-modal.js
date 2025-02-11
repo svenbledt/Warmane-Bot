@@ -17,6 +17,10 @@ module.exports = new Component({
         const field1 = interaction.fields.getTextInputValue(
             'report-modal-id-field-1'
         );
+        
+        // Check if field1 is a valid Discord user ID
+        const reportedUserMention = field1.match(/^\d+$/) ? `<@${field1}>` : field1;
+
         const field2 = interaction.fields.getTextInputValue(
             'report-modal-id-field-2'
         );
@@ -37,7 +41,7 @@ module.exports = new Component({
             const embed = new EmbedBuilder()
                 .setTitle('User Report')
                 .addFields(
-                    { name: 'Reported User', value: field1, inline: true },
+                    { name: 'Reported User', value: reportedUserMention, inline: true },
                     { name: 'Reason', value: field2 },
                     { name: 'Evidence', value: field3 },
                     { name: 'ReporterID', value: `<@${interaction.user.id}>` }
