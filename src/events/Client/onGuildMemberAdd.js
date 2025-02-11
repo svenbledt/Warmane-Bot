@@ -858,21 +858,84 @@ async function handleWelcomeMessage(client, member, guildSettings) {
         }
 
         const welcomeChannel = guild.channels.cache.get(guildSettings.welcomeChannel);
-        if (!welcomeChannel) return;
+        if (!welcomeChannel) {
+            console.warn(`Welcome channel not found for guild ${guild.id}`);
+            return;
+        }
+
+        // Check bot permissions in the welcome channel
+        const permissions = welcomeChannel.permissionsFor(client.user);
+        if (!permissions?.has(['ViewChannel', 'SendMessages', 'AttachFiles'])) {
+            console.warn(`Missing required permissions in welcome channel for guild ${guild.id}`);
+            
+            // Try to notify guild owner
+            try {
+                const owner = await guild.fetchOwner();
+                await owner.send({
+                    content: `I don't have the required permissions to send welcome messages in the configured welcome channel. Please ensure I have the following permissions: View Channel, Send Messages, and Attach Files.`
+                });
+            } catch (dmError) {
+                console.warn(`Could not notify guild owner about missing welcome channel permissions in ${guild.id}`);
+            }
+
+            // Log the permission issue
+            await Logger.log(client, guild.id, {
+                titleKey: 'welcome_channel_permission_error',
+                descData: { channelId: welcomeChannel.id },
+                color: '#ff0000',
+                fields: [
+                    { 
+                        nameKey: 'channel_id',
+                        value: welcomeChannel.id
+                    },
+                    {
+                        nameKey: 'missing_permissions',
+                        value: 'ViewChannel, SendMessages, AttachFiles'
+                    }
+                ]
+            }).catch(() => {}); // Prevent logging errors from causing issues
+
+            return;
+        }
 
         const welcomeMessage = await createWelcomeImage(member);
-        await welcomeChannel.send({ 
-            files: [welcomeMessage] 
-        });
+        
+        try {
+            await welcomeChannel.send({ 
+                files: [welcomeMessage] 
+            });
+        } catch (sendError) {
+            if (sendError.code === 50013) {
+                console.warn(`Missing permissions to send welcome message in guild ${guild.id}`);
+            } else {
+                console.error('Error sending welcome message:', sendError);
+            }
+        }
 
     } catch (error) {
-        console.error('Welcome Message Error:', {
+        // More detailed error logging
+        const errorDetails = {
             error: error.message,
             stack: error.stack,
             guildId: member.guild.id,
             channelId: guildSettings.welcomeChannel,
             memberTag: member.user.tag
-        });
+        };
+
+        console.error('Welcome Message Error:', errorDetails);
+
+        // Log the error to the logging system
+        await Logger.log(client, member.guild.id, {
+            titleKey: 'welcome_message_error',
+            descData: { error: error.message },
+            color: '#ff0000',
+            fields: [
+                { 
+                    nameKey: 'error_details',
+                    value: JSON.stringify(errorDetails, null, 2).substring(0, 1024)
+                }
+            ]
+        }).catch(() => {}); // Prevent logging errors from causing issues
     }
 }
 

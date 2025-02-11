@@ -1,27 +1,27 @@
 const config = {
     base: {
-        iconAlliance: 'https://i.imgur.com/SDoVQmV.png', // The Alliance icon.
-        iconHorde: 'https://i.imgur.com/ap8Nran.png', // The Horde icon.
-        humanMale: 'https://i.imgur.com/70Fa4LF.png', // The Human
-        humanFemale: 'https://i.imgur.com/uc1fAcR.png', // The Human
-        orcMale: 'https://i.imgur.com/Yd15jZE.png', // The Orc
-        orcFemale: 'https://i.imgur.com/ooWSzKw.png', // The Orc
-        dwarfMale: 'https://i.imgur.com/IrPIiGr.png', // The Dwarf
-        dwarfFemale: 'https://i.imgur.com/6PyAAf9.png', // The Dwarf
-        nightElfMale: 'https://i.imgur.com/tsQBM10.png', // The Night Elf
-        nightElfFemale: 'https://i.imgur.com/xfD8Qt4.png', // The Night Elf
-        undeadMale: 'https://i.imgur.com/MYT2vmD.png', // The Undead
-        undeadFemale: 'https://i.imgur.com/pXfY1mc.png', // The Undead
-        taurenMale: 'https://i.imgur.com/j5aZZWY.png', // The Tauren
-        taurenFemale: 'https://i.imgur.com/vd2h3pZ.png', // The Tauren
-        gnomeMale: 'https://i.imgur.com/9nriTFE.png', // The Gnome
-        gnomeFemale: 'https://i.imgur.com/C6lybzM.png', // The Gnome
-        trollMale: 'https://i.imgur.com/dzdx2R2.png', // The Troll
-        trollFemale: 'https://i.imgur.com/Ay3xgX4.png', // The Troll
-        bloodElfMale: 'https://i.imgur.com/efv7ZBN.png', // The Blood Elf
-        bloodElfFemale: 'https://i.imgur.com/mwwUcgP.png', // The Blood Elf
-        draeneiMale: 'https://i.imgur.com/LXidUlc.png', // The Draenei
-        draeneiFemale: 'https://i.imgur.com/isDVJYZ.png', // The Draenei
+        iconAlliance: './assets/races/alliance.png', // The Alliance icon.
+        iconHorde: './assets/races/horde.png', // The Horde icon.
+        humanMale: './assets/races/human_male.png', // The Human
+        humanFemale: './assets/races/human_female.png', // The Human
+        orcMale: './assets/races/orc_male.png', // The Orc
+        orcFemale: './assets/races/orc_female.png', // The Orc
+        dwarfMale: './assets/races/dwarf_male.png', // The Dwarf
+        dwarfFemale: './assets/races/dwarf_female.png', // The Dwarf
+        nightElfMale: './assets/races/nightelf_male.png', // The Night Elf
+        nightElfFemale: './assets/races/nightelf_female.png', // The Night Elf
+        undeadMale: './assets/races/undead_male.png', // The Undead
+        undeadFemale: './assets/races/undead_female.png', // The Undead
+        taurenMale: './assets/races/tauren_male.png', // The Tauren
+        taurenFemale: './assets/races/tauren_female.png', // The Tauren
+        gnomeMale: './assets/races/gnome_male.png', // The Gnome
+        gnomeFemale: './assets/races/gnome_female.png', // The Gnome
+        trollMale: './assets/races/troll_male.png', // The Troll
+        trollFemale: './assets/races/troll_female.png', // The Troll
+        bloodElfMale: './assets/races/bloodelf_male.png', // The Blood Elf
+        bloodElfFemale: './assets/races/bloodelf_female.png', // The Blood Elf
+        draeneiMale: './assets/races/draenei_male.png', // The Draenei
+        draeneiFemale: './assets/races/draenei_female.png', // The Draenei
     },
     development: {
         enabled: false, // If true, the bot will register all application commands to a specific guild (not globally).

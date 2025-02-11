@@ -360,7 +360,7 @@ async function processAndDisplayCharacterInfo(client, interaction, summary, armo
 
     // Parse armory data for gems and enchants
     const $ = cheerio.load(armoryBody);
-    const { missingGems, missingEnchants } = await processArmoryData($, character);
+    const { missingGems, missingEnchants } = await processArmoryData($, character, itemsDB);
 
     // Set character appearance
     setCharacterAppearance(character);
@@ -374,7 +374,7 @@ async function processAndDisplayCharacterInfo(client, interaction, summary, armo
     });
 }
 
-function processArmoryData($, character) {
+function processArmoryData($, character, itemsDB) {
     const itemNames = [
         'Head', 'Neck', 'Shoulders', 'Cloak', 'Chest', 'Shirt', 'Tabard',
         'Bracer', 'Gloves', 'Belt', 'Legs', 'Boots', 'Ring #1', 'Ring #2',
@@ -383,25 +383,81 @@ function processArmoryData($, character) {
     const bannedItems = [1, 5, 6, 9, 14, 15];
     const missingGems = [];
     const missingEnchants = [];
+    const itemIDs = [];
+    const actualItems = [];
     
     const professions = character.professions.map(p => p.name);
     const hasBlacksmithing = professions.includes('Blacksmithing');
-    const shouldCheckMissing = [60, 70, 80].includes(character.level);
+    const shouldCheckMissing = [60, 70, 80].includes(Number(character.level));
 
     let i = 0;
     $('.item-model a').each(function() {
         const rel = $(this).attr('rel');
-        if (!rel) return;
+        if (!rel) {
+            i++;
+            return;
+        }
 
         const params = getParams(rel);
         const amount = params['gems'] ? params['gems'].split(':').filter(x => x !== '0').length : 0;
 
+        itemIDs.push({
+            itemID: Number(params['item'])
+        });
+
+        actualItems.push({
+            itemID: Number(params['item']),
+            gems: amount,
+            type: itemNames[i]
+        });
+
         if (shouldCheckMissing && !bannedItems.includes(i)) {
-            checkEnchants(rel, itemNames[i], character, professions, missingEnchants);
-            checkGems(params, amount, itemNames[i], hasBlacksmithing, missingGems);
+            const isEnchanted = rel.indexOf('ench') !== -1;
+
+            if (!isEnchanted) {
+                if (itemNames[i] === 'Ranged' && character.class.toLowerCase() === 'hunter') {
+                    missingEnchants.push(itemNames[i]);
+                } else if ((itemNames[i] === 'Ring #1' || itemNames[i] === 'Ring #2') && 
+                           professions.includes('Enchanting')) {
+                    missingEnchants.push(itemNames[i]);
+                } else if (itemNames[i] === 'Off-hand' && 
+                          !['mage', 'warlock', 'druid', 'priest'].includes(character.class.toLowerCase())) {
+                    missingEnchants.push(itemNames[i]);
+                } else if ((itemNames[i] === 'Gloves' || itemNames[i] === 'Boots') && 
+                          !professions.includes('Engineering')) {
+                    missingEnchants.push(itemNames[i]);
+                } else if (!['Ranged', 'Ring #1', 'Ring #2'].includes(itemNames[i])) {
+                    missingEnchants.push(itemNames[i]);
+                }
+            }
         }
         i++;
     });
+
+    if (shouldCheckMissing) {
+        const items = itemsDB.items.filter(item => 
+            itemIDs.some(id => id.itemID === item.itemID)
+        );
+
+        items.forEach(item => {
+            const foundItem = actualItems.find(x => x.itemID === item.itemID);
+            if (foundItem) {
+                if (hasBlacksmithing && (foundItem.type === 'Gloves' || foundItem.type === 'Bracer')) {
+                    return;
+                }
+
+                if (foundItem.type === 'Belt') {
+                    if (item.gems + 1 !== foundItem.gems) {
+                        missingGems.push(foundItem.type);
+                    }
+                } else {
+                    if (item.gems !== foundItem.gems) {
+                        missingGems.push(foundItem.type);
+                    }
+                }
+            }
+        });
+    }
 
     return { missingGems, missingEnchants };
 }
@@ -627,46 +683,6 @@ async function updateCharacterOwnership(client, interaction, user, charNameForma
     });
 }
 
-function checkEnchants(rel, itemName, character, professions, missingEnchants) {
-    const isEnchanted = rel.indexOf('ench') !== -1;
-    if (!isEnchanted) {
-        if (itemName === 'Ranged' && character.class.toLowerCase() === 'hunter') {
-            missingEnchants.push(itemName);
-        } else if (
-            (itemName === 'Ring #1' || itemName === 'Ring #2') &&
-            professions.includes('Enchanting')
-        ) {
-            missingEnchants.push(itemName);
-        } else if (
-            itemName === 'Off-hand' &&
-            !['mage', 'warlock', 'druid', 'priest'].some(
-                cls => cls.toLowerCase() === character.class.toLowerCase()
-            )
-        ) {
-            missingEnchants.push(itemName);
-        } else if (
-            (itemName === 'Gloves' || itemName === 'Boots') &&
-            !professions.includes('Engineering')
-        ) {
-            missingEnchants.push(itemName);
-        } else if (!['Ranged', 'Ring #1', 'Ring #2'].includes(itemName)) {
-            missingEnchants.push(itemName);
-        }
-    }
-}
-
-function checkGems(params, amount, itemName, hasBlacksmithing, missingGems) {
-    // Skip gem check for Gloves and Bracers if character has Blacksmithing
-    if (hasBlacksmithing && (itemName === 'Gloves' || itemName === 'Bracer')) {
-        return;
-    }
-
-    const expectedGems = itemName === 'Belt' ? params.gems + 1 : params.gems;
-    if (expectedGems !== amount) {
-        missingGems.push(itemName);
-    }
-}
-
 function addBasicFields(embed, character, lang) {
     const baseFields = [
         ['character', character.name],
@@ -690,6 +706,7 @@ function addBasicFields(embed, character, lang) {
 }
 
 function addAdditionalFields(embed, character, missingGems, missingEnchants, data, lang) {
+
     // Add talents
     if (character.talents?.length > 0) {
         embed.addFields({
@@ -700,7 +717,8 @@ function addAdditionalFields(embed, character, missingGems, missingEnchants, dat
     }
 
     // Add missing gems and enchants
-    const shouldCheckMissing = [60, 70, 80].includes(character.level);
+    const shouldCheckMissing = [60, 70, 80].includes(Number(character.level));
+    
     if (shouldCheckMissing) {
         if (missingGems.length > 0) {
             embed.addFields({

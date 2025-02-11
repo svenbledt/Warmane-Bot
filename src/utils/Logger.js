@@ -19,7 +19,6 @@ class Logger {
                 });
             }
     
-            // Then proceed with normal guild logging
             const guildSettings = await client.getDatabaseHandler().findOne('settings', {
                 guild: guildId
             });
@@ -31,15 +30,37 @@ class Logger {
             let channel;
             try {
                 channel = await client.channels.fetch(guildSettings.logChannel);
+                
+                // Check bot permissions in the channel
+                const permissions = channel.permissionsFor(client.user);
+                if (!permissions?.has(['ViewChannel', 'SendMessages', 'EmbedLinks'])) {
+                    console.warn(`Missing required permissions in log channel for guild ${guildId}`);
+                    
+                    // Try to notify guild owner
+                    try {
+                        const guild = await client.guilds.fetch(guildId);
+                        const owner = await guild.fetchOwner();
+                        await owner.send({
+                            content: 'I don\'t have the required permissions to send logs in the configured log channel. Please ensure I have the following permissions: View Channel, Send Messages, and Embed Links.'
+                        });
+                    } catch (error) {
+                        console.warn(`Could not notify guild owner about missing permissions in ${guildId}: ${error.message}`);
+                    }
+                    return;
+                }
             } catch (error) {
-                // If channel doesn't exist, update database to remove invalid channel
+                // Handle channel fetch errors
                 if (error.code === 10003) {
                     await client.getDatabaseHandler().updateOne('settings', 
                         { guild: guildId },
                         { $set: { logChannel: '' } }
                     );
+                    console.warn(`Invalid log channel removed for guild ${guildId}`);
+                } else if (error.code === 50001) {
+                    console.warn(`Missing access to log channel in guild ${guildId}`);
+                } else {
+                    console.error(`Failed to fetch log channel for guild ${guildId}: ${error.message}`);
                 }
-                console.error(`Failed to fetch log channel for guild ${guildId}: ${error.message}`);
                 return;
             }
     
@@ -67,7 +88,15 @@ class Logger {
                 iconURL: client.user.displayAvatarURL() 
             });
 
-            await channel.send({ embeds: [embed] });
+            try {
+                await channel.send({ embeds: [embed] });
+            } catch (error) {
+                if (error.code === 50001) {
+                    console.warn(`Missing permissions to send messages in log channel for guild ${guildId}`);
+                } else {
+                    console.error(`Error sending log message to guild ${guildId}:`, error.message);
+                }
+            }
         } catch (error) {
             console.error('Error in Logger:', error);
         }
