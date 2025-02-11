@@ -495,7 +495,7 @@ function setCharacterAppearance(character) {
         'Human': { 'Female': config.base.humanFemale, 'Male': config.base.humanMale },
         'Orc': { 'Female': config.base.orcFemale, 'Male': config.base.orcMale },
         'Dwarf': { 'Female': config.base.dwarfFemale, 'Male': config.base.dwarfMale },
-        'Night Elf': { 'Female': config.base.nightelfFemale, 'Male': config.base.nightelfMale },
+        'Night Elf': { 'Female': config.base.nightElfFemale, 'Male': config.base.nightElfMale },
         'Undead': { 'Female': config.base.undeadFemale, 'Male': config.base.undeadMale },
         'Tauren': { 'Female': config.base.taurenFemale, 'Male': config.base.taurenMale },
         'Gnome': { 'Female': config.base.gnomeFemale, 'Male': config.base.gnomeMale },

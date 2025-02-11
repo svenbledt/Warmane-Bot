@@ -529,7 +529,7 @@ module.exports = new ApplicationCommand({
                     const embed = new EmbedBuilder()
                         .setTitle('Blacklisted Users')
                         .setColor('#C41E3A')
-                        .setThumbnail('./../assets/blacklist.png')
+                        .setThumbnail('https://i.imgur.com/VlVw8JK.png')
                         .setFooter({
                             text: `Page ${embeds.length + 1} of ${Math.ceil(blacklistedUsers.length / 25)}`,
                             iconURL: client.user.displayAvatarURL(),
