@@ -355,7 +355,28 @@ async function handleInfoCommand(client, interaction, lang) {
 }
 
 async function handleListCommand(client, interaction, lang) {
-    const targetUser = interaction.member.permissions.has([PermissionsBitField.Flags.BanMembers]) 
+    // Check if interaction is in a guild
+    if (!interaction.guild) {
+        return interaction.reply({
+            content: LanguageManager.getText('commands.global_strings.guild_only', lang),
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+
+    // Get member object and check if it exists
+    const member = interaction.member;
+    if (!member) {
+        return interaction.reply({
+            content: LanguageManager.getText('commands.global_strings.error_occurred', lang, {
+                error: 'Member not found'
+            }),
+            flags: [MessageFlags.Ephemeral]
+        });
+    }
+
+    // Check permissions and get target user
+    const hasPermission = member.permissions?.has([PermissionsBitField.Flags.BanMembers]);
+    const targetUser = hasPermission 
         ? (interaction.options.getUser('user') || interaction.user)
         : interaction.user;
 
