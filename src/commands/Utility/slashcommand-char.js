@@ -300,7 +300,16 @@ async function validateSetCommandPermissions(interaction, lang) {
 async function handleNameCommand(client, interaction, lang) {
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
     
-    if (!interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
+    // Check if interaction is in a guild
+    if (!interaction.guild) {
+        return interaction.editReply({
+            content: LanguageManager.getText('commands.global_strings.guild_only', lang),
+            flags: [MessageFlags.Ephemeral],
+        });
+    }
+
+    // Check if member exists and has required permissions
+    if (!interaction.member || !interaction.member.permissions?.has(PermissionsBitField.Flags.BanMembers)) {
         return interaction.editReply({
             content: LanguageManager.getText('commands.global_strings.no_permission', lang),
             flags: [MessageFlags.Ephemeral],
@@ -310,6 +319,13 @@ async function handleNameCommand(client, interaction, lang) {
     const TIMEOUT_DURATION = 600000; // 10 minutes
     const user = interaction.options.getUser('user', true);
     const member = interaction.guild.members.cache.get(user.id);
+
+    if (!member) {
+        return interaction.editReply({
+            content: LanguageManager.getText('commands.global_strings.user_not_found', lang),
+            flags: [MessageFlags.Ephemeral],
+        });
+    }
 
     try {
         const dmChannel = await member.createDM();

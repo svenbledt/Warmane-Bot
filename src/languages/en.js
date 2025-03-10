@@ -6,7 +6,8 @@ module.exports = {
             dm_failed: 'Failed to send a DM to {username}.',
             dm_sent: 'DM sent to {username}.',
             guild_only: 'This command can only be used in a server.',
-            error_occurred: 'An error occurred: {error}'
+            error_occurred: 'An error occurred: {error}',
+            user_not_found: 'User not found.'
         },
         charname: {
             dm_initial: 'Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\nYou have 10 minutes to respond.',
