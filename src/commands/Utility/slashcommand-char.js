@@ -1132,82 +1132,72 @@ function addAdditionalFields(
     // Add talents
     if (character.talents?.length > 0) {
         embed.addFields({
-            name: LanguageManager.getText(
-                'commands.charinfo.embed.fields.talents',
-                lang
-            ),
+            name: LanguageManager.getText('commands.charinfo.embed.fields.talents', lang),
             value: character.talents.join(' / '),
-            inline: true,
+            inline: true
         });
     }
 
     // Add missing gems and enchants
     const shouldCheckMissing = [60, 70, 80].includes(Number(character.level));
-
+    
     if (shouldCheckMissing) {
-    // Only add missing gems field if there are missing gems
+        // Only add missing gems field if there are missing gems
         if (missingGems && missingGems.length > 0) {
-            embed.addFields({
-                name: LanguageManager.getText(
-                    'commands.charinfo.embed.fields.missing_gems',
-                    lang
-                ),
-                value: missingGems.join(', '),
-                inline: true,
-            });
+            const gemsValue = missingGems.join(', ');
+            if (gemsValue) {  // Only add if there's actual content
+                embed.addFields({
+                    name: LanguageManager.getText('commands.charinfo.embed.fields.missing_gems', lang),
+                    value: gemsValue,
+                    inline: true
+                });
+            }
         }
+        
         // Only add missing enchants field if there are missing enchants
-        if (
-            missingEnchants &&
-      missingEnchants.length > 0 &&
-      missingEnchants.filter(Boolean).length > 0
-        ) {
-            embed.addFields({
-                name: LanguageManager.getText(
-                    'commands.charinfo.embed.fields.missing_enchants',
-                    lang
-                ),
-                value: missingEnchants.filter(Boolean).join(', '),
-                inline: true,
-            });
+        if (missingEnchants && missingEnchants.length > 0) {
+            const enchantsValue = missingEnchants.filter(Boolean).join(', ');
+            if (enchantsValue) {  // Only add if there's actual content
+                embed.addFields({
+                    name: LanguageManager.getText('commands.charinfo.embed.fields.missing_enchants', lang),
+                    value: enchantsValue,
+                    inline: true
+                });
+            }
         }
     }
 
     // Add professions
     if (character.professions?.length > 0) {
         const professions = character.professions
-            .map((profession) => `${profession.name}: ${profession.skill}`)
+            .map(profession => `${profession.name}: ${profession.skill}`)
             .join('\n');
-        embed.addFields({
-            name: LanguageManager.getText(
-                'commands.charinfo.embed.fields.professions',
-                lang
-            ),
-            value: professions,
-            inline: true,
-        });
+        if (professions) {  // Only add if there's actual content
+            embed.addFields({
+                name: LanguageManager.getText('commands.charinfo.embed.fields.professions', lang),
+                value: professions,
+                inline: true
+            });
+        }
     }
 
     // Add PvP teams
     if (data.pvpteams?.length > 0) {
         const pvpteams = data.pvpteams
-            .map((team) =>
-                LanguageManager.getText('commands.charinfo.embed.fields.teams', lang, {
-                    type: team.type,
-                    name: team.name,
-                    rating: team.rating,
-                    rank: team.rank,
-                })
-            )
+            .map(team => LanguageManager.getText('commands.charinfo.embed.fields.teams', lang, {
+                type: team.type,
+                name: team.name,
+                rating: team.rating,
+                rank: team.rank
+            }))
             .join('\n');
-        embed.addFields({
-            name: LanguageManager.getText(
-                'commands.charinfo.embed.fields.pvp_teams',
-                lang
-            ),
-            value: pvpteams,
-            inline: false,
-        });
+        if (pvpteams) {  // Only add if there's actual content
+            embed.addFields({
+                name: LanguageManager.getText('commands.charinfo.embed.fields.pvp_teams', lang),
+                value: pvpteams,
+                inline: false
+            });
+        }
     }
 }
 
