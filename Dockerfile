@@ -1,4 +1,4 @@
-# Verwenden eines schlankeren Node.js-Image
+# Verwenden eines schlanken Node.js-Image
 FROM node:20-slim
 
 # Setzen des Arbeitsverzeichnisses
@@ -7,16 +7,16 @@ WORKDIR /usr/src/bot
 # Installiere pnpm global
 RUN npm install -g pnpm
 
-# Kopiere nur package.json und pnpm-lock.yaml für den Build-Cache
-COPY package.json pnpm-lock.yaml ./
+# Kopiere nur die package.json (aber nicht die pnpm-lock.yaml)
+COPY package.json ./
 
-# Installiere Abhängigkeiten im Container
-RUN pnpm install --frozen-lockfile
+# Installiere Abhängigkeiten basierend auf der package.json
+RUN pnpm install
 
 # Kopiere den Rest der Projektdateien
 COPY . .
 
-# Exponiere den notwendigen Port (z.B. 3000)
+# Exponiere den notwendigen Port (z. B. 3000, falls benötigt)
 EXPOSE 3000
 
 # Starten der Anwendung
