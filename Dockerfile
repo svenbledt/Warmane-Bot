@@ -1,16 +1,17 @@
 # Verwenden eines Node.js Slim Basisimages
 FROM node:20-slim
 
-# Setze das Arbeitsverzeichnis
+# Setze Arbeitsverzeichnis
 WORKDIR /usr/src/bot
 
 # Installiere Systemabhängigkeiten für native Module (z. B. canvas)
+# Korrigiere cairo-dev zu libcairo2-dev
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     make \
     g++ \
-    cairo-dev \
+    libcairo2-dev \
     libjpeg-dev \
     libpango1.0-dev \
     libgif-dev \
