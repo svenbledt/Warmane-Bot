@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   bot:
-    image: ${REPOSITORY}:latest  # Stellt sicher, dass Ihr Repository verwendet wird
+    image: warmane-bot:latest  # Stellt sicher, dass Ihr Repository verwendet wird
     container_name: warmane-bot
     restart: always
     environment:
