@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  bot:
+    image: ${REPOSITORY}:latest  # Stellt sicher, dass Ihr Repository verwendet wird
+    container_name: warmane-bot
+    restart: always
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - "${PORT}:3000" # Exponiert den Port des Bots auf den Host-Port
+    privileged: true  # Falls der Container root-Rechte benötigt
+    volumes:
+      - .:/usr/src/bot  # Optional für lokale Entwicklung
+    build:
+      context: .
+      dockerfile: Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Nur falls externe Netzwerke nötig sind

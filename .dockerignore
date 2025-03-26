@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+pnpm-lock.yaml.bad
+.DS_Store
+.git
+.dockerignore
+.env
