@@ -7,13 +7,9 @@ services:
     restart: always
     environment:
       - NODE_ENV=${NODE_ENV}
-    ports:
-      - "${PORT}:3000" # Exponiert den Port des Bots auf den Host-Port
     privileged: true  # Falls der Container root-Rechte benötigt
     volumes:
       - .:/usr/src/bot  # Optional für lokale Entwicklung
     build:
       context: .
       dockerfile: Dockerfile
-    extra_hosts:
-      - "host.docker.internal:host-gateway" # Nur falls externe Netzwerke nötig sind

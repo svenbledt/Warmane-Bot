@@ -5,7 +5,6 @@ FROM node:20-slim
 WORKDIR /usr/src/bot
 
 # Installiere Systemabhängigkeiten für native Module (z. B. canvas)
-# Korrigiere cairo-dev zu libcairo2-dev
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
@@ -29,9 +28,6 @@ RUN pnpm install
 
 # Kopiere den Rest der Projektdateien
 COPY . .
-
-# Öffne den benötigten Port
-EXPOSE 3000
 
 # Starte die Anwendung
 CMD ["pnpm", "start"]
