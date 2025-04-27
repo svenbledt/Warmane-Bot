@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  warmane-bot:
+    image: svenbledt/warmane-bot:latest
+    container_name: warmane-bot
+    restart: unless-stopped
+    environment:
+      - CLIENT_TOKEN=your-discord-token
+      - MONGODB_URI=mongodb+srv://user:password@yourcluster.mongodb.net/?retryWrites=true&w=majority
+      - DB_NAME=warmane_bot
+    volumes:
+      - ./logs:/usr/src/bot/logs 

@@ -1,7 +1,25 @@
-node_modules
+# Environment variables
+.env
+.env.*
+
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Git files
+.git/
+.gitignore
+
+# Other files that shouldn't be in the Docker image
+.vscode/
+.idea/
+*.md
+LICENSE
+
 npm-debug.log
 pnpm-lock.yaml.bad
 .DS_Store
-.git
 .dockerignore
-.env

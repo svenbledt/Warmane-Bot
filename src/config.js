@@ -24,13 +24,13 @@ const config = {
         draeneiFemale: 'https://i.imgur.com/isDVJYZ.png', // The Draenei
     },
     development: {
-        enabled: false, // If true, the bot will register all application commands to a specific guild (not globally).
-        guildId: '1254444159985651712',
-        reportChannel: '1257409168265187428',
-        inviteChannel: '1257459204948627638',
-        announcementChannel: '1257409143724310609',
-        staffAnnouncementChannel: '1257409165769314435',
-        logChannel: '1333610717630300210',
+        enabled: process.env.DEV_MODE === 'true' || false, // Read from environment variable, default to false
+        guildId: process.env.GUILD_ID || '1254444159985651712',
+        reportChannel: process.env.REPORT_CHANNEL || '1257409168265187428',
+        inviteChannel: process.env.INVITE_CHANNEL || '1257459204948627638',
+        announcementChannel: process.env.ANNOUNCEMENT_CHANNEL || '1257409143724310609',
+        staffAnnouncementChannel: process.env.STAFF_ANNOUNCEMENT_CHANNEL || '1257409165769314435',
+        logChannel: process.env.LOG_CHANNEL || '1333610717630300210',
     },
     commands: {
         application_commands: {
