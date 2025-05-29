@@ -618,28 +618,48 @@ async function processAndDisplayCharacterInfo(
 }
 
 function processArmoryData($, character, itemsDB) {
-    const enchantCheckItems = [
-        'Head', // index 0
-        // 'Neck',      // index 1 - banned
-        'Shoulders', // index 2
-        'Cloak', // index 3
-        'Chest', // index 4
-        // 'Shirt',     // index 5 - banned
-        // 'Tabard',    // index 6 - banned
-        'Bracer', // index 7
-        'Gloves', // index 8
-        // 'Belt',      // index 9 - banned
-        'Legs', // index 10
-        'Boots', // index 11
-        'Ring #1', // index 12
-        'Ring #2', // index 13
-        // 'Trinket #1',// index 14 - banned
-        // 'Trinket #2',// index 15 - banned
-        'Main-hand', // index 16
-        'Off-hand', // index 17
-        'Ranged', // index 18
+    // Define the item slots in order they appear in the armory
+    const itemSlots = [
+        'Head',
+        'Neck',
+        'Shoulders',
+        'Cloak',
+        'Chest',
+        'Shirt',
+        'Tabard',
+        'Bracer',
+        'Gloves',
+        'Belt',
+        'Legs',
+        'Boots',
+        'Ring #1',
+        'Ring #2',
+        'Trinket #1',
+        'Trinket #2',
+        'Main-hand',
+        'Off-hand',
+        'Ranged'
     ];
-    const bannedItems = [1, 5, 6, 9, 14, 15];
+    
+    // Define slots that can have enchants
+    const enchantableSlots = [
+        'Head',
+        'Shoulders',
+        'Cloak',
+        'Chest',
+        'Bracer',
+        'Gloves',
+        'Legs',
+        'Boots',
+        'Ring #1',
+        'Ring #2',
+        'Main-hand',
+        'Off-hand',
+        'Ranged',
+    ];
+    
+    // Items that don't need enchants (exceptions)
+    const bannedSlots = [1, 5, 6, 9, 14, 15]; // Neck, Shirt, Tabard, Belt, Trinkets
     const missingGems = [];
     const missingEnchants = [];
     const itemIDs = [];
@@ -648,10 +668,13 @@ function processArmoryData($, character, itemsDB) {
     const professions = character.professions.map((p) => p.name);
     const hasBlacksmithing = professions.includes('Blacksmithing');
     const shouldCheckMissing = [60, 70, 80].includes(Number(character.level));
+    const isHunter = character.class.toLowerCase() === 'hunter';
 
     let i = 0;
     $('.item-model a').each(function () {
         const rel = $(this).attr('rel');
+        const currentSlot = itemSlots[i] || `Unknown slot ${i}`;
+        
         if (!rel) {
             i++;
             return;
@@ -668,53 +691,62 @@ function processArmoryData($, character, itemsDB) {
         actualItems.push({
             itemID: Number(params['item']),
             gems: amount,
-            type: enchantCheckItems[i],
+            type: currentSlot,
         });
 
-        if (shouldCheckMissing && !bannedItems.includes(i)) {
+        if (shouldCheckMissing && !bannedSlots.includes(i)) {
             const isEnchanted = rel.indexOf('ench') !== -1;
 
-            if (!isEnchanted) {
+            // Special handling for hunter ranged weapons
+            if (currentSlot === 'Ranged' && isHunter) {
+                // For hunters with ranged weapons, only add to missing if not enchanted
+                if (!isEnchanted) {
+                    missingEnchants.push(currentSlot);
+                }
+            } else if (!isEnchanted) {
                 const isCasterClass = ['mage', 'warlock', 'druid', 'priest'].includes(
                     character.class.toLowerCase()
                 );
-                const excludedItems = ['Ranged', 'Ring #1', 'Ring #2'];
-
+                
+                // Create a list of items that should be excluded for this character
+                const excludedItems = ['Ring #1', 'Ring #2'];
+                
+                // Add Ranged to excluded items if not a hunter
+                if (!isHunter) {
+                    excludedItems.push('Ranged');
+                }
+                
                 // Add Off-hand to excluded items if it's a caster class
                 if (isCasterClass) {
                     excludedItems.push('Off-hand');
                 }
 
-                // Only add to missingEnchants if the item needs an enchant
+                // Only add to missingEnchants if the item needs an enchant and isn't excluded
                 if (
-                    enchantCheckItems[i] === 'Ranged' &&
-          character.class.toLowerCase() === 'hunter'
+                    (currentSlot === 'Ring #1' || currentSlot === 'Ring #2') &&
+                    professions.includes('Enchanting')
                 ) {
-                    missingEnchants.push(enchantCheckItems[i]);
+                    missingEnchants.push(currentSlot);
+                } else if (currentSlot === 'Off-hand' && !isCasterClass) {
+                    missingEnchants.push(currentSlot);
                 } else if (
-                    (enchantCheckItems[i] === 'Ring #1' ||
-            enchantCheckItems[i] === 'Ring #2') &&
-          professions.includes('Enchanting')
+                    (currentSlot === 'Gloves' || currentSlot === 'Boots') &&
+                    !professions.includes('Engineering')
                 ) {
-                    missingEnchants.push(enchantCheckItems[i]);
-                } else if (enchantCheckItems[i] === 'Off-hand' && !isCasterClass) {
-                    // Simplified the condition using isCasterClass
-                    missingEnchants.push(enchantCheckItems[i]);
+                    missingEnchants.push(currentSlot);
                 } else if (
-                    (enchantCheckItems[i] === 'Gloves' ||
-            enchantCheckItems[i] === 'Boots') &&
-          !professions.includes('Engineering')
+                    enchantableSlots.includes(currentSlot) && 
+                    !excludedItems.includes(currentSlot)
                 ) {
-                    missingEnchants.push(enchantCheckItems[i]);
-                } else if (!excludedItems.includes(enchantCheckItems[i])) {
-                    // Only add items that aren't in the excluded list
-                    missingEnchants.push(enchantCheckItems[i]);
+                    // Only add items that are enchantable and aren't in the excluded list
+                    missingEnchants.push(currentSlot);
                 }
             }
         }
         i++;
     });
-
+    
+    // Check for missing gems
     if (shouldCheckMissing) {
         const items = itemsDB.items.filter((item) =>
             itemIDs.some((id) => id.itemID === item.itemID)
@@ -725,7 +757,7 @@ function processArmoryData($, character, itemsDB) {
             if (foundItem) {
                 if (
                     hasBlacksmithing &&
-          (foundItem.type === 'Gloves' || foundItem.type === 'Bracer')
+                    (foundItem.type === 'Gloves' || foundItem.type === 'Bracer')
                 ) {
                     return;
                 }
@@ -747,7 +779,7 @@ function processArmoryData($, character, itemsDB) {
             }
         });
     }
-
+    
     return { missingGems, missingEnchants };
 }
 
