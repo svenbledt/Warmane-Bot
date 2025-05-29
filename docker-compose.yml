@@ -6,8 +6,20 @@ services:
     container_name: warmane-bot
     restart: unless-stopped
     environment:
+      # Bot configuration
       - CLIENT_TOKEN=your-discord-token
       - MONGODB_URI=mongodb+srv://user:password@yourcluster.mongodb.net/?retryWrites=true&w=majority
       - DB_NAME=warmane_bot
+      
+      # Development section IDs from config.js
+      - GUILD_ID=1254444159985651712
+      - REPORT_CHANNEL=1257409168265187428
+      - INVITE_CHANNEL=1257459204948627638
+      - ANNOUNCEMENT_CHANNEL=1257409143724310609
+      - STAFF_ANNOUNCEMENT_CHANNEL=1257409165769314435
+      - LOG_CHANNEL=1333610717630300210
+      
+      # Development mode toggle
+      - DEV_MODE=false
     volumes:
-      - ./logs:/usr/src/bot/logs 
+      - ./logs:/usr/src/bot/logs
