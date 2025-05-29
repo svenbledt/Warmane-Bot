@@ -126,23 +126,44 @@ async function generateAndSendInvites(client) {
                                     ? `Missing permissions: ${error.translatedPermissions.join(', ')}`
                                     : 'Missing permissions: "Create Invite" and "Manage Server"';
 
-                                await owner.send(
-                                    `Hello! I'm missing permissions in your guild "${guild.name}".\n\n${missingPerms}\n(These permissions can be found in Server Settings -> Roles -> Bot Role)\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
-                                );
+                                try {
+                                    await owner.send(
+                                        `Hello! I'm missing permissions in your guild "${guild.name}".\n\n${missingPerms}\n(These permissions can be found in Server Settings -> Roles -> Bot Role)\n\nPlease update my permissions or consider removing me from the server if I'm not needed.\n\nSupport Server: https://discord.gg/invte/YDqBQU43Ht`
+                                    );
+                                    
+                                    errorResults.push(`${guild.name}: ${missingPerms}`);
 
-                                errorResults.push(`${guild.name}: ${missingPerms}`);
-
-                                // Update lastOwnerDM timestamp
-                                if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
-                                guildSettings.lastOwnerDM[owner.id] = now;
-              
-                                await client.getDatabaseHandler().updateOne('settings',
-                                    { guild: guild.id },
-                                    { $set: { lastOwnerDM: guildSettings.lastOwnerDM } }
-                                );
+                                    // Update lastOwnerDM timestamp
+                                    if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
+                                    guildSettings.lastOwnerDM[owner.id] = now;
+                  
+                                    await client.getDatabaseHandler().updateOne('settings',
+                                        { guild: guild.id },
+                                        { $set: { lastOwnerDM: guildSettings.lastOwnerDM } }
+                                    );
+                                } catch (sendError) {
+                                    // Handle DM blocked error (50007)
+                                    if (sendError.code === 50007) {
+                                        errorResults.push(`${guild.name}: ${missingPerms} (Owner has DMs disabled)`);
+                                        console.log(`Cannot send DM to owner of ${guild.name}: DMs disabled`);
+                                    } else {
+                                        errorResults.push(`${guild.name}: ${missingPerms} (Failed to contact owner)`);
+                                        console.error(`Error sending DM to owner of ${guild.name}:`, sendError);
+                                    }
+                                    
+                                    // Still update the lastOwnerDM timestamp to avoid repeated attempts
+                                    if (!guildSettings.lastOwnerDM) guildSettings.lastOwnerDM = {};
+                                    guildSettings.lastOwnerDM[owner.id] = now;
+                  
+                                    await client.getDatabaseHandler().updateOne('settings',
+                                        { guild: guild.id },
+                                        { $set: { lastOwnerDM: guildSettings.lastOwnerDM } }
+                                    );
+                                }
                             }
                         } catch (dmError) {
-                            console.error(`Couldn't DM owner of ${guild.name}:`, dmError);
+                            console.error(`Couldn't fetch owner of ${guild.name}:`, dmError);
+                            errorResults.push(`${guild.name}: Missing permissions (Failed to fetch owner)`);
                         }
                     } else {
                         console.error(`Error in guild ${guild.name}:`, error);
