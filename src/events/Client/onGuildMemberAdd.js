@@ -6,6 +6,7 @@ const {
     StringSelectMenuBuilder,
     ComponentType,
     AttachmentBuilder,
+    PermissionsBitField,
 } = require('discord.js');
 const axios = require('axios');
 const rateLimit = require('axios-rate-limit');
@@ -1015,9 +1016,17 @@ async function handleWelcomeMessage(client, member, guildSettings) {
             return;
         }
 
-        // Check bot permissions in the welcome channel
+        // Check bot permissions in the welcome channel - Updated permission check
+        const requiredPermissions = [
+            PermissionsBitField.Flags.ViewChannel,
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.AttachFiles
+        ];
+        
         const permissions = welcomeChannel.permissionsFor(client.user);
-        if (!permissions?.has(['ViewChannel', 'SendMessages', 'AttachFiles'])) {
+        const missingPermissions = requiredPermissions.filter(perm => !permissions.has(perm));
+        
+        if (missingPermissions.length > 0) {
             console.warn(
                 `Missing required permissions in welcome channel for guild ${guild.id}`
             );

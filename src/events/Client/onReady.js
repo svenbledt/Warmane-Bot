@@ -2,6 +2,7 @@ const { success } = require('../../utils/Console');
 const Event = require('../../structure/Event');
 const config = require('../../config');
 const Logger = require('../../utils/Logger');
+const { PermissionsBitField } = require('discord.js');
 
 const COOLDOWN_HOURS = 24;
 
@@ -34,8 +35,8 @@ async function updateStatus(client) {
 }
 
 const permissionTranslations = {
-    CreateInstantInvite: 'Create Invite',
-    ManageGuild: 'Manage Server',
+    [PermissionsBitField.Flags.CreateInstantInvite]: 'Create Invite',
+    [PermissionsBitField.Flags.ManageGuild]: 'Manage Server',
 };
 
 async function generateAndSendInvites(client) {
@@ -55,7 +56,11 @@ async function generateAndSendInvites(client) {
             if (guild.systemChannel) {
                 try {
                     const botMember = guild.members.cache.get(client.user.id);
-                    const requiredPermissions = ['CreateInstantInvite', 'ManageGuild'];
+                    const requiredPermissions = [
+                        PermissionsBitField.Flags.CreateInstantInvite,
+                        PermissionsBitField.Flags.ManageGuild
+                    ];
+                    
                     const missingPermissions = requiredPermissions.filter(
                         (perm) => !botMember.permissions.has(perm)
                     );
@@ -65,7 +70,7 @@ async function generateAndSendInvites(client) {
                             code: 50013,
                             missingPermissions: missingPermissions,
                             translatedPermissions: missingPermissions.map(
-                                (perm) => permissionTranslations[perm] || perm
+                                (perm) => permissionTranslations[perm] || String(perm)
                             ),
                         };
                     }

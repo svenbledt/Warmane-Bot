@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 const LanguageManager = require('./LanguageManager');
 const DevLogger = require('./DevLogger');
 
@@ -31,9 +31,17 @@ class Logger {
             try {
                 channel = await client.channels.fetch(guildSettings.logChannel);
                 
-                // Check bot permissions in the channel
+                // Check bot permissions in the channel - Updated permission check
+                const requiredPermissions = [
+                    PermissionsBitField.Flags.ViewChannel,
+                    PermissionsBitField.Flags.SendMessages,
+                    PermissionsBitField.Flags.EmbedLinks
+                ];
+                
                 const permissions = channel.permissionsFor(client.user);
-                if (!permissions?.has(['ViewChannel', 'SendMessages', 'EmbedLinks'])) {
+                const missingPermissions = requiredPermissions.filter(perm => !permissions.has(perm));
+                
+                if (missingPermissions.length > 0) {
                     console.warn(`Missing required permissions in log channel for guild ${guildId}`);
                     
                     // Try to notify guild owner
