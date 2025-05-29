@@ -265,27 +265,26 @@ module.exports = {
     },
     logging: {
         error: 'Error',
-        leveling_progress_removed: {
-            title: 'Leveling Progress Removed',
-            description: 'Leveling progress removed for {username}, {userId}>'
-        },
-        dm_sent: {
-            title: 'MP Envoyé',
-            description: 'MP de demande de nom de personnage envoyé à {username}'
-        },
+        footer: 'Journaux du Serveur',
+        
+        // Member events
         member_banned: {
             title: 'Membre Banni',
             description: 'Utilisateur de la liste noire banni',
             reason_label: 'Raison'
         },
-        invite_created: {
-            title: 'Invitation Créée',
-            description: 'Nouvelle invitation du serveur créée pour les développeurs de {botName}',
-            channel: 'Canal',
-            created_by: 'Créé par'
+        nickname_changed: {
+            title: 'Surnom Modifié',
+            description: 'Surnom de {username} changé en {nickname}',
+            new_nickname: 'Nouveau Surnom'
         },
-        footer: 'Journaux du Serveur',
-        dm: {
+        
+        // DM related logs
+        dm_sent: {
+            title: 'MP Envoyé',
+            description: 'MP de demande de nom de personnage envoyé à {username}'
+        },
+        dm_failed: {
             title: 'Échec du MP',
             description: 'Impossible d\'envoyer un MP à {username}',
             user_label: 'Utilisateur',
@@ -298,14 +297,48 @@ module.exports = {
             title: 'Délai de Réponse MP Dépassé',
             description: '{username} n\'a pas répondu dans le délai imparti'
         },
-        nickname_changed: {
-            title: 'Surnom Modifié',
-            description: 'Surnom de {username} changé en {nickname}',
-            new_nickname: 'Nouveau Surnom'
+        
+        // System events
+        invite_created: {
+            title: 'Invitation Créée',
+            description: 'Nouvelle invitation du serveur créée pour les développeurs de {botName}',
+            channel: 'Canal',
+            created_by: 'Créé par'
         },
         interaction_failed: {
             title: 'Échec de l\'interaction',
-            description: 'Échec de l\'interaction avec {username}: {error}'
+            description: 'Échec de l\'interaction avec {username}',
+            error_label: 'Erreur',
+            component_label: 'Composant'
+        },
+        
+        // Leveling system logs
+        leveling_progress_removed: {
+            title: 'Progression de Niveau Supprimée',
+            description: 'Progression de niveau supprimée pour {username}, {userId}>'
+        },
+        level_up: {
+            title: 'Niveau Augmenté',
+            description: '{username} a atteint le niveau {level}',
+            previous_level: 'Niveau Précédent',
+            current_level: 'Niveau Actuel',
+            xp_earned: 'XP Gagnée'
+        },
+        
+        // Permission logs
+        permission_denied: {
+            title: 'Permission Refusée',
+            description: '{username} a tenté d\'utiliser {command} sans les permissions appropriées',
+            required_permissions: 'Permissions Requises',
+            user_permissions: 'Permissions de l\'Utilisateur'
+        },
+        
+        // Command usage logs
+        command_used: {
+            title: 'Commande Utilisée',
+            description: '{username} a utilisé {command}',
+            channel: 'Canal',
+            options: 'Options'
         }
     }
 }; 

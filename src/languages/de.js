@@ -269,27 +269,26 @@ module.exports = {
     },
     logging: {
         error: 'Error',
-        leveling_progress_removed: {
-            title: 'Leveling Progress Removed',
-            description: 'Leveling progress removed for {username}, {userId}>'
-        },
-        dm_sent: {
-            title: 'DM Gesendet',
-            description: 'Charakternamen-Anfrage DM an {username} gesendet'
-        },
+        footer: 'Server Logs',
+        
+        // Member events
         member_banned: {
             title: 'Mitglied Gebannt',
             description: 'Blacklist-Benutzer gebannt',
             reason_label: 'Grund'
         },
-        invite_created: {
-            title: 'Einladung Erstellt',
-            description: 'Neue Server-Einladung für {botName} Entwickler erstellt',
-            channel: 'Kanal',
-            created_by: 'Erstellt von'
+        nickname_changed: {
+            title: 'Nickname Geändert',
+            description: 'Nickname für {username} zu {nickname} geändert',
+            new_nickname: 'Neuer Nickname'
         },
-        footer: 'Server Logs',
-        dm: {
+        
+        // DM related logs
+        dm_sent: {
+            title: 'DM Gesendet',
+            description: 'Charakternamen-Anfrage DM an {username} gesendet'
+        },
+        dm_failed: {
             title: 'DM Fehlgeschlagen',
             description: 'Konnte keine DM an {username} senden',
             user_label: 'Benutzer',
@@ -298,18 +297,52 @@ module.exports = {
             response: 'Antwort',
             reason_label: 'Grund'
         },
-        nickname_changed: {
-            title: 'Nickname Geändert',
-            description: 'Nickname für {username} zu {nickname} geändert',
-            new_nickname: 'Neuer Nickname'
-        },
         dm_timeout: {
             title: 'DM Antwort Zeitüberschreitung',
             description: '{username} hat nicht innerhalb der Zeitbegrenzung geantwortet'
         },
+        
+        // System events
+        invite_created: {
+            title: 'Einladung Erstellt',
+            description: 'Neue Server-Einladung für {botName} Entwickler erstellt',
+            channel: 'Kanal',
+            created_by: 'Erstellt von'
+        },
         interaction_failed: {
             title: 'Interaktion Fehlgeschlagen',
-            description: 'Fehlgeschlagen, um mit {username} zu interagieren: {error}'
+            description: 'Fehlgeschlagen, um mit {username} zu interagieren',
+            error_label: 'Fehler',
+            component_label: 'Komponente'
+        },
+        
+        // Leveling system logs
+        leveling_progress_removed: {
+            title: 'Leveling-Fortschritt Entfernt',
+            description: 'Leveling-Fortschritt entfernt für {username}, {userId}>'
+        },
+        level_up: {
+            title: 'Level Aufgestiegen',
+            description: '{username} hat Level {level} erreicht',
+            previous_level: 'Vorheriges Level',
+            current_level: 'Aktuelles Level',
+            xp_earned: 'XP Erhalten'
+        },
+        
+        // Permission logs
+        permission_denied: {
+            title: 'Berechtigung Verweigert',
+            description: '{username} hat versucht, {command} ohne die erforderlichen Berechtigungen zu verwenden',
+            required_permissions: 'Erforderliche Berechtigungen',
+            user_permissions: 'Benutzer-Berechtigungen'
+        },
+        
+        // Command usage logs
+        command_used: {
+            title: 'Befehl Verwendet',
+            description: '{username} hat {command} verwendet',
+            channel: 'Kanal',
+            options: 'Optionen'
         }
     }
 };

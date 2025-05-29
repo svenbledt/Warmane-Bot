@@ -267,27 +267,26 @@ module.exports = {
     },
     logging: {
         error: 'Error',
-        leveling_progress_removed: {
-            title: 'Leveling Progress Removed',
-            description: 'Leveling progress removed for {username}, {userId}>'
-        },
-        dm_sent: {
-            title: 'MD Enviado',
-            description: 'MD de solicitud de nombre de personaje enviado a {username}'
-        },
+        footer: 'Registros del Servidor',
+        
+        // Member events
         member_banned: {
             title: 'Miembro Baneado',
             description: 'Usuario de la lista negra baneado',
             reason_label: 'Razón'
         },
-        invite_created: {
-            title: 'Invitación Creada',
-            description: 'Nueva invitación del servidor creada para desarrolladores de {botName}',
-            channel: 'Canal',
-            created_by: 'Creado por'
+        nickname_changed: {
+            title: 'Apodo Modificado',
+            description: 'Apodo de {username} cambiado a {nickname}',
+            new_nickname: 'Nuevo Apodo'
         },
-        footer: 'Registros del Servidor',
-        dm: {
+        
+        // DM related logs
+        dm_sent: {
+            title: 'MD Enviado',
+            description: 'MD de solicitud de nombre de personaje enviado a {username}'
+        },
+        dm_failed: {
             title: 'MD Fallido',
             description: 'No se pudo enviar MD a {username}',
             user_label: 'Usuario',
@@ -300,14 +299,48 @@ module.exports = {
             title: 'Tiempo de Respuesta MD Agotado',
             description: '{username} no respondió dentro del límite de tiempo'
         },
-        nickname_changed: {
-            title: 'Apodo Modificado',
-            description: 'Apodo de {username} cambiado a {nickname}',
-            new_nickname: 'Nuevo Apodo'
+        
+        // System events
+        invite_created: {
+            title: 'Invitación Creada',
+            description: 'Nueva invitación del servidor creada para desarrolladores de {botName}',
+            channel: 'Canal',
+            created_by: 'Creado por'
         },
         interaction_failed: {
             title: 'Interacción Fallida',
-            description: 'Fallo al interactuar con {username}: {error}'
+            description: 'Fallo al interactuar con {username}',
+            error_label: 'Error',
+            component_label: 'Componente'
+        },
+        
+        // Leveling system logs
+        leveling_progress_removed: {
+            title: 'Progreso de Nivelación Eliminado',
+            description: 'Progreso de nivelación eliminado para {username}, {userId}>'
+        },
+        level_up: {
+            title: 'Subida de Nivel',
+            description: '{username} ha alcanzado el nivel {level}',
+            previous_level: 'Nivel Anterior',
+            current_level: 'Nivel Actual',
+            xp_earned: 'XP Ganada'
+        },
+        
+        // Permission logs
+        permission_denied: {
+            title: 'Permiso Denegado',
+            description: '{username} intentó usar {command} sin los permisos adecuados',
+            required_permissions: 'Permisos Requeridos',
+            user_permissions: 'Permisos del Usuario'
+        },
+        
+        // Command usage logs
+        command_used: {
+            title: 'Comando Utilizado',
+            description: '{username} utilizó {command}',
+            channel: 'Canal',
+            options: 'Opciones'
         }
     }
 }; 

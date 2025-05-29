@@ -272,27 +272,26 @@ module.exports = {
     },
     logging: {
         error: 'Error',
-        leveling_progress_removed: {
-            title: 'Leveling Progress Removed',
-            description: 'Leveling progress removed for {username}, {userId}>'
-        },
-        dm_sent: {
-            title: 'DM Sent',
-            description: 'Sent character name request DM to {username}'
-        },
+        footer: 'Server Logs',
+        
+        // Member events
         member_banned: {
             title: 'Member Banned',
             description: 'Banned blacklisted user',
             reason_label: 'Reason'
         },
-        invite_created: {
-            title: 'Invite Created',
-            description: 'Created new server invite for {botName} Developers',
-            channel: 'Channel',
-            created_by: 'Created By'
+        nickname_changed: {
+            title: 'Nickname Changed',
+            description: 'Changed nickname for {username} to {nickname}',
+            new_nickname: 'New Nickname'
         },
-        footer: 'Server Logs',
-        dm: {
+        
+        // DM related logs
+        dm_sent: {
+            title: 'DM Sent',
+            description: 'Sent character name request DM to {username}'
+        },
+        dm_failed: {
             title: 'DM Failed',
             description: 'Failed to send DM to {username}',
             user_label: 'User',
@@ -301,18 +300,52 @@ module.exports = {
             response: 'Response',
             reason_label: 'Reason'
         },
-        nickname_changed: {
-            title: 'Nickname Changed',
-            description: 'Changed nickname for {username} to {nickname}',
-            new_nickname: 'New Nickname'
-        },
         dm_timeout: {
             title: 'DM Response Timeout',
             description: '{username} did not respond within the time limit'
         },
+        
+        // System events
+        invite_created: {
+            title: 'Invite Created',
+            description: 'Created new server invite for {botName} Developers',
+            channel: 'Channel',
+            created_by: 'Created By'
+        },
         interaction_failed: {
             title: 'Interaction Failed',
-            description: 'Failed to interact with {username}'
+            description: 'Failed to interact with {username}',
+            error_label: 'Error',
+            component_label: 'Component'
+        },
+        
+        // Leveling system logs
+        leveling_progress_removed: {
+            title: 'Leveling Progress Removed',
+            description: 'Leveling progress removed for {username}, {userId}>'
+        },
+        level_up: {
+            title: 'Level Up',
+            description: '{username} has reached level {level}',
+            previous_level: 'Previous Level',
+            current_level: 'Current Level',
+            xp_earned: 'XP Earned'
+        },
+        
+        // Permission logs
+        permission_denied: {
+            title: 'Permission Denied',
+            description: '{username} attempted to use {command} without proper permissions',
+            required_permissions: 'Required Permissions',
+            user_permissions: 'User Permissions'
+        },
+        
+        // Command usage logs
+        command_used: {
+            title: 'Command Used',
+            description: '{username} used {command}',
+            channel: 'Channel',
+            options: 'Options'
         }
     }
 };

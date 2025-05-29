@@ -266,27 +266,26 @@ module.exports = {
     },
     logging: {
         error: 'Error',
-        leveling_progress_removed: {
-            title: 'Leveling Progress Removed',
-            description: 'Leveling progress removed for {username}, {userId}>'
-        },
-        dm_sent: {
-            title: 'ЛС Отправлено',
-            description: 'Отправлен запрос имени персонажа в ЛС пользователю {username}'
-        },
+        footer: 'Логи Сервера',
+        
+        // Member events
         member_banned: {
             title: 'Участник Заблокирован',
             description: 'Заблокирован пользователь из черного списка',
             reason_label: 'Причина'
         },
-        invite_created: {
-            title: 'Приглашение Создано',
-            description: 'Новое приглашение на сервер создано для разработчиков {botName}',
-            channel: 'Канал',
-            created_by: 'Создано'
+        nickname_changed: {
+            title: 'Никнейм Изменен',
+            description: 'Изменен никнейм пользователя {username} на {nickname}',
+            new_nickname: 'Новый Никнейм'
         },
-        footer: 'Логи Сервера',
-        dm: {
+        
+        // DM related logs
+        dm_sent: {
+            title: 'ЛС Отправлено',
+            description: 'Отправлен запрос имени персонажа в ЛС пользователю {username}'
+        },
+        dm_failed: {
             title: 'Ошибка ЛС',
             description: 'Не удалось отправить ЛС пользователю {username}',
             user_label: 'Пользователь',
@@ -299,14 +298,48 @@ module.exports = {
             title: 'Время Ожидания ЛС Истекло',
             description: '{username} не ответил в установленное время'
         },
-        nickname_changed: {
-            title: 'Никнейм Изменен',
-            description: 'Изменен никнейм пользователя {username} на {nickname}',
-            new_nickname: 'Новый Никнейм'
+        
+        // System events
+        invite_created: {
+            title: 'Приглашение Создано',
+            description: 'Новое приглашение на сервер создано для разработчиков {botName}',
+            channel: 'Канал',
+            created_by: 'Создано'
         },
         interaction_failed: {
             title: 'Ошибка взаимодействия',
-            description: 'Не удалось взаимодействовать с {username}: {error}'
+            description: 'Не удалось взаимодействовать с {username}',
+            error_label: 'Ошибка',
+            component_label: 'Компонент'
+        },
+        
+        // Leveling system logs
+        leveling_progress_removed: {
+            title: 'Прогресс Уровней Удален',
+            description: 'Прогресс уровней удален для {username}, {userId}>'
+        },
+        level_up: {
+            title: 'Повышение Уровня',
+            description: '{username} достиг уровня {level}',
+            previous_level: 'Предыдущий Уровень',
+            current_level: 'Текущий Уровень',
+            xp_earned: 'Получено Опыта'
+        },
+        
+        // Permission logs
+        permission_denied: {
+            title: 'Доступ Запрещен',
+            description: '{username} попытался использовать {command} без необходимых разрешений',
+            required_permissions: 'Необходимые Разрешения',
+            user_permissions: 'Разрешения Пользователя'
+        },
+        
+        // Command usage logs
+        command_used: {
+            title: 'Команда Использована',
+            description: '{username} использовал {command}',
+            channel: 'Канал',
+            options: 'Опции'
         }
     }
 };
