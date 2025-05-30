@@ -268,6 +268,14 @@ module.exports = {
         error: 'Error',
         footer: 'Логи Сервера',
         
+        // Direct translations for field keys
+        dm: {
+            user_label: 'Пользователь',
+            user_id: 'ID Пользователя',
+            error_label: 'Ошибка',
+            error: 'Ошибка'
+        },
+        
         // Member events
         member_banned: {
             title: 'Участник Заблокирован',

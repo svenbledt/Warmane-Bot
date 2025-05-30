@@ -271,6 +271,14 @@ module.exports = {
         error: 'Error',
         footer: 'Server Logs',
         
+        // Direct translations for field keys
+        dm: {
+            user_label: 'Benutzer',
+            user_id: 'Benutzer ID',
+            error_label: 'Fehler',
+            error: 'Fehler'
+        },
+        
         // Member events
         member_banned: {
             title: 'Mitglied Gebannt',

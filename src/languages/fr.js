@@ -267,6 +267,14 @@ module.exports = {
         error: 'Error',
         footer: 'Journaux du Serveur',
         
+        // Direct translations for field keys
+        dm: {
+            user_label: 'Utilisateur',
+            user_id: 'ID Utilisateur',
+            error_label: 'Erreur',
+            error: 'Erreur'
+        },
+        
         // Member events
         member_banned: {
             title: 'Membre Banni',
