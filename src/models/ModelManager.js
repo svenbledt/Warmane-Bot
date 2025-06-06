@@ -1,7 +1,6 @@
 const BlacklistedUserSchema = require('./BlacklistedUser');
 const GuildSettingsSchema = require('./GuildSettings');
 const UserCharacterSchema = require('./UserCharacter');
-const BlacklistedWordSchema = require('./BlacklistedWord');
 
 class ModelManager {
     constructor(client) {
@@ -15,7 +14,6 @@ class ModelManager {
             await this.createCollection('blacklisted', BlacklistedUserSchema);
             await this.createCollection('settings', GuildSettingsSchema);
             await this.createCollection('userCharacters', UserCharacterSchema);
-            await this.createCollection('blacklistedWords', BlacklistedWordSchema);
 
             // Create indexes
             await this.createIndexes();
@@ -58,7 +56,6 @@ class ModelManager {
         await this.models.blacklisted.createIndex({ id: 1 }, { unique: true });
         await this.models.settings.createIndex({ guild: 1 }, { unique: true });
         await this.models.userCharacters.createIndex({ userId: 1 }, { unique: true });
-        await this.models.blacklistedWords.createIndex({ word: 1 }, { unique: true });
     }
 
     convertSchemaToJsonSchema(schema) {
