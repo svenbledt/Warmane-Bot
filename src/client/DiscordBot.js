@@ -9,6 +9,7 @@ const EventsHandler = require('./handler/EventsHandler');
 const LanguageManager = require('../utils/LanguageManager');
 const DatabaseHandler = require('./handler/DatabaseHandler');
 const LevelingSystemHandler = require('./handler/LevelingSystemHandler');
+const BlacklistedWordsHandler = require('../client/handler/BlacklistedWordsHandler');
 
 class DiscordBot extends Client {
     // Use private fields for better encapsulation
@@ -16,6 +17,7 @@ class DiscordBot extends Client {
     #loginTime = 0;
     #databaseHandler = null;
     #levelingSystemHandler = null;
+    #blacklistedWordsHandler = null;
 
     // Simplified collection structure using Map for better performance
     collection = {
@@ -65,6 +67,7 @@ class DiscordBot extends Client {
         new CommandsListener(this);
         new ComponentsListener(this);
         this.#levelingSystemHandler = new LevelingSystemHandler(this);
+        this.#blacklistedWordsHandler = new BlacklistedWordsHandler(this);
     }
 
     loadLanguages() {
@@ -95,7 +98,6 @@ class DiscordBot extends Client {
 
         try {
             await this.connectToMongoDB();
-            await this.login(process.env.CLIENT_TOKEN);
             await this.initializeBot();
         } catch (err) {
             error('Failed to connect to services, retrying...');
@@ -114,6 +116,9 @@ class DiscordBot extends Client {
 
         await this.commands_handler.deleteApplicationCommands(config.development);
         await this.commands_handler.registerApplicationCommands(config.development);
+
+        await this.#levelingSystemHandler.initialize();
+        await this.#blacklistedWordsHandler.initialize();
     }
 
     async disconnect() {
@@ -141,6 +146,10 @@ class DiscordBot extends Client {
 
     getLoginTime() {
         return this.#loginTime;
+    }
+
+    getBlacklistedWordsHandler() {
+        return this.#blacklistedWordsHandler;
     }
 }
 
