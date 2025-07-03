@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const blacklistedWordSchema = new mongoose.Schema({
-    guild: { type: String, required: true },
+    guild: { type: String, required: function() { return !this.global; } },
     word: { type: String, required: true },
     addedBy: { type: String, required: true }, // User ID who added the word
     addedByUsername: { type: String, required: true }, // Username for display
@@ -10,8 +10,8 @@ const blacklistedWordSchema = new mongoose.Schema({
     deleteMessage: { type: Boolean, default: true }, // Whether to delete messages containing this word
     warnUser: { type: Boolean, default: true }, // Whether to warn the user
     caseSensitive: { type: Boolean, default: false }, // Whether the word check is case sensitive
-    useContextAnalysis: { type: Boolean, default: true }, // Whether to use context analysis
-    contextThreshold: { type: Number, default: 0.2, min: 0, max: 1 }, // Confidence threshold for context analysis
+    useContextAnalysis: { type: Boolean, default: false }, // Whether to use context analysis
+    contextThreshold: { type: Number, default: 1.0, min: 0, max: 1 }, // Confidence threshold for context analysis
     global: { type: Boolean, default: false }, // New field for global words
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
@@ -20,8 +20,8 @@ const blacklistedWordSchema = new mongoose.Schema({
     strict: true
 });
 
-// Compound index to ensure unique words per guild
-blacklistedWordSchema.index({ guild: 1, word: 1 }, { unique: true });
+// Compound index to ensure unique words per guild (global words have null guild)
+blacklistedWordSchema.index({ guild: 1, word: 1 }, { unique: true, sparse: true });
 
 // Index for efficient word lookups
 blacklistedWordSchema.index({ guild: 1, enabled: 1 });

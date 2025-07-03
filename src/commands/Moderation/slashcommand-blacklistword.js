@@ -39,32 +39,31 @@ module.exports = new ApplicationCommand({
                     },
                     {
                         name: 'case_sensitive',
-                        description: 'Whether the word check should be case sensitive',
+                        description: 'Make word check case sensitive',
                         type: 5, // Boolean
                         required: false,
                     },
                     {
                         name: 'delete_message',
-                        description: 'Whether to delete messages containing this word',
+                        description: 'Delete messages containing this word',
                         type: 5, // Boolean
                         required: false,
                     },
                     {
                         name: 'warn_user',
-                        description: 'Whether to warn the user when this word is used',
+                        description: 'Warn user when this word is used',
                         type: 5, // Boolean
                         required: false,
                     },
                     {
                         name: 'use_context_analysis',
-                        description:
-              'Whether to analyze context to determine appropriate usage',
+                        description: 'Analyze context to determine appropriate usage',
                         type: 5, // Boolean
                         required: false,
                     },
                     {
                         name: 'context_threshold',
-                        description: 'Confidence threshold for context analysis (0-100%)',
+                        description: 'Confidence threshold for context analysis (0-100)',
                         type: 4, // Integer
                         required: false,
                         min_value: 0,
@@ -117,6 +116,20 @@ module.exports = new ApplicationCommand({
                         type: 3, // String
                         required: true,
                         max_length: 50,
+                    },
+                ],
+            },
+            {
+                name: 'listglobal',
+                description: 'List all global blacklisted words (developers only)',
+                type: 1, // Subcommand
+                options: [
+                    {
+                        name: 'page',
+                        description: 'Page number to display',
+                        type: 4, // Integer
+                        required: false,
+                        min_value: 1,
                     },
                 ],
             },
@@ -181,6 +194,9 @@ module.exports = new ApplicationCommand({
         case 'toggle':
             await handleToggleWord(client, interaction, lang);
             break;
+        case 'listglobal':
+            await handleListGlobalWords(client, interaction, lang);
+            break;
         }
     },
 });
@@ -194,9 +210,9 @@ async function handleAddWord(client, interaction, lang) {
     interaction.options.getBoolean('delete_message') ?? true;
     const warnUser = interaction.options.getBoolean('warn_user') ?? true;
     const useContextAnalysis =
-    interaction.options.getBoolean('use_context_analysis') ?? true;
+    interaction.options.getBoolean('use_context_analysis') ?? false;
     const contextThreshold =
-    (interaction.options.getInteger('context_threshold') ?? 20) / 100;
+    (interaction.options.getInteger('context_threshold') ?? 100) / 100;
     const global = interaction.options.getBoolean('global') ?? false;
 
     // Check if user is trying to make a global word
@@ -407,12 +423,52 @@ async function handleRemoveWord(client, interaction, lang) {
     const word = interaction.options.getString('word');
 
     try {
-    // Find and remove the word
+        // First try to find the word in the current guild
+        let wordData = await client
+            .getDatabaseHandler()
+            .findOne('blacklistedWords', {
+                guild: interaction.guildId,
+                word: word.toLowerCase(),
+            });
+
+        // If not found in guild, check if it's a global word
+        if (!wordData) {
+            wordData = await client
+                .getDatabaseHandler()
+                .findOne('blacklistedWords', {
+                    global: true,
+                    word: word.toLowerCase(),
+                });
+
+            // If it's a global word, check if user is a developer
+            if (wordData && !client.config.users.developers.includes(interaction.user.id)) {
+                return interaction.reply({
+                    content: LanguageManager.getText(
+                        'commands.global_strings.bot_developer_only',
+                        lang
+                    ),
+                    flags: [MessageFlags.Ephemeral],
+                });
+            }
+        }
+
+        // If word not found anywhere
+        if (!wordData) {
+            return interaction.reply({
+                content: LanguageManager.getText(
+                    'commands.blacklistword.word_not_found',
+                    lang,
+                    { word }
+                ),
+                flags: [MessageFlags.Ephemeral],
+            });
+        }
+
+        // Remove the word
         const result = await client
             .getDatabaseHandler()
             .deleteOne('blacklistedWords', {
-                guild: interaction.guildId,
-                word: word.toLowerCase(),
+                _id: wordData._id,
             });
 
         if (result.deletedCount === 0) {
@@ -562,7 +618,7 @@ async function handleListWords(client, interaction, lang) {
             const warnUser = wordData.warnUser ? '✅' : '❌';
 
             const useContextAnalysis = wordData.useContextAnalysis ? '✅' : '❌';
-            const contextThreshold = wordData.contextThreshold || 0.2;
+            const contextThreshold = wordData.contextThreshold || 1.0;
 
             embed.addFields({
                 name: `${status} ${wordData.word}`,
@@ -620,13 +676,36 @@ async function handleToggleWord(client, interaction, lang) {
     const word = interaction.options.getString('word');
 
     try {
-        const wordData = await client
+        // First try to find the word in the current guild
+        let wordData = await client
             .getDatabaseHandler()
             .findOne('blacklistedWords', {
                 guild: interaction.guildId,
                 word: word.toLowerCase(),
             });
 
+        // If not found in guild, check if it's a global word
+        if (!wordData) {
+            wordData = await client
+                .getDatabaseHandler()
+                .findOne('blacklistedWords', {
+                    global: true,
+                    word: word.toLowerCase(),
+                });
+
+            // If it's a global word, check if user is a developer
+            if (wordData && !client.config.users.developers.includes(interaction.user.id)) {
+                return interaction.reply({
+                    content: LanguageManager.getText(
+                        'commands.global_strings.bot_developer_only',
+                        lang
+                    ),
+                    flags: [MessageFlags.Ephemeral],
+                });
+            }
+        }
+
+        // If word not found anywhere
         if (!wordData) {
             return interaction.reply({
                 content: LanguageManager.getText(
@@ -643,7 +722,7 @@ async function handleToggleWord(client, interaction, lang) {
             .getDatabaseHandler()
             .updateOne(
                 'blacklistedWords',
-                { guild: interaction.guildId, word: word.toLowerCase() },
+                { _id: wordData._id },
                 { enabled: newStatus }
             );
 
@@ -738,6 +817,124 @@ async function handleToggleWord(client, interaction, lang) {
         }
     } catch (error) {
         console.error('Error toggling blacklisted word:', error);
+        await interaction.reply({
+            content: LanguageManager.getText(
+                'commands.global_strings.error_occurred',
+                lang,
+                { error: error.message }
+            ),
+            flags: [MessageFlags.Ephemeral],
+        });
+    }
+}
+
+async function handleListGlobalWords(client, interaction, lang) {
+    // Check if user is a bot developer
+    if (!client.config.users.developers.includes(interaction.user.id)) {
+        return interaction.reply({
+            content: LanguageManager.getText(
+                'commands.global_strings.bot_developer_only',
+                lang
+            ),
+            flags: [MessageFlags.Ephemeral],
+        });
+    }
+
+    const page = interaction.options.getInteger('page') || 1;
+    const wordsPerPage = 10;
+
+    try {
+        const globalWords = await client
+            .getDatabaseHandler()
+            .find('blacklistedWords', {
+                global: true,
+            });
+
+        if (globalWords.length === 0) {
+            return interaction.reply({
+                content: LanguageManager.getText(
+                    'commands.blacklistword.no_global_words',
+                    lang
+                ),
+                flags: [MessageFlags.Ephemeral],
+            });
+        }
+
+        const totalPages = Math.ceil(globalWords.length / wordsPerPage);
+        const startIndex = (page - 1) * wordsPerPage;
+        const endIndex = startIndex + wordsPerPage;
+        const pageWords = globalWords.slice(startIndex, endIndex);
+
+        const embed = new EmbedBuilder()
+            .setColor(0x0099ff)
+            .setTitle(
+                LanguageManager.getText('commands.blacklistword.global_list_title', lang)
+            )
+            .setDescription(
+                LanguageManager.getText(
+                    'commands.blacklistword.global_list_description',
+                    lang,
+                    { count: globalWords.length }
+                )
+            )
+            .setFooter({
+                text: LanguageManager.getText(
+                    'commands.blacklistword.page_info',
+                    lang,
+                    { page, totalPages }
+                ),
+            })
+            .setTimestamp();
+
+        pageWords.forEach((wordData) => {
+            const status = wordData.enabled ? '✅' : '❌';
+            const caseSensitive = wordData.caseSensitive ? '✅' : '❌';
+            const deleteMsg = wordData.deleteMessage ? '✅' : '❌';
+            const warnUser = wordData.warnUser ? '✅' : '❌';
+            const useContextAnalysis = wordData.useContextAnalysis ? '✅' : '❌';
+            const contextThreshold = wordData.contextThreshold || 1.0;
+
+            embed.addFields({
+                name: `${status} ${wordData.word} (Global)`,
+                value: LanguageManager.getText(
+                    'commands.blacklistword.word_info',
+                    lang,
+                    {
+                        addedBy: wordData.addedByUsername,
+                        caseSensitive,
+                        deleteMessage: deleteMsg,
+                        warnUser,
+                        useContextAnalysis,
+                        contextThreshold: (contextThreshold * 100).toFixed(0) + '%',
+                        reason:
+              wordData.reason ||
+              LanguageManager.getText('commands.blacklistword.no_reason', lang),
+                    }
+                ),
+                inline: false,
+            });
+        });
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('blacklistword_global_prev_page')
+                .setLabel(
+                    LanguageManager.getText('commands.blacklistword.previous_page', lang)
+                )
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(page <= 1),
+            new ButtonBuilder()
+                .setCustomId('blacklistword_global_next_page')
+                .setLabel(
+                    LanguageManager.getText('commands.blacklistword.next_page', lang)
+                )
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(page >= totalPages)
+        );
+
+        await interaction.reply({ embeds: [embed], components: [row] });
+    } catch (error) {
+        console.error('Error listing global blacklisted words:', error);
         await interaction.reply({
             content: LanguageManager.getText(
                 'commands.global_strings.error_occurred',

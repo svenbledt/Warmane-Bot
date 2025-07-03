@@ -20,7 +20,6 @@
   * [globalcheck](commands/globalcheck.md)
   * [report](commands/report.md)
   * [testcontext](commands/testcontext.md)
-  * [charname](commands/charname.md)
 
 * **⚙️ Settings**
   * [setup](commands/setup.md)

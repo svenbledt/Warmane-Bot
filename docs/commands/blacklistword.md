@@ -5,20 +5,32 @@ The `/blacklistword` command manage blacklisted words for the server.
 ## Usage
 
 ```bash
-/blacklistword [options]
+/blacklistword <subcommand>
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `add` | Add a word to the blacklist |
+
+## Examples
+
+### Add subcommand
+```bash
+/blacklistword add
 ```
 
 ## Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `add` | String | Yes | Add a word to the blacklist |
 | `reason` | String | No | Reason for blacklisting this word |
-| `case_sensitive` | String | No | Whether the word check should be case sensitive |
-| `delete_message` | String | No | Whether to delete messages containing this word |
-| `warn_user` | String | No | Whether to warn the user when this word is used |
-| `use_context_analysis` | String | No | Whether to analyze context to determine appropriate usage |
-| `context_threshold` | String | No | Confidence threshold for context analysis (0-100%) |
+| `case_sensitive` | String | No | Make word check case sensitive |
+| `delete_message` | String | No | Delete messages containing this word |
+| `warn_user` | String | No | Warn user when this word is used |
+| `use_context_analysis` | String | No | Analyze context to determine appropriate usage |
+| `context_threshold` | String | No | Confidence threshold for context analysis (0-100) |
 | `global` | String | No | Make this word global (bot developers only) |
 
 ## Examples
@@ -39,10 +51,10 @@ This command manage blacklisted words for the server..
 
 ## Permissions
 
-- **Required**: Moderator
-- **Additional**: Manage Messages, Manage Members
+- **Required**: Developer
 
 
+- **Additional**: Bot Developer
 
 ## Response
 

@@ -51,19 +51,39 @@ This will send a DM to the user asking for their character name, then automatica
 
 ### Word Filtering
 
-**Add a word to the blacklist:**
+**Add a server-specific word to the blacklist:**
 ```bash
-/blacklistword add inappropriate_word
+/blacklistword add word:spam reason:Prevent spam messages
+```
+
+**Add a global word (developers only):**
+```bash
+/blacklistword add word:nigger global:true reason:Offensive language
 ```
 
 **Remove a word from the blacklist:**
 ```bash
-/blacklistword remove inappropriate_word
+/blacklistword remove word:spam
 ```
 
-**List all blacklisted words:**
+**List all server blacklisted words:**
 ```bash
 /blacklistword list
+```
+
+**List all global blacklisted words (developers only):**
+```bash
+/blacklistword listglobal
+```
+
+**Toggle a word on/off:**
+```bash
+/blacklistword toggle word:spam
+```
+
+**Add a word with custom settings:**
+```bash
+/blacklistword add word:test case_sensitive:true delete_message:true warn_user:true context_threshold:80
 ```
 
 ### User Management

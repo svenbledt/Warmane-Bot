@@ -1,6 +1,6 @@
 # Report Command
 
-The `/report` command report a warmane player for rule violations. adds them to the global blacklist and notifies moderators.
+The `/report` command report a warmane player for rule violations and add to global blacklist.
 
 ## Usage
 
@@ -17,7 +17,7 @@ The `/report` command report a warmane player for rule violations. adds them to 
 
 ## What it does
 
-This command report a warmane player for rule violations. adds them to the global blacklist and notifies moderators..
+This command report a warmane player for rule violations and add to global blacklist..
 
 ## Permissions
 

@@ -66,7 +66,7 @@ module.exports = new ApplicationCommand({
             const mockWordData = {
                 word: testWord,
                 useContextAnalysis: true,
-                contextThreshold: 0.2
+                contextThreshold: 1.0
             };
 
             const analysis = contextAnalyzer.analyzeContext(testMessage, testWord, mockWordData);

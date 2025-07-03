@@ -28,6 +28,7 @@ const PERMISSIONS = {
     color: "#ffc107",
   },
   admin: { name: "Admin", class: "permission-admin", color: "#dc3545" },
+  developer: { name: "Developer", class: "permission-developer", color: "#6f42c1" },
 };
 
 /**
@@ -46,6 +47,14 @@ function extractCommandInfo(filePath) {
     // Extract category from directory
     const category = path.basename(path.dirname(filePath));
 
+    // Extract type from module.exports
+    const typeMatch = content.match(/type:\s*(\d)/);
+    const commandType = typeMatch ? parseInt(typeMatch[1], 10) : 1;
+    if (commandType !== 1) {
+      // Not a slash command, skip
+      return null;
+    }
+
     // Extract description from module.exports
     const descriptionMatch = content.match(
       /description:\s*['"`]([^'"`]+)['"`]/
@@ -54,19 +63,46 @@ function extractCommandInfo(filePath) {
       ? descriptionMatch[1]
       : "No description available";
 
-    // Extract options/parameters
+    // Extract options/parameters and subcommands
     const optionsMatch = content.match(/options:\s*\[([\s\S]*?)\]/);
     let options = [];
+    let subcommands = [];
+    
     if (optionsMatch) {
       const optionsContent = optionsMatch[1];
-      const optionMatches = optionsContent.matchAll(
-        /{\s*name:\s*['"`]([^'"`]+)['"`][\s\S]*?description:\s*['"`]([^'"`]+)['"`][\s\S]*?required:\s*(true|false)/g
-      );
-      for (const match of optionMatches) {
-        options.push({
-          name: match[1],
-          description: match[2],
-          required: match[3] === "true",
+      
+      // More robust subcommand extraction
+      const subcommandBlocks = optionsContent.match(/{[^}]*name:\s*['"`][^'"`]+['"`][^}]*type:\s*1[^}]*}/g);
+      if (subcommandBlocks) {
+        subcommandBlocks.forEach(block => {
+          const nameMatch = block.match(/name:\s*['"`]([^'"`]+)['"`]/);
+          const descMatch = block.match(/description:\s*['"`]([^'"`]+)['"`]/);
+          if (nameMatch && descMatch) {
+            subcommands.push({
+              name: nameMatch[1],
+              description: descMatch[1],
+            });
+          }
+        });
+      }
+      
+      // Extract regular options (not subcommands)
+      const optionBlocks = optionsContent.match(/{[^}]*name:\s*['"`][^'"`]+['"`][^}]*required:\s*(true|false)[^}]*}/g);
+      if (optionBlocks) {
+        optionBlocks.forEach(block => {
+          // Skip if this is a subcommand
+          if (!block.includes('type: 1')) {
+            const nameMatch = block.match(/name:\s*['"`]([^'"`]+)['"`]/);
+            const descMatch = block.match(/description:\s*['"`]([^'"`]+)['"`]/);
+            const requiredMatch = block.match(/required:\s*(true|false)/);
+            if (nameMatch && descMatch && requiredMatch) {
+              options.push({
+                name: nameMatch[1],
+                description: descMatch[1],
+                required: requiredMatch[1] === "true",
+              });
+            }
+          }
         });
       }
     }
@@ -78,12 +114,21 @@ function extractCommandInfo(filePath) {
     } else if (category === "Moderation") {
       permission = "moderator";
     }
+    
+    // Check for developer-only features
+    if (content.includes("bot_developer_only") || 
+        content.includes("client.config.users.developers") ||
+        content.includes("global: true") ||
+        content.includes("listglobal")) {
+      permission = "developer";
+    }
 
     return {
       name: commandName,
       category,
       description,
       options,
+      subcommands,
       permission,
       filePath: path.relative(path.join(__dirname, ".."), filePath),
     };
@@ -110,10 +155,31 @@ The \`/${command.name}\` command ${command.description.toLowerCase()}
 ## Usage
 
 \`\`\`bash
-/${command.name}${command.options.length > 0 ? " [options]" : ""}
+/${command.name}${command.subcommands.length > 0 ? " <subcommand>" : command.options.length > 0 ? " [options]" : ""}
 \`\`\`
 
 `;
+
+  if (command.subcommands.length > 0) {
+    doc += `## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+`;
+
+    command.subcommands.forEach((subcommand) => {
+      doc += `| \`${subcommand.name}\` | ${subcommand.description} |\n`;
+    });
+
+    doc += "\n## Examples\n\n";
+    
+    command.subcommands.forEach((subcommand) => {
+      doc += `### ${subcommand.name.charAt(0).toUpperCase() + subcommand.name.slice(1)} subcommand\n`;
+      doc += `\`\`\`bash\n`;
+      doc += `/${command.name} ${subcommand.name}\n`;
+      doc += `\`\`\`\n\n`;
+    });
+  }
 
   if (command.options.length > 0) {
     doc += `## Parameters
@@ -267,6 +333,8 @@ function main() {
     const files = fs.readdirSync(categoryDir);
     files.forEach((file) => {
       if (file.endsWith(".js")) {
+        // Skip user context and message context menu commands
+        if (file.startsWith("usercontext-") || file.startsWith("messagecontext-")) return;
         const filePath = path.join(categoryDir, file);
         const commandInfo = extractCommandInfo(filePath);
         if (commandInfo) {

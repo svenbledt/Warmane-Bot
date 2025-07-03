@@ -61,7 +61,16 @@ This guide helps you resolve common issues you might encounter while using the W
 1. **Check word spelling**: Ensure the word is spelled exactly as it should be filtered
 2. **Test with `/testcontext`**: Use this command to test if a word would be flagged
 3. **Verify bot permissions**: The bot needs Manage Messages permission
-4. **Check word list**: Use `/blacklistword list` to see current blacklisted words
+4. **Check word list**: Use `/blacklistword list` to see current server blacklisted words
+5. **Check global words**: Use `/blacklistword listglobal` (developers only) to see global words
+
+**Problem**: Can't manage global words.
+
+**Solutions**:
+1. **Check developer status**: Only bot developers can manage global words
+2. **Use correct subcommand**: Use `/blacklistword listglobal` to view global words
+3. **Verify permissions**: Ensure you're a bot developer for global word management
+4. **Contact developers**: If you need global words added/removed, contact a bot developer
 
 ### Report Command Issues
 
@@ -151,6 +160,13 @@ These require moderation permissions:
 ### Administrator Commands
 These require administrator permissions:
 - `/setup`
+
+### Developer Commands
+These require bot developer permissions:
+- `/blacklistword listglobal` - List global blacklisted words
+- `/blacklistword add global:true` - Add global words
+- `/blacklistword remove` (global words) - Remove global words
+- `/blacklistword toggle` (global words) - Toggle global words
 
 ## Getting Help
 

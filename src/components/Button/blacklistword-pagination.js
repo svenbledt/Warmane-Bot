@@ -98,7 +98,7 @@ module.exports = new Component({
                 const deleteMsg = wordData.deleteMessage ? '✅' : '❌';
                 const warnUser = wordData.warnUser ? '✅' : '❌';
                 const useContextAnalysis = wordData.useContextAnalysis ? '✅' : '❌';
-                const contextThreshold = wordData.contextThreshold || 0.2;
+                const contextThreshold = wordData.contextThreshold || 1.0;
 
                 newEmbed.addFields({
                     name: `${status} ${wordData.word}`,

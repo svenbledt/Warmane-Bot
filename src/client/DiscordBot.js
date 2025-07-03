@@ -52,6 +52,7 @@ class DiscordBot extends Client {
             },
         });
 
+        this.config = config;
         this.initializeHandlers();
         this.loadLanguages();
         this.initializeEnvironmentVariables();

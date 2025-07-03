@@ -10,7 +10,7 @@ const LanguageManager = require('../../utils/LanguageManager');
 module.exports = new ApplicationCommand({
     command: {
         name: 'report',
-        description: 'Report a Warmane player for rule violations. Adds them to the global blacklist and notifies moderators.',
+        description: 'Report a Warmane player for rule violations and add to global blacklist.',
         type: 1,
         contexts: [0, 2], // 0 = Guild, 1 = BotDM, 2 = PrivateChannel
         options: [],

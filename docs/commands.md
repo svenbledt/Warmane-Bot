@@ -27,11 +27,10 @@ Commands for server moderation and user management.
 | Command | Description | Usage | Permission |
 |---------|-------------|-------|------------|
 | [account](commands/account.md) | Check the account of a user and display some information about it. | `/account [options]` | <span class="permission-badge permission-moderator">Moderator</span> |
-| [blacklistword](commands/blacklistword.md) | Manage blacklisted words for the server. | `/blacklistword [options]` | <span class="permission-badge permission-moderator">Moderator</span> |
+| [blacklistword](commands/blacklistword.md) | Manage blacklisted words for the server. | `/blacklistword [options]` | <span class="permission-badge permission-developer">Developer</span> |
 | [globalcheck](commands/globalcheck.md) | Checks the current members of the guild for global blacklist entry\ | `/globalcheck` | <span class="permission-badge permission-moderator">Moderator</span> |
-| [report](commands/report.md) | Report a Warmane player for rule violations. Adds them to the global blacklist and notifies moderators. | `/report` | <span class="permission-badge permission-moderator">Moderator</span> |
+| [report](commands/report.md) | Report a Warmane player for rule violations and add to global blacklist. | `/report` | <span class="permission-badge permission-moderator">Moderator</span> |
 | [testcontext](commands/testcontext.md) | Test how the context analyzer would interpret a message with blacklisted words. | `/testcontext [options]` | <span class="permission-badge permission-moderator">Moderator</span> |
-| [charname](commands/charname.md) | No description available | `/charname` | <span class="permission-badge permission-moderator">Moderator</span> |
 
 ## ⚙️ Settings Commands
 
