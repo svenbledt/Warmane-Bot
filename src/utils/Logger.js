@@ -10,7 +10,7 @@ class Logger {
                 await DevLogger.log(client, guildId, {
                     title: options.titleKey ? 
                         LanguageManager.getText(`logging.${options.titleKey}.title`, 'en', options.titleData) : 
-                        'Log Event',
+                        LanguageManager.getText('logging.log_event', 'en'),
                     description: options.descData ? 
                         LanguageManager.getText(`logging.${options.titleKey}.description`, 'en', options.descData) :
                         options.description,
@@ -49,7 +49,7 @@ class Logger {
                         const guild = await client.guilds.fetch(guildId);
                         const owner = await guild.fetchOwner();
                         await owner.send({
-                            content: 'I don\'t have the required permissions to send logs in the configured log channel. Please ensure I have the following permissions: View Channel, Send Messages, and Embed Links.'
+                            content: LanguageManager.getText('logging.missing_permissions_notification', 'en')
                         });
                     } catch (error) {
                         console.warn(`Could not notify guild owner about missing permissions in ${guildId}: ${error.message}`);
@@ -84,8 +84,8 @@ class Logger {
                 const formattedFields = options.fields.map(field => ({
                     name: field.nameKey ? 
                         LanguageManager.getText(`logging.${field.nameKey}`, lang, field.nameData) : 
-                        field.name || 'Information',
-                    value: field.value || 'No value provided',
+                        field.name || LanguageManager.getText('logging.information', lang),
+                    value: field.value || LanguageManager.getText('logging.no_value_provided', lang),
                     inline: field.inline || false
                 }));
                 embed.addFields(formattedFields);

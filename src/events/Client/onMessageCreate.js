@@ -1,6 +1,6 @@
 const Event = require('../../structure/Event');
 const LanguageManager = require('../../utils/LanguageManager');
-const { ChannelType, EmbedBuilder } = require('discord.js');
+const { ChannelType, EmbedBuilder, MessageFlags } = require('discord.js');
 const WordContextAnalyzer = require('../../utils/WordContextAnalyzer');
 
 module.exports = new Event({
@@ -13,6 +13,7 @@ module.exports = new Event({
             try {
                 // Get guild settings
                 const guildSettings = await client.getDatabaseHandler().findOne('settings', { guild: message.guild.id });
+                const lang = guildSettings?.language || 'en'; // Default to English if no language set
                 
                 // Get global words first (always enforced regardless of server settings)
                 const globalWords = await client.getDatabaseHandler().find('blacklistedWords', {
@@ -36,7 +37,7 @@ module.exports = new Event({
 
                 const messageContent = message.content;
                 const messageWords = messageContent.toLowerCase().split(/\s+/);
-                let foundWords = [];
+                const foundWords = [];
                 let shouldDelete = false;
                 let shouldWarn = false;
                 const contextAnalyzer = new WordContextAnalyzer();
@@ -87,7 +88,10 @@ module.exports = new Event({
                     try {
                         await message.delete();
                     } catch (error) {
-                        console.error('Failed to delete message with blacklisted word:', error);
+                        if (error.code !== 10008) { // 10008 = Unknown Message
+                            console.error('Failed to delete message with blacklisted word:', error);
+                        }
+                        // else: ignore, message was already deleted
                     }
                 }
 
@@ -96,14 +100,14 @@ module.exports = new Event({
                     try {
                         const warningEmbed = new EmbedBuilder()
                             .setColor(0xff0000)
-                            .setTitle(LanguageManager.getText('events.blacklisted_word.title', guildSettings.language))
-                            .setDescription(LanguageManager.getText('events.blacklisted_word.description', guildSettings.language, {
+                            .setTitle(LanguageManager.getText('events.blacklisted_word.title', lang))
+                            .setDescription(LanguageManager.getText('events.blacklisted_word.description', lang, {
                                 username: message.author.username,
                                 words: foundWords.map(w => w.word).join(', ')
                             }))
                             .addFields(
-                                { name: LanguageManager.getText('events.blacklisted_word.fields.channel', guildSettings.language), value: message.channel.name, inline: true },
-                                { name: LanguageManager.getText('events.blacklisted_word.fields.message_id', guildSettings.language), value: message.id, inline: true }
+                                { name: LanguageManager.getText('events.blacklisted_word.fields.channel', lang), value: message.channel.name, inline: true },
+                                { name: LanguageManager.getText('events.blacklisted_word.fields.message_id', lang), value: message.id, inline: true }
                             )
                             .setTimestamp();
 
@@ -115,17 +119,23 @@ module.exports = new Event({
                             ).join('\n');
                             
                             warningEmbed.addFields({
-                                name: LanguageManager.getText('events.blacklisted_word.fields.context_analysis', guildSettings.language),
+                                name: LanguageManager.getText('events.blacklisted_word.fields.context_analysis', lang),
                                 value: contextInfo,
                                 inline: false
                             });
                         }
 
-                        // Send warning to the channel
-                        await message.channel.send({
-                            content: `${message.author}`,
-                            embeds: [warningEmbed]
-                        });
+                        // Send warning as DM to the user (ephemeral-like behavior)
+                        try {
+                            await message.author.send({ embeds: [warningEmbed] });
+                        } catch (dmError) {
+                            // If DM fails (user has DMs disabled), send a brief public message and auto-delete it
+                            console.log(`Failed to send DM to ${message.author.username}: ${dmError.message}`);
+                            const publicMsg = await message.channel.send({
+                                content: `${message.author} ⚠️ Your message contained blacklisted words. Please check your DMs for details.`
+                            });
+                            setTimeout(() => publicMsg.delete().catch(() => {}), 5000);
+                        }
                     } catch (error) {
                         console.error('Failed to send blacklisted word warning:', error);
                     }
@@ -138,22 +148,22 @@ module.exports = new Event({
                         if (logChannel) {
                             const logEmbed = new EmbedBuilder()
                                 .setColor(0xff0000)
-                                .setTitle(LanguageManager.getText('logging.blacklisted_word_used.title', guildSettings.language))
-                                .setDescription(LanguageManager.getText('logging.blacklisted_word_used.description', guildSettings.language, {
+                                .setTitle(LanguageManager.getText('logging.blacklisted_word_used.title', lang))
+                                .setDescription(LanguageManager.getText('logging.blacklisted_word_used.description', lang, {
                                     username: message.author.username,
                                     words: foundWords.map(w => w.word).join(', ')
                                 }))
                                 .addFields(
-                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.user', guildSettings.language), value: `${message.author.username} (${message.author.id})`, inline: true },
-                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.channel', guildSettings.language), value: message.channel.name, inline: true },
-                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.message_id', guildSettings.language), value: message.id, inline: true },
-                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.action_taken', guildSettings.language), value: `${shouldDelete ? '🗑️' : ''} ${shouldWarn ? '⚠️' : ''}`.trim() || LanguageManager.getText('logging.blacklisted_word_used.no_action', guildSettings.language) }
+                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.user', lang), value: `${message.author.username} (${message.author.id})`, inline: true },
+                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.channel', lang), value: message.channel.name, inline: true },
+                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.message_id', lang), value: message.id, inline: true },
+                                    { name: LanguageManager.getText('logging.blacklisted_word_used.fields.action_taken', lang), value: `${shouldDelete ? '🗑️' : ''} ${shouldWarn ? '⚠️' : ''}`.trim() || LanguageManager.getText('logging.blacklisted_word_used.no_action', lang) }
                                 )
                                 .setTimestamp();
 
                             if (message.content.length > 0) {
                                 logEmbed.addFields({
-                                    name: LanguageManager.getText('logging.blacklisted_word_used.fields.message_content', guildSettings.language),
+                                    name: LanguageManager.getText('logging.blacklisted_word_used.fields.message_content', lang),
                                     value: message.content.length > 1024 ? message.content.substring(0, 1021) + '...' : message.content
                                 });
                             }
@@ -187,8 +197,8 @@ module.exports = new Event({
         await levelingSystem.addMessageAccount(userId);
 
         // Process guild-specific XP only if leveling is enabled
-        const guildSettings = await client.getDatabaseHandler().findOne('settings', { guild: guildId });
-        if (!guildSettings?.levelingSystem) return;
+        const levelingGuildSettings = await client.getDatabaseHandler().findOne('settings', { guild: guildId });
+        if (!levelingGuildSettings?.levelingSystem) return;
 
         // Get current level before adding XP
         const levelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', { 
@@ -201,17 +211,18 @@ module.exports = new Event({
         await levelingSystem.addMessageGuild(guildId, userId);
 
         // Send level up message if channel is configured
-        if (guildSettings.levelingChannel) {
+        if (levelingGuildSettings.levelingChannel) {
             const newLevelingProgress = await client.getDatabaseHandler().findOne('levelingProgress', { 
                 guild: guildId, 
                 userId: userId 
             });
             
             if (newLevelingProgress?.level > oldLevel) {
-                const levelingChannel = client.channels.cache.get(guildSettings.levelingChannel);
+                const levelingChannel = client.channels.cache.get(levelingGuildSettings.levelingChannel);
                 if (levelingChannel) {
                     const displayName = member.nickname || member.user.globalName || member.user.username;
-                    await levelingChannel.send(LanguageManager.getText('level.level_up', guildSettings.language, {
+                    const levelingLang = levelingGuildSettings?.language || 'en';
+                    await levelingChannel.send(LanguageManager.getText('level.level_up', levelingLang, {
                         level: newLevelingProgress.level,
                         user: displayName
                     }));

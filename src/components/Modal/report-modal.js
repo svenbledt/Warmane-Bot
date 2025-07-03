@@ -4,6 +4,7 @@ const {
 } = require('discord.js');
 const Component = require('../../structure/Component');
 const config = require('../../config');
+const LanguageManager = require('../../utils/LanguageManager');
 
 module.exports = new Component({
     customId: 'report-modal-id',
@@ -28,10 +29,15 @@ module.exports = new Component({
             'report-modal-id-field-3'
         );
 
+        // Get guild settings for language
+        const guildSettings = await client.getDatabaseHandler().findOne('settings', {
+            guild: interaction.guildId
+        });
+        const lang = guildSettings?.language || 'en';
+
         // Tell the interaction user that the report has been submitted.
         await interaction.reply({
-            content:
-        'Your report has been submitted. Thank you for helping us keep the server safe.',
+            content: LanguageManager.getText('commands.report.submitted', lang),
             flags: [MessageFlags.Ephemeral],
         });
 
@@ -39,15 +45,15 @@ module.exports = new Component({
         const channel = client.channels.cache.get(config.development.reportChannel);
         if (channel) {
             const embed = new EmbedBuilder()
-                .setTitle('User Report')
+                .setTitle(LanguageManager.getText('commands.report.report_title', lang))
                 .addFields(
-                    { name: 'Reported User', value: reportedUserMention, inline: true },
-                    { name: 'Reason', value: field2 },
-                    { name: 'Evidence', value: field3 },
-                    { name: 'ReporterID', value: `<@${interaction.user.id}>` }
+                    { name: LanguageManager.getText('commands.report.reported_user', lang), value: reportedUserMention, inline: true },
+                    { name: LanguageManager.getText('commands.report.reason', lang), value: field2 },
+                    { name: LanguageManager.getText('commands.report.evidence', lang), value: field3 },
+                    { name: LanguageManager.getText('commands.report.reporter_id', lang), value: `<@${interaction.user.id}>` }
                 )
                 .setFooter({
-                    text: 'Report submitted by ' + interaction.user.tag,
+                    text: LanguageManager.getText('commands.report.submitted_by', lang, { user: interaction.user.tag }),
                     iconURL: interaction.user.displayAvatarURL(),
                 })
                 .setTimestamp()
@@ -55,7 +61,7 @@ module.exports = new Component({
 
             await channel.send({ embeds: [embed] });
         } else {
-            console.error('Failed to send the report to the Moderation channel.');
+            console.error(LanguageManager.getText('commands.report.send_failed', lang));
         }
     },
 });

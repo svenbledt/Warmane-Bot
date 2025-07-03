@@ -116,12 +116,12 @@ module.exports = new ApplicationCommand({
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
                 .setCustomId('previous')
-                .setLabel('Previous')
+                .setLabel(LanguageManager.getText('commands.globalcheck.navigation.previous', lang))
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(embeds.length === 1),
             new ButtonBuilder()
                 .setCustomId('next')
-                .setLabel('Next')
+                .setLabel(LanguageManager.getText('commands.globalcheck.navigation.next', lang))
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(embeds.length === 1)
         );

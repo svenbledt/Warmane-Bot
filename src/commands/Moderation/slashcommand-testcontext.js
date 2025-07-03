@@ -73,19 +73,19 @@ module.exports = new ApplicationCommand({
 
             const embed = new EmbedBuilder()
                 .setColor(analysis.isAppropriate ? 0x00ff00 : 0xff0000)
-                .setTitle('🔍 Context Analysis Test')
-                .setDescription(`Testing word: **${testWord}**`)
+                .setTitle(`🔍 ${LanguageManager.getText('commands.testcontext.title', lang)}`)
+                .setDescription(LanguageManager.getText('commands.testcontext.description', lang, { word: testWord }))
                 .addFields(
-                    { name: '📝 Test Message', value: testMessage.length > 1024 ? testMessage.substring(0, 1021) + '...' : testMessage, inline: false },
-                    { name: '🎯 Result', value: analysis.isAppropriate ? '✅ **Appropriate Usage**' : '❌ **Inappropriate Usage**', inline: true },
-                    { name: '📊 Confidence', value: `${(analysis.confidence * 100).toFixed(1)}%`, inline: true },
-                    { name: '⚖️ Threshold', value: `${(mockWordData.contextThreshold * 100).toFixed(0)}%`, inline: true }
+                    { name: `📝 ${LanguageManager.getText('commands.testcontext.test_message', lang)}`, value: testMessage.length > 1024 ? testMessage.substring(0, 1021) + '...' : testMessage, inline: false },
+                    { name: `🎯 ${LanguageManager.getText('commands.testcontext.result', lang)}`, value: analysis.isAppropriate ? `✅ **${LanguageManager.getText('commands.testcontext.appropriate_usage', lang)}**` : `❌ **${LanguageManager.getText('commands.testcontext.inappropriate_usage', lang)}**`, inline: true },
+                    { name: `📊 ${LanguageManager.getText('commands.testcontext.confidence', lang)}`, value: `${(analysis.confidence * 100).toFixed(1)}%`, inline: true },
+                    { name: `⚖️ ${LanguageManager.getText('commands.testcontext.threshold', lang)}`, value: `${(mockWordData.contextThreshold * 100).toFixed(0)}%`, inline: true }
                 )
                 .setTimestamp();
 
             if (analysis.context) {
                 embed.addFields({
-                    name: '🔍 Context Around Word',
+                    name: `🔍 ${LanguageManager.getText('commands.testcontext.context_around_word', lang)}`,
                     value: `"...${analysis.context}..."`,
                     inline: false
                 });
@@ -94,16 +94,16 @@ module.exports = new ApplicationCommand({
             if (analysis.reasoning.length > 0) {
                 const reasoningText = analysis.reasoning.slice(0, 5).join('\n');
                 embed.addFields({
-                    name: '💭 Analysis Reasoning',
-                    value: reasoningText + (analysis.reasoning.length > 5 ? '\n*...and more*' : ''),
+                    name: `💭 ${LanguageManager.getText('commands.testcontext.analysis_reasoning', lang)}`,
+                    value: reasoningText + (analysis.reasoning.length > 5 ? `\n*${LanguageManager.getText('commands.testcontext.and_more', lang)}*` : ''),
                     inline: false
                 });
             }
 
             const wouldTakeAction = analysis.confidence < mockWordData.contextThreshold;
             embed.addFields({
-                name: '🤖 Bot Action',
-                value: wouldTakeAction ? '🚫 **Would take action** (delete/warn)' : '✅ **Would allow message**',
+                name: `🤖 ${LanguageManager.getText('commands.testcontext.bot_action', lang)}`,
+                value: wouldTakeAction ? `🚫 **${LanguageManager.getText('commands.testcontext.would_take_action', lang)}**` : `✅ **${LanguageManager.getText('commands.testcontext.would_allow_message', lang)}**`,
                 inline: false
             });
 

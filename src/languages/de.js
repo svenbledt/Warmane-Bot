@@ -6,9 +6,10 @@ module.exports = {
             dm_failed: 'Konnte keine DM an {username} senden.',
             dm_sent: 'DM an {username} gesendet.',
             guild_only: 'Dieser Befehl kann nur in einem Server verwendet werden.',
+            not_in_guild: 'Dieser Befehl kann nur in einem Server verwendet werden.',
             error_occurred: 'Ein Fehler ist aufgetreten: {error}',
             user_not_found: 'Benutzer nicht gefunden.',
-            bot_developer_only: 'Nur Bot-Entwickler können diese Aktion ausführen.'
+            bot_developer_only: 'Dieser Befehl ist nur für Bot-Entwickler verfügbar.'
         },
         charname: {
             dm_initial: 'Hey, ich würde gerne nach deinem Hauptcharakter-Namen fragen.\nBitte antworte mit deinem Hauptcharakter-Namen für den Server.\n\nDu hast 10 Minuten Zeit zum Antworten.',
@@ -33,6 +34,10 @@ module.exports = {
                 BANNED: '{COUNT} Mitglieder erfolgreich gebannt',
                 NOTHING: 'Keine Aktion durchgeführt',
                 FAILED: 'Konnte {COUNT} Mitglieder nicht verarbeiten'
+            },
+            navigation: {
+                previous: 'Zurück',
+                next: 'Weiter'
             }
         },
         report: {
@@ -44,13 +49,21 @@ module.exports = {
                 reason_placeholder: 'Gib den Grund hier ein!',
                 evidence_label: 'Stelle deine Beweise bereit.',
                 evidence_placeholder: 'https://imgur.com/blablabla!'
-            }
+            },
+            submitted: 'Dein Bericht wurde eingereicht. Vielen Dank, dass du uns hilfst, den Server sicher zu halten.',
+            report_title: 'Benutzerbericht',
+            reported_user: 'Gemeldeter Benutzer',
+            reason: 'Grund',
+            evidence: 'Beweise',
+            reporter_id: 'Reporter-ID',
+            submitted_by: 'Bericht eingereicht von {user}',
+            send_failed: 'Fehler beim Senden des Berichts an den Moderationskanal.'
         },
         poll: {
             question_missing: 'Umfragefrage fehlt.',
             answer_too_long: 'Eine der Antworten überschreitet das Limit von 55 Zeichen: "{answer}"',
             min_answers: 'Mindestens zwei Antworten sind erforderlich.',
-            creation_failed: 'Fehler beim Erstellen der Umfrage: {error}',
+            creation_failed: 'Fehler beim Senden einer Umfrage an den Kanal: {error}',
             created_pinned: 'Deine Umfrage wurde erstellt und angepinnt!',
             created: 'Deine Umfrage wurde erstellt!'
         },
@@ -96,7 +109,8 @@ module.exports = {
                 title: 'Serverzeit',
                 description: 'Die aktuelle Serverzeit ist: {time}',
                 footer: 'Angefordert von: {user}'
-            }
+            },
+            error: 'Ein Fehler ist beim Abrufen der Serverzeit aufgetreten.'
         },
         setwelcomechannel: {
             channel_set: 'Der Willkommenskanal wurde auf {channel} gesetzt.',
@@ -111,8 +125,11 @@ module.exports = {
             NO_DESCRIPTION: 'Keine Beschreibung verfügbar',
             BUTTONS: {
                 PREVIOUS: 'Zurück',
-                NEXT: 'Weiter'
-            }
+                NEXT: 'Weiter',
+                BACK_TO_OVERVIEW: 'Zurück zur Übersicht'
+            },
+            command_not_found: 'Befehl nicht gefunden. Verwende `/help`, um alle verfügbaren Befehle zu sehen.',
+            options: 'Befehlsoptionen'
         },
         setchar: {
             char_not_exist: 'Der Charakter {character} existiert nicht auf Warmane.',
@@ -134,7 +151,8 @@ module.exports = {
         level: {
             no_progress: 'Du hast noch keinen Level erreicht.',
             level_up: '🎉 Hey {user} du hast Level {level} erreicht! Gratulation! 🎉',
-            disabled: 'Das Leveling-System ist auf diesem Server deaktiviert.'
+            disabled: 'Das Leveling-System ist auf diesem Server deaktiviert.',
+            card_description: 'Level-Kartenbild'
         },
         setup: {
             title: 'Server Einstellungen',
@@ -200,8 +218,8 @@ module.exports = {
             select_welcome_channel: 'Willkommenskanal auswählen',
             select_leveling_channel: 'Leveling-Kanal auswählen',
             log_channel_set: '✅ Protokollkanal wurde auf {channel} gesetzt',
-            not_set: 'Nicht eingestellt',
-            language_set: '✅ Serversprache wurde auf {language} eingestellt',
+            not_set: 'Nicht gesetzt',
+            language_set: '✅ Server-Sprache wurde auf {language} gesetzt',
             leveling_channel_set: '✅ Leveling-Kanal wurde auf {channel} gesetzt',
             welcome_channel_set: '✅ Willkommenskanal wurde auf {channel} gesetzt',
             charname_dm_modal: {
@@ -234,6 +252,7 @@ module.exports = {
                     serverXP: 'Server-XP',
                     
                     roles_title: '🎭 Rollen [{count}]',
+                    
                     badges_title: '🏅 Abzeichen',
                     
                     tiers: {
@@ -247,16 +266,37 @@ module.exports = {
                 footer: 'Kontoinformationen • {guildName}'
             }
         },
+        testcontext: {
+            title: 'Kontextanalyse-Test',
+            description: 'Testwort: **{word}**',
+            test_message: 'Testnachricht',
+            result: 'Ergebnis',
+            confidence: 'Vertrauen',
+            threshold: 'Schwellenwert',
+            context_around_word: 'Kontext um das Wort',
+            analysis_reasoning: 'Analyse-Begründung',
+            bot_action: 'Bot-Aktion',
+            appropriate_usage: 'Angemessene Verwendung',
+            inappropriate_usage: 'Unangemessene Verwendung',
+            would_take_action: 'Würde Aktion ergreifen (löschen/warnen)',
+            would_allow_message: 'Würde Nachricht erlauben',
+            and_more: '...und mehr'
+        },
         blacklistword: {
             word_already_exists: 'Das Wort "{word}" ist bereits auf der schwarzen Liste.',
+            invalid_pagination_state: 'Ungültiger Paginierungszustand.',
+            pagination_error: 'Ein Fehler ist beim Aktualisieren der Seite aufgetreten.',
             word_not_found: 'Das Wort "{word}" ist nicht auf der schwarzen Liste.',
             no_words: 'Es gibt keine Wörter auf der schwarzen Liste für diesen Server.',
+            no_global_words: 'Es gibt keine globalen Wörter auf der schwarzen Liste.',
             added_title: '✅ Wort zur schwarzen Liste hinzugefügt',
             added_description: 'Das Wort "{word}" wurde erfolgreich zur schwarzen Liste hinzugefügt.',
             removed_title: '❌ Wort von der schwarzen Liste entfernt',
             removed_description: 'Das Wort "{word}" wurde erfolgreich von der schwarzen Liste entfernt.',
             list_title: '📝 Wörter auf der schwarzen Liste',
             list_description: 'Hier sind alle Wörter auf der schwarzen Liste für diesen Server ({count} insgesamt):',
+            global_list_title: '🌐 Globale Wörter auf der schwarzen Liste',
+            global_list_description: 'Hier sind alle globalen Wörter auf der schwarzen Liste ({count} insgesamt):',
             page_info: 'Seite {page} von {totalPages}',
             toggle_title: '🔄 Wortstatus aktualisiert',
             toggle_description: 'Das Wort "{word}" wurde {status}.',
@@ -312,11 +352,42 @@ module.exports = {
                 message_id: 'Message ID',
                 context_analysis: 'Context Analysis'
             }
+        },
+        guildCreate: {
+            thanks_title: 'Danke, dass du mich zu {guildName} hinzugefügt hast! 🎉',
+            description: 'So kannst du mit der Einrichtung des Bots beginnen:',
+            basic_commands: '📚 Grundlegende Befehle',
+            help_command: '`/help` - Alle verfügbaren Befehle anzeigen',
+            essential_setup: '⚙️ Wichtige Einrichtung',
+            setup_command: '`/setup` - Alle Bot-Funktionen konfigurieren:',
+            setup_features: [
+                '• Willkommensnachrichten & Kanal',
+                '• Charakternamen-System',
+                '• Sperrlisten-Schutz',
+                '• Server-Protokollierung',
+                '• Bot-Sprache',
+                '• Benutzerdefinierte DM-Nachrichten'
+            ],
+            character_management: '👤 Charakterverwaltung',
+            char_commands: [
+                '`/set-char` - Einen Charakter einem Benutzer zuweisen',
+                '`/charname` - Einen Benutzer nach seinem Charakternamen fragen',
+                'Du kannst auch mit der rechten Maustaste auf einen Benutzer klicken und "Nach Charname fragen" auswählen'
+            ],
+            need_help: '🔗 Brauchst du Hilfe?',
+            support_server: '[Tritt unserem Support-Server bei](https://discord.gg/YDqBQU43Ht)',
+            footer: 'Viel Spaß beim Verwenden des Bots! 🤖'
         }
     },
     logging: {
-        error: 'Error',
-        footer: 'Server Logs',
+        error: 'Fehler',
+        footer: 'Server-Logs',
+        log_event: 'Log-Ereignis',
+        information: 'Information',
+        no_value_provided: 'Kein Wert angegeben',
+        missing_permissions_notification: 'Ich habe nicht die erforderlichen Berechtigungen, um Logs im konfigurierten Log-Kanal zu senden. Bitte stelle sicher, dass ich die folgenden Berechtigungen habe: Kanal anzeigen, Nachrichten senden und Einbettungen verknüpfen.',
+        server_information: 'Server-Information',
+        development_logs: 'Entwicklungs-Logs',
         
         // Direct translations for field keys
         dm: {

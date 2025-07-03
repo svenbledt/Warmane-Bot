@@ -151,7 +151,7 @@ module.exports = new ApplicationCommand({
         // Send the response
         const attachment = new AttachmentBuilder(canvas.toBuffer(), { 
             name: 'level-card.png',
-            description: 'Level card image'
+            description: LanguageManager.getText('commands.level.card_description', lang)
         });
         await interaction.reply({
             files: [attachment]

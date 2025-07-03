@@ -101,7 +101,7 @@ module.exports = new ApplicationCommand({
                 embed.addFields({
                     name: LanguageManager.getText('commands.help.options', lang),
                     value: cmd.command.options.map(option => 
-                        `> • \`${option.name}\`\n> └ *${option.description}*`
+                        `> • \`${option.name}\`\n> └ *${option.description || LanguageManager.getText('commands.help.NO_DESCRIPTION', lang)}*`
                     ).join('\n')
                 });
             }
@@ -109,7 +109,7 @@ module.exports = new ApplicationCommand({
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('back')
-                    .setLabel('Back to Overview')
+                    .setLabel(LanguageManager.getText('commands.help.BUTTONS.BACK_TO_OVERVIEW', lang))
                     .setStyle(ButtonStyle.Secondary)
             );
 
@@ -121,11 +121,11 @@ module.exports = new ApplicationCommand({
         }
 
         const embed = new EmbedBuilder()
-            .setTitle('📋 Available Commands')
+            .setTitle(`📋 ${LanguageManager.getText('commands.help.EMBED.TITLE', lang)}`)
             .setColor('#0099ff')
-            .setDescription('> Use `/help <command>` to get detailed information about a specific command.\n\u200b')
+            .setDescription(`> ${LanguageManager.getText('commands.help.EMBED.DESCRIPTION', lang)}\n\u200b`)
             .setFooter({ 
-                text: `Requested by ${interaction.user.tag}`,
+                text: LanguageManager.getText('commands.help.EMBED.FOOTER', lang, { USER_TAG: interaction.user.tag }),
                 iconURL: interaction.user.displayAvatarURL()
             })
             .setTimestamp();

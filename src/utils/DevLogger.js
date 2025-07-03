@@ -78,13 +78,13 @@ class DevLogger {
     static #createEmbed(options, actionGuild) {
         const embed = new EmbedBuilder()
             .setColor(options.color || '#0099ff')
-            .setTitle(`${options.title || 'Log Event'} | ${actionGuild.name}`)
-            .setDescription(options.description || 'No description provided')
+            .setTitle(`${options.title || LanguageManager.getText('logging.log_event', 'en')} | ${actionGuild.name}`)
+            .setDescription(options.description || LanguageManager.getText('logging.no_value_provided', 'en'))
             .setTimestamp();
 
         // Add server information field
         embed.addFields({
-            name: 'Server Information',
+            name: LanguageManager.getText('logging.server_information', 'en'),
             value: `Name: ${actionGuild.name}\nID: ${actionGuild.id}\nMembers: ${actionGuild.memberCount}`,
             inline: false
         });
@@ -94,15 +94,15 @@ class DevLogger {
             const formattedFields = options.fields.map(field => ({
                 name: field.nameKey ? 
                     LanguageManager.getText(`logging.${field.nameKey}`, 'en', field.nameData) : 
-                    field.name || 'Information',
-                value: field.value || 'No value provided',
+                    field.name || LanguageManager.getText('logging.information', 'en'),
+                value: field.value || LanguageManager.getText('logging.no_value_provided', 'en'),
                 inline: field.inline || false
             }));
             embed.addFields(formattedFields);
         }
 
         embed.setFooter({ 
-            text: `Development Logs | ${actionGuild.name}`, 
+            text: `${LanguageManager.getText('logging.development_logs', 'en')} | ${actionGuild.name}`, 
             iconURL: actionGuild.client.user.displayAvatarURL() 
         });
 

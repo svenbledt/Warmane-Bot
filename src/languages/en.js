@@ -6,8 +6,10 @@ module.exports = {
             dm_failed: 'Failed to send a DM to {username}.',
             dm_sent: 'DM sent to {username}.',
             guild_only: 'This command can only be used in a server.',
+            not_in_guild: 'This command can only be used in a server.',
             error_occurred: 'An error occurred: {error}',
-            user_not_found: 'User not found.'
+            user_not_found: 'User not found.',
+            bot_developer_only: 'This command is only available to bot developers.'
         },
         charname: {
             dm_initial: 'Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.\n\nYou have 10 minutes to respond.',
@@ -32,6 +34,10 @@ module.exports = {
                 BANNED: 'Successfully banned {COUNT} members',
                 NOTHING: 'No action taken',
                 FAILED: 'Failed to process {COUNT} members'
+            },
+            navigation: {
+                previous: 'Previous',
+                next: 'Next'
             }
         },
         report: {
@@ -43,7 +49,15 @@ module.exports = {
                 reason_placeholder: 'Enter the reason here!',
                 evidence_label: 'Provide your evidence.',
                 evidence_placeholder: 'https://imgur.com/blablabla!'
-            }
+            },
+            submitted: 'Your report has been submitted. Thank you for helping us keep the server safe.',
+            report_title: 'User Report',
+            reported_user: 'Reported User',
+            reason: 'Reason',
+            evidence: 'Evidence',
+            reporter_id: 'ReporterID',
+            submitted_by: 'Report submitted by {user}',
+            send_failed: 'Failed to send the report to the Moderation channel.'
         },
         poll: {
             question_missing: 'Poll question is missing.',
@@ -95,7 +109,8 @@ module.exports = {
                 title: 'Servertime',
                 description: 'The current servertime is: {time}',
                 footer: 'Requested by: {user}'
-            }
+            },
+            error: 'An error occurred while fetching the server time.'
         },
         setwelcomechannel: {
             channel_set: 'The welcome channel has been set to {channel}.',
@@ -110,8 +125,11 @@ module.exports = {
             NO_DESCRIPTION: 'No description available',
             BUTTONS: {
                 PREVIOUS: 'Previous',
-                NEXT: 'Next'
-            }
+                NEXT: 'Next',
+                BACK_TO_OVERVIEW: 'Back to Overview'
+            },
+            command_not_found: 'Command not found. Use `/help` to see all available commands.',
+            options: 'Command Options'
         },
         setchar: {
             char_not_exist: 'The character {character} does not exist on Warmane.',
@@ -133,7 +151,8 @@ module.exports = {
         level: {
             no_progress: 'No leveling progress found for this user.',
             level_up: '🎉 Hey {user} you have reached level {level}! Congratulations! 🎉',
-            disabled: 'The leveling system is disabled on this server.'
+            disabled: 'The leveling system is disabled on this server.',
+            card_description: 'Level card image'
         },
         setup: {
             title: 'Server Settings',
@@ -210,7 +229,7 @@ module.exports = {
                 message_placeholder: 'Enter the message to send when asking for character name...'
             },
             charname_dm_updated: '✅ Character name DM message has been updated',
-            error_occurred: 'An error occurred: {error}'
+            error_occurred: 'An error occurred: {error}',
         },
         account: {
             embed: {
@@ -248,16 +267,39 @@ module.exports = {
                 footer: 'Account Information • {guildName}'
             }
         },
+        testcontext: {
+            title: 'Context Analysis Test',
+            description: 'Testing word: **{word}**',
+            test_message: 'Test Message',
+            result: 'Result',
+            confidence: 'Confidence',
+            threshold: 'Threshold',
+            context_around_word: 'Context Around Word',
+            analysis_reasoning: 'Analysis Reasoning',
+            bot_action: 'Bot Action',
+            appropriate_usage: 'Appropriate Usage',
+            inappropriate_usage: 'Inappropriate Usage',
+            would_take_action: 'Would take action (delete/warn)',
+            would_allow_message: 'Would allow message',
+            and_more: '...and more'
+        },
+
+
         blacklistword: {
             word_already_exists: 'The word "{word}" is already blacklisted.',
+            invalid_pagination_state: 'Invalid pagination state.',
+            pagination_error: 'An error occurred while updating the page.',
             word_not_found: 'The word "{word}" is not in the blacklist.',
             no_words: 'There are no blacklisted words for this server.',
+            no_global_words: 'There are no global blacklisted words.',
             added_title: '✅ Word Added to Blacklist',
             added_description: 'The word "{word}" has been successfully added to the blacklist.',
             removed_title: '❌ Word Removed from Blacklist',
             removed_description: 'The word "{word}" has been successfully removed from the blacklist.',
             list_title: '📝 Blacklisted Words',
             list_description: 'Here are all blacklisted words for this server ({count} total):',
+            global_list_title: '🌐 Global Blacklisted Words',
+            global_list_description: 'Here are all global blacklisted words ({count} total):',
             page_info: 'Page {page} of {totalPages}',
             toggle_title: '🔄 Word Status Updated',
             toggle_description: 'The word "{word}" has been {status}.',
@@ -314,11 +356,45 @@ module.exports = {
                 message_id: 'Message ID',
                 context_analysis: 'Context Analysis'
             }
+        },
+        guildCreate: {
+            thanks_title: 'Thanks for adding me to {guildName}! 🎉',
+            description: 'Here\'s how to get started with setting up the bot:',
+            basic_commands: '📚 Basic Commands',
+            help_command: '`/help` - View all available commands',
+            essential_setup: '⚙️ Essential Setup',
+            setup_command: '`/setup` - Configure all bot features:',
+            setup_features: [
+                '• Welcome Messages & Channel',
+                '• Character Name System',
+                '• Block List Protection',
+                '• Server Logging',
+                '• Bot Language',
+                '• Custom DM Messages'
+            ],
+            character_management: '👤 Character Management',
+            char_commands: [
+                '`/set-char` - Assign a character to a user',
+                '`/charname` - Ask a user for their character name',
+                'U can also right click on a user and select "Ask for Charname" to ask for a character name'
+            ],
+            need_help: '🔗 Need Help?',
+            support_server: '[Join our Support Server](https://discord.gg/YDqBQU43Ht)',
+            footer: 'Have fun using the bot! 🤖'
         }
+    },
+    level: {
+        level_up: '{user} has reached level {level}!'
     },
     logging: {
         error: 'Error',
         footer: 'Server Logs',
+        log_event: 'Log Event',
+        information: 'Information',
+        no_value_provided: 'No value provided',
+        missing_permissions_notification: 'I don\'t have the required permissions to send logs in the configured log channel. Please ensure I have the following permissions: View Channel, Send Messages, and Embed Links.',
+        server_information: 'Server Information',
+        development_logs: 'Development Logs',
         
         // Direct translations for field keys
         dm: {

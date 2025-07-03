@@ -11,13 +11,16 @@ module.exports = new Component({
     customId: ['blacklistword_prev_page', 'blacklistword_next_page'],
     type: 'button',
     run: async (client, interaction) => {
+        let guildSettings;
+        let lang = 'en';
+        
         try {
-            const guildSettings = await client
+            guildSettings = await client
                 .getDatabaseHandler()
                 .findOne('settings', {
                     guild: interaction.guildId,
                 });
-            const lang = guildSettings?.language || 'en';
+            lang = guildSettings?.language || 'en';
 
             if (!interaction.member.permissions.has('ManageMessages')) {
                 return interaction.reply({
@@ -36,7 +39,7 @@ module.exports = new Component({
             const pageMatch = footerText.match(/Page (\d+) of (\d+)/);
             if (!pageMatch) {
                 return interaction.reply({
-                    content: 'Invalid pagination state.',
+                    content: LanguageManager.getText('commands.blacklistword.invalid_pagination_state', lang),
                     ephemeral: true,
                 });
             }
@@ -149,7 +152,7 @@ module.exports = new Component({
         } catch (error) {
             console.error('Error handling blacklist word pagination:', error);
             await interaction.reply({
-                content: 'An error occurred while updating the page.',
+                content: LanguageManager.getText('commands.blacklistword.pagination_error', lang),
                 ephemeral: true,
             });
         }
