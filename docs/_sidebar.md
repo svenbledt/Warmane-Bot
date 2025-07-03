@@ -4,7 +4,6 @@
 * [📚 Commands](commands.md)
 * [💡 Examples](examples.md)
 * [🐛 Troubleshooting](troubleshooting.md)
-
 * [🔒 Privacy Policy](PRIVACY_POLICY.md)
 
 * **📚 Information**
