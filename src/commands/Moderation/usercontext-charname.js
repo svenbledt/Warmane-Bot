@@ -15,6 +15,7 @@ module.exports = new ApplicationCommand({
     command: {
         name: 'Ask for Charname',
         type: 2,
+        description: 'Ask a user for their character name via DM and set it as their nickname.',
     },
     options: {
         cooldown: 5000,

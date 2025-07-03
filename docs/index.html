@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Warmane Bot Documentation</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0"
+    />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/dark.css" />
+    <link
+      rel="stylesheet"
+      href="//cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.css"
+    />
+    <style>
+      .markdown-section {
+        max-width: 1200px;
+      }
+      .sidebar-nav {
+        padding: 0;
+      }
+      .sidebar-nav li {
+        margin: 0;
+      }
+      .sidebar-nav a {
+        padding: 8px 15px;
+        border-bottom: 1px solid #404040;
+        transition: all 0.2s ease;
+      }
+      .sidebar-nav a:hover {
+        background-color: #404040;
+        color: #ffffff;
+      }
+      .command-category {
+        font-weight: bold;
+        color: #00d4aa;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+      .command-item {
+        margin: 5px 0;
+        padding: 5px 0;
+      }
+      .command-name {
+        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Source Code Pro", monospace;
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid #404040;
+      }
+      .permission-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 16px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-left: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .permission-public {
+        background-color: #10b981;
+        color: white;
+        box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
+      }
+      .permission-moderator {
+        background-color: #f59e0b;
+        color: #1f2937;
+        box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
+      }
+      .permission-admin {
+        background-color: #ef4444;
+        color: white;
+        box-shadow: 0 1px 3px rgba(239, 68, 68, 0.3);
+      }
+      .permission-developer {
+        background-color: #8b5cf6;
+        color: white;
+        box-shadow: 0 1px 3px rgba(139, 92, 246, 0.3);
+      }
+      
+      /* Modern dark theme adjustments */
+      .markdown-section table {
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 2em 0;
+        background: none;
+        width: auto;
+        min-width: 400px;
+        max-width: 100%;
+        box-shadow: none;
+      }
+      
+      .markdown-section table th {
+        background: #18191c;
+        color: #fff;
+        font-weight: 700;
+        border: none;
+        padding: 12px 18px;
+        font-size: 1em;
+      }
+      
+      .markdown-section table th:first-child {
+        border-top-left-radius: 12px;
+      }
+      
+      .markdown-section table th:last-child {
+        border-top-right-radius: 12px;
+      }
+      
+      .markdown-section table td {
+        border: none;
+        padding: 10px 18px;
+        color: #e0e0e0;
+        background: #23272a;
+        font-size: 0.98em;
+        vertical-align: middle;
+      }
+      
+      .markdown-section table tr:not(:last-child) td {
+        border-bottom: 1px solid #262a2e;
+      }
+      
+      .markdown-section table tr:last-child td:first-child {
+        border-bottom-left-radius: 12px;
+      }
+      
+      .markdown-section table tr:last-child td:last-child {
+        border-bottom-right-radius: 12px;
+      }
+      
+      .markdown-section table tr:nth-child(even) td {
+        background: #262a2e;
+      }
+      
+      .markdown-section table tr:hover td {
+        background: #31363b;
+        transition: background 0.2s;
+      }
+      
+      .markdown-section table code {
+        background: #18191c;
+        color: #00d4aa;
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 0.97em;
+        border: none;
+      }
+      
+      .markdown-section pre {
+        background-color: #1a1a1a;
+        border: 1px solid #404040;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .markdown-section pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        color: #e0e0e0;
+      }
+      
+      .markdown-section blockquote {
+        border-left: 4px solid #00d4aa;
+        background-color: #2a2a2a;
+        padding: 16px 20px;
+        border-radius: 0 8px 8px 0;
+        margin: 20px 0;
+      }
+      
+      .markdown-section h1,
+      .markdown-section h2,
+      .markdown-section h3,
+      .markdown-section h4,
+      .markdown-section h5,
+      .markdown-section h6 {
+        color: #ffffff;
+        font-weight: 600;
+      }
+      
+      .markdown-section h1 {
+        border-bottom: 2px solid #404040;
+        padding-bottom: 10px;
+      }
+      
+      .markdown-section h2 {
+        border-bottom: 1px solid #404040;
+        padding-bottom: 8px;
+      }
+      
+      .markdown-section a {
+        color: #00d4aa;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      
+      .markdown-section a:hover {
+        color: #00b894;
+        text-decoration: underline;
+      }
+      
+      .markdown-section strong {
+        color: #ffffff;
+        font-weight: 600;
+      }
+      
+      .markdown-section em {
+        color: #d0d0d0;
+      }
+      
+      /* Search styling */
+      .search {
+        background-color: #2a2a2a;
+        border: 1px solid #404040;
+        border-radius: 8px;
+      }
+      
+      .search input {
+        background-color: #1a1a1a;
+        border: 1px solid #404040;
+        color: #e0e0e0;
+        border-radius: 6px;
+      }
+      
+      .search input:focus {
+        border-color: #00d4aa;
+        box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      window.$docsify = {
+        name: "Warmane Bot",
+        //repo: "svenbledt/Warmane-Bot",
+        loadSidebar: true,
+        subMaxLevel: 3,
+        auto2top: true,
+        search: {
+          maxAge: 86400000,
+          paths: "auto",
+          placeholder: "Search...",
+          noData: "No Results!",
+          depth: 6,
+        },
+        plugins: [
+          function (hook, vm) {
+            hook.beforeEach(function (html) {
+              return html;
+            });
+          },
+        ],
+      };
+    </script>
+    <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+    <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  </body>
+</html>

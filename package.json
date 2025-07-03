@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node .",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "docs:generate": "node scripts/generate-docs.js",
+    "docs:serve": "docsify serve docs",
+    "docs:dev": "docsify serve docs --port 3000"
   },
   "keywords": [],
   "author": "svenbledt",
