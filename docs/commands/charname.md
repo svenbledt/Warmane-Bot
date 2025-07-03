@@ -1,6 +1,6 @@
 # Charname Command
 
-The `/charname` command ask a user for their character name via dm and set it as their nickname.
+The `/charname` command no description available
 
 ## Usage
 
@@ -17,7 +17,7 @@ The `/charname` command ask a user for their character name via dm and set it as
 
 ## What it does
 
-This command ask a user for their character name via dm and set it as their nickname..
+This command no description available.
 
 ## Permissions
 
