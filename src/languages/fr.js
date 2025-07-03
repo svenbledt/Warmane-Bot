@@ -7,7 +7,8 @@ module.exports = {
             dm_sent: 'MP envoyé à {username}.',
             guild_only: 'Cette commande ne peut être utilisée que dans un serveur.',
             error_occurred: 'Une erreur s\'est produite : {error}',
-            user_not_found: 'Utilisateur non trouvé.'
+            user_not_found: 'Utilisateur non trouvé.',
+            bot_developer_only: 'Seuls les développeurs du bot peuvent effectuer cette action.'
         },
         charname: {
             dm_initial: 'Salut, j\'aimerais connaître le nom de ton personnage principal.\nMerci de répondre avec le nom de ton personnage principal pour le serveur.\n\nTu as 10 minutes pour répondre.',
@@ -135,41 +136,6 @@ module.exports = {
             level_up: '🎉 Hey {user} vous avez atteint le niveau {level} ! Félicitations ! 🎉',
             disabled: 'Le système de niveau est désactivé sur ce serveur.'
         },
-        account: {
-            embed: {
-                description: 'Informations et statistiques du compte',
-                fields: {
-                    account_info_title: '👤 Informations du Compte',
-                    username: 'Nom d\'utilisateur',
-                    displayName: 'Nom affiché',
-                    id: 'ID',
-                    created: 'Créé',
-                    joined: 'Rejoint le serveur',
-                    
-                    activity_title: '📊 Statistiques d\'Activité',
-                    accountStanding: 'Statut du Compte',
-                    accountLevel: 'Niveau',
-                    accountXP: 'Expérience',
-                    xpProgress: 'Progression du Niveau',
-                    voiceTime: 'Temps en Vocal',
-                    serverProgress: 'Progression du Serveur',
-                    serverLevel: 'Niveau Serveur',
-                    serverXP: 'XP Serveur',
-                    
-                    roles_title: '�� Rôles [{count}]',
-                    badges_title: '🏅 Badges',
-                    
-                    tiers: {
-                        veteran: '🔱 Artefact',
-                        diamond: '💎 Légendaire',
-                        gold: '🥇 Épique',
-                        silver: '🥈 Rare',
-                        bronze: '🥉 Commun'
-                    }
-                },
-                footer: 'Informations du Compte • {guildName}'
-            }
-        },
         setup: {
             title: 'Paramètres du Serveur',
             description: 'Configurez les paramètres de votre serveur en cliquant sur les boutons ci-dessous. Chaque paramètre contrôle différents aspects de la fonctionnalité du bot.',
@@ -201,76 +167,161 @@ module.exports = {
                     description: 'Changez la langue que le bot utilise sur votre serveur.',
                     current: 'Langue actuelle : {language}'
                 },
+                char_name: {
+                    name: '👤 Nom de Personnage',
+                    description: 'Configurez les paramètres de nom de personnage pour votre serveur.'
+                },
                 status: {
                     enabled: '✅ Activé',
                     disabled: '❌ Désactivé',
-                    channel: 'Canal: {channel}'
+                    channel: 'Canal : {channel}'
                 },
                 leveling: {
                     name: '📊 Système de Niveau',
                     description: 'Configurez le système de niveau pour votre serveur.'
+                },
+                blacklist_words: {
+                    name: '🚫 Blacklisted Words',
+                    description: 'When enabled, the bot will automatically detect and handle messages containing blacklisted words.'
                 }
             },
-
             buttons: {
                 welcome_message: 'Message de Bienvenue',
                 char_name_ask: 'Demande de Nom de Personnage',
                 block_list: 'Liste Noire',
                 logging: 'Journalisation',
-                change_language: 'Changer la Langue',
+                change_language: 'Changer de Langue',
                 select_language: 'Sélectionner une langue',
-                edit_charname_dm: 'Modifier DM du nom'
+                edit_charname_dm: 'Modifier le MP du nom',
+                leveling: 'Système de Niveau',
+                blacklist_words: 'Blacklisted Words'
             },
             select_log_channel: 'Sélectionner le canal de journalisation',
             select_welcome_channel: 'Sélectionner le canal de bienvenue',
             select_leveling_channel: 'Sélectionner le canal de niveau',
-            log_channel_set: '✅ Le canal de journalisation a été défini sur {channel}',
+            log_channel_set: '✅ Canal de journalisation défini sur {channel}',
             not_set: 'Non défini',
-            language_set: '✅ La langue du serveur a été définie sur {language}',
-            leveling_channel_set: '✅ Le canal de niveau a été défini sur {channel}',
-            welcome_channel_set: '✅ Le canal de bienvenue a été défini sur {channel}',
-
+            language_set: '✅ Langue du serveur définie sur {language}',
+            leveling_channel_set: '✅ Canal de niveau défini sur {channel}',
+            welcome_channel_set: '✅ Canal de bienvenue défini sur {channel}',
             charname_dm_modal: {
-                title: 'Modifier le message DM du nom de personnage',
-                message_label: 'Message DM',
-                message_placeholder: 'Entrez le message à envoyer lors de la demande du nom du personnage...'
+                title: 'Modifier le message MP du nom de personnage',
+                message_label: 'Message MP',
+                message_placeholder: 'Entrez le message à envoyer lors de la demande du nom de personnage...'
             },
-            charname_dm_updated: '✅ Le message DM du nom de personnage a été mis à jour',
-            error_occurred: 'Une erreur est survenue : {error}'
+            charname_dm_updated: '✅ Message MP du nom de personnage mis à jour',
+            error_occurred: 'Une erreur s\'est produite : {error}'
+        },
+        account: {
+            embed: {
+                description: 'Informations et statistiques du compte',
+                fields: {
+                    account_info_title: '👤 Informations du Compte',
+                    username: 'Nom d\'utilisateur',
+                    displayName: 'Nom affiché',
+                    id: 'ID',
+                    created: 'Créé',
+                    joined: 'Rejoint le serveur',
+                    
+                    activity_title: '📊 Statistiques d\'Activité',
+                    accountStanding: 'Statut du Compte',
+                    accountLevel: 'Niveau',
+                    accountXP: 'Expérience',
+                    xpProgress: 'Progression du Niveau',
+                    voiceTime: 'Temps en Vocal',
+                    serverProgress: 'Progression du Serveur',
+                    serverLevel: 'Niveau Serveur',
+                    serverXP: 'XP Serveur',
+                    
+                    roles_title: '🎭 Rôles [{count}]',
+                    badges_title: '🏅 Badges',
+                    
+                    tiers: {
+                        veteran: '🔱 Artefact',
+                        diamond: '💎 Légendaire',
+                        gold: '🥇 Épique',
+                        silver: '🥈 Rare',
+                        bronze: '🥉 Commun'
+                    }
+                },
+                footer: 'Informations du Compte • {guildName}'
+            }
+        },
+        blacklistword: {
+            word_already_exists: 'Le mot "{word}" est déjà sur la liste noire.',
+            word_not_found: 'Le mot "{word}" n\'est pas sur la liste noire.',
+            no_words: 'Il n\'y a pas de mots sur la liste noire pour ce serveur.',
+            added_title: '✅ Mot ajouté à la liste noire',
+            added_description: 'Le mot "{word}" a été ajouté avec succès à la liste noire.',
+            removed_title: '❌ Mot supprimé de la liste noire',
+            removed_description: 'Le mot "{word}" a été supprimé avec succès de la liste noire.',
+            list_title: '📝 Mots sur la liste noire',
+            list_description: 'Voici tous les mots sur la liste noire pour ce serveur ({count} au total) :',
+            page_info: 'Page {page} sur {totalPages}',
+            toggle_title: '🔄 Statut du mot mis à jour',
+            toggle_description: 'Le mot "{word}" a été {status}.',
+            enabled: 'activé',
+            disabled: 'désactivé',
+            previous_page: 'Précédent',
+            next_page: 'Suivant',
+            no_reason: 'Aucune raison fournie',
+            fields: {
+                word: 'Mot',
+                added_by: 'Ajouté par',
+                removed_by: 'Supprimé par',
+                toggled_by: 'Basculé par',
+                reason: 'Raison',
+                case_sensitive: 'Sensible à la casse',
+                delete_message: 'Supprimer le message',
+                warn_user: 'Avertir l\'utilisateur',
+                context_analysis: 'Analyse de contexte',
+                context_threshold: 'Seuil de contexte'
+            },
+            word_info: '**Ajouté par :** {addedBy}\n**Sensible à la casse :** {caseSensitive}\n**Supprimer le message :** {deleteMessage}\n**Avertir l\'utilisateur :** {warnUser}\n**Analyse de contexte :** {useContextAnalysis}\n**Seuil de contexte :** {contextThreshold}\n**Raison :** {reason}'
         }
     },
     events: {
         guildMemberAdd: {
-            blacklisted: 'Vous avez été mis sur la liste noire de la guilde. Si vous pensez qu\'il s\'agit d\'une erreur, veuillez contacter le personnel de la guilde ou faire appel sur https://discord.gg/YDqBQU43Ht',
-            invalid_response: 'Votre réponse ne peut pas être vide ou trop longue.\nVeuillez fournir une réponse valide.',
-            name_changed: 'Votre nom a été changé avec succès en {nickname} pour la guilde {guildName}.',
-            name_change_failed: 'Échec du changement de votre nom : {error}',
-            mod_notification: 'Impossible d\'envoyer la demande de nom de personnage à {username}. Leurs MPs sont probablement désactivés.',
+            blacklisted: 'Vous avez été mis sur la liste noire de la Guilde. Si vous pensez que c\'est une erreur, veuillez contacter le personnel de la Guilde ou faire appel sur https://discord.gg/YDqBQU43Ht',
+            charname_ask: 'Salut, j\'aimerais connaître le nom de ton personnage principal.\nMerci de répondre avec le nom de ton personnage principal pour le serveur.',
+            invalid_response: 'Ta réponse ne peut pas être vide ou trop longue.\nMerci de fournir une réponse valide.',
+            name_changed: 'Ton nom a été changé avec succès en {nickname} pour la Guilde {guildName}.',
+            name_change_failed: 'Échec du changement de ton nom : {error}',
+            mod_notification: 'Impossible d\'envoyer la demande de nom de personnage à {username}. Ils ont probablement les MP désactivés.',
             welcome_title: 'Bienvenue sur {guildName} !',
             welcome_message: 'Bienvenue {member} sur notre serveur !\n\nSi vous avez des questions, n\'hésitez pas à les poser dans un canal public.',
-            log_kicked: '{username} a été expulsé car il est sur liste noire.',
+            log_kicked: 'Expulsé {username} pour être sur la liste noire.',
             log_kick_failed: 'Impossible d\'expulser {username} : {error}',
             log_dm_failed: 'Impossible d\'envoyer un MP à {username}.',
-            log_name_changed: 'Le nom de {username} a été changé en {nickname}.',
+            log_name_changed: 'Nom de {username} changé en {nickname}.',
             log_name_change_failed: 'Impossible de changer le nom de {username} en {nickname} : {error}',
-            log_end_message_failed: 'Impossible d\'envoyer le message final à {username} : {error}',
+            log_end_message_failed: 'Impossible d\'envoyer le message de fin à {username} : {error}',
             log_interaction_failed: 'Impossible d\'interagir avec {username} : {error}',
-            log_mod_notification_failed: 'Impossible d\'envoyer la notification aux modérateurs : {error}',
-            select_character: 'Sélectionnez l\'un de vos personnages',
-            assigned_chars_found: 'J\'ai trouvé des personnages associés à votre compte. Veuillez en sélectionner un à utiliser comme pseudo :',
-            not_on_list_label: 'Pas dans la liste',
-            not_on_list_description: 'Entrer un autre nom de personnage manuellement',
-            character_not_found: 'Je n\'ai pas trouvé ce personnage. Veuillez réessayer avec un nom de personnage valide.'
+            log_mod_notification_failed: 'Impossible d\'envoyer la notification mod : {error}',
+            select_character: 'Sélectionnez un de vos personnages',
+            assigned_chars_found: 'J\'ai trouvé quelques personnages assignés à votre compte. Veuillez en sélectionner un pour l\'utiliser comme surnom :',
+            not_on_list_label: 'Pas sur la liste',
+            not_on_list_description: 'Entrez un nom de personnage différent manuellement',
+            character_not_found: 'Je n\'ai pas pu trouver ce personnage. Veuillez réessayer avec un nom de personnage valide.'
+        },
+        blacklisted_word: {
+            title: '🚫 Blacklisted Word Detected',
+            description: '{username}, your message contained blacklisted word(s): **{words}**\nPlease avoid using these words in the future.',
+            fields: {
+                channel: 'Channel',
+                message_id: 'Message ID',
+                context_analysis: 'Context Analysis'
+            }
         }
     },
     logging: {
         error: 'Error',
-        footer: 'Journaux du Serveur',
+        footer: 'Server Logs',
         
         // Direct translations for field keys
         dm: {
             user_label: 'Utilisateur',
-            user_id: 'ID Utilisateur',
+            user_id: 'ID utilisateur',
             error_label: 'Erreur',
             error: 'Erreur'
         },
@@ -278,44 +329,44 @@ module.exports = {
         // Member events
         member_banned: {
             title: 'Membre Banni',
-            description: 'Utilisateur de la liste noire banni',
+            description: 'Utilisateur de liste noire banni',
             reason_label: 'Raison'
         },
         nickname_changed: {
             title: 'Surnom Modifié',
-            description: 'Surnom de {username} changé en {nickname}',
-            new_nickname: 'Nouveau Surnom'
+            description: 'Surnom modifié pour {username} en {nickname}',
+            new_nickname: 'Nouveau surnom'
         },
         
         // DM related logs
         dm_sent: {
             title: 'MP Envoyé',
-            description: 'MP de demande de nom de personnage envoyé à {username}'
+            description: 'Demande de nom de personnage MP envoyée à {username}'
         },
         dm_failed: {
-            title: 'Échec du MP',
+            title: 'MP Échoué',
             description: 'Impossible d\'envoyer un MP à {username}',
             user_label: 'Utilisateur',
-            user_id: 'ID Utilisateur',
+            user_id: 'ID utilisateur',
             error_label: 'Erreur',
             response: 'Réponse',
             reason_label: 'Raison'
         },
         dm_timeout: {
-            title: 'Délai de Réponse MP Dépassé',
+            title: 'Délai d\'attente de réponse MP',
             description: '{username} n\'a pas répondu dans le délai imparti'
         },
         
         // System events
         invite_created: {
             title: 'Invitation Créée',
-            description: 'Nouvelle invitation du serveur créée pour les développeurs de {botName}',
+            description: 'Nouvelle invitation de serveur créée pour les développeurs de {botName}',
             channel: 'Canal',
             created_by: 'Créé par'
         },
         interaction_failed: {
-            title: 'Échec de l\'interaction',
-            description: 'Échec de l\'interaction avec {username}',
+            title: 'Interaction Échouée',
+            description: 'Impossible d\'interagir avec {username}',
             error_label: 'Erreur',
             component_label: 'Composant'
         },
@@ -326,19 +377,19 @@ module.exports = {
             description: 'Progression de niveau supprimée pour {username}, {userId}>'
         },
         level_up: {
-            title: 'Niveau Augmenté',
+            title: 'Montée de Niveau',
             description: '{username} a atteint le niveau {level}',
-            previous_level: 'Niveau Précédent',
-            current_level: 'Niveau Actuel',
-            xp_earned: 'XP Gagnée'
+            previous_level: 'Niveau précédent',
+            current_level: 'Niveau actuel',
+            xp_earned: 'XP gagnée'
         },
         
         // Permission logs
         permission_denied: {
             title: 'Permission Refusée',
             description: '{username} a tenté d\'utiliser {command} sans les permissions appropriées',
-            required_permissions: 'Permissions Requises',
-            user_permissions: 'Permissions de l\'Utilisateur'
+            required_permissions: 'Permissions requises',
+            user_permissions: 'Permissions utilisateur'
         },
         
         // Command usage logs
@@ -347,6 +398,47 @@ module.exports = {
             description: '{username} a utilisé {command}',
             channel: 'Canal',
             options: 'Options'
+        },
+        
+        // Blacklisted word logs
+        blacklisted_word_added: {
+            title: 'Blacklisted Word Added',
+            description: 'Added "{word}" to blacklist',
+            fields: {
+                added_by: 'Added By',
+                channel: 'Channel',
+                reason: 'Reason'
+            }
+        },
+        blacklisted_word_removed: {
+            title: 'Blacklisted Word Removed',
+            description: 'Removed "{word}" from blacklist',
+            fields: {
+                removed_by: 'Removed By',
+                channel: 'Channel'
+            }
+        },
+        blacklisted_word_toggled: {
+            title: 'Blacklisted Word Toggled',
+            description: 'Toggled "{word}" {status}',
+            enabled: 'enabled',
+            disabled: 'disabled',
+            fields: {
+                toggled_by: 'Toggled By',
+                channel: 'Channel'
+            }
+        },
+        blacklisted_word_used: {
+            title: 'Blacklisted Word Used',
+            description: '{username} used blacklisted word(s): {words}',
+            fields: {
+                user: 'User',
+                channel: 'Channel',
+                message_id: 'Message ID',
+                action_taken: 'Action Taken',
+                message_content: 'Message Content'
+            },
+            no_action: 'No action taken'
         }
     }
 }; 

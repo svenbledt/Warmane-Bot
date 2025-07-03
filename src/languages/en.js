@@ -178,6 +178,10 @@ module.exports = {
                 leveling: {
                     name: '📊 Leveling System',
                     description: 'Configure the leveling system for your server.'
+                },
+                blacklist_words: {
+                    name: '🚫 Blacklisted Words',
+                    description: 'When enabled, the bot will automatically detect and handle messages containing blacklisted words.'
                 }
             },
             buttons: {
@@ -189,7 +193,8 @@ module.exports = {
                 change_language: 'Change Language',
                 select_language: 'Select a language',
                 edit_charname_dm: 'Edit Character Name DM',
-                leveling: 'Leveling System'
+                leveling: 'Leveling System',
+                blacklist_words: 'Blacklisted Words'
             },
             select_log_channel: 'Select logging channel',
             select_welcome_channel: 'Select welcome channel',
@@ -242,6 +247,38 @@ module.exports = {
                 },
                 footer: 'Account Information • {guildName}'
             }
+        },
+        blacklistword: {
+            word_already_exists: 'The word "{word}" is already blacklisted.',
+            word_not_found: 'The word "{word}" is not in the blacklist.',
+            no_words: 'There are no blacklisted words for this server.',
+            added_title: '✅ Word Added to Blacklist',
+            added_description: 'The word "{word}" has been successfully added to the blacklist.',
+            removed_title: '❌ Word Removed from Blacklist',
+            removed_description: 'The word "{word}" has been successfully removed from the blacklist.',
+            list_title: '📝 Blacklisted Words',
+            list_description: 'Here are all blacklisted words for this server ({count} total):',
+            page_info: 'Page {page} of {totalPages}',
+            toggle_title: '🔄 Word Status Updated',
+            toggle_description: 'The word "{word}" has been {status}.',
+            enabled: 'enabled',
+            disabled: 'disabled',
+            previous_page: 'Previous',
+            next_page: 'Next',
+            no_reason: 'No reason provided',
+            fields: {
+                word: 'Word',
+                added_by: 'Added By',
+                removed_by: 'Removed By',
+                toggled_by: 'Toggled By',
+                reason: 'Reason',
+                case_sensitive: 'Case Sensitive',
+                delete_message: 'Delete Message',
+                warn_user: 'Warn User',
+                context_analysis: 'Context Analysis',
+                context_threshold: 'Context Threshold'
+            },
+            word_info: '**Added by:** {addedBy}\n**Case Sensitive:** {caseSensitive}\n**Delete Message:** {deleteMessage}\n**Warn User:** {warnUser}\n**Context Analysis:** {useContextAnalysis}\n**Context Threshold:** {contextThreshold}\n**Reason:** {reason}'
         }
     },
 
@@ -268,6 +305,15 @@ module.exports = {
             not_on_list_label: 'Not on the list',
             not_on_list_description: 'Enter a different character name manually',
             character_not_found: 'I couldn\'t find that character. Please try again with a valid character name.',
+        },
+        blacklisted_word: {
+            title: '🚫 Blacklisted Word Detected',
+            description: '{username}, your message contained blacklisted word(s): **{words}**\nPlease avoid using these words in the future.',
+            fields: {
+                channel: 'Channel',
+                message_id: 'Message ID',
+                context_analysis: 'Context Analysis'
+            }
         }
     },
     logging: {
@@ -354,6 +400,47 @@ module.exports = {
             description: '{username} used {command}',
             channel: 'Channel',
             options: 'Options'
+        },
+        
+        // Blacklisted word logs
+        blacklisted_word_added: {
+            title: 'Blacklisted Word Added',
+            description: 'Added "{word}" to blacklist',
+            fields: {
+                added_by: 'Added By',
+                channel: 'Channel',
+                reason: 'Reason'
+            }
+        },
+        blacklisted_word_removed: {
+            title: 'Blacklisted Word Removed',
+            description: 'Removed "{word}" from blacklist',
+            fields: {
+                removed_by: 'Removed By',
+                channel: 'Channel'
+            }
+        },
+        blacklisted_word_toggled: {
+            title: 'Blacklisted Word Toggled',
+            description: 'Toggled "{word}" {status}',
+            enabled: 'enabled',
+            disabled: 'disabled',
+            fields: {
+                toggled_by: 'Toggled By',
+                channel: 'Channel'
+            }
+        },
+        blacklisted_word_used: {
+            title: 'Blacklisted Word Used',
+            description: '{username} used blacklisted word(s): {words}',
+            fields: {
+                user: 'User',
+                channel: 'Channel',
+                message_id: 'Message ID',
+                action_taken: 'Action Taken',
+                message_content: 'Message Content'
+            },
+            no_action: 'No action taken'
         }
     }
 };

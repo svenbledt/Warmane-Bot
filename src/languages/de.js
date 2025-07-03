@@ -7,7 +7,8 @@ module.exports = {
             dm_sent: 'DM an {username} gesendet.',
             guild_only: 'Dieser Befehl kann nur in einem Server verwendet werden.',
             error_occurred: 'Ein Fehler ist aufgetreten: {error}',
-            user_not_found: 'Benutzer nicht gefunden.'
+            user_not_found: 'Benutzer nicht gefunden.',
+            bot_developer_only: 'Nur Bot-Entwickler können diese Aktion ausführen.'
         },
         charname: {
             dm_initial: 'Hey, ich würde gerne nach deinem Hauptcharakter-Namen fragen.\nBitte antworte mit deinem Hauptcharakter-Namen für den Server.\n\nDu hast 10 Minuten Zeit zum Antworten.',
@@ -135,7 +136,6 @@ module.exports = {
             level_up: '🎉 Hey {user} du hast Level {level} erreicht! Gratulation! 🎉',
             disabled: 'Das Leveling-System ist auf diesem Server deaktiviert.'
         },
-
         setup: {
             title: 'Server Einstellungen',
             description: 'Konfiguriere deine Server-Einstellungen durch Klicken der Schaltflächen unten. Jede Einstellung steuert verschiedene Aspekte der Bot-Funktionalität.',
@@ -162,26 +162,29 @@ module.exports = {
                     name: '📝 Protokollierung',
                     description: 'Wenn aktiviert, protokolliert der Bot wichtige Ereignisse, die vom Bot in Bezug auf deinen Server ausgeführt werden.'
                 },
-                status: {
-                    enabled: '✅ Aktiviert',
-                    disabled: '❌ Deaktiviert',
-                    channel: 'Kanal: {channel}'
-                },
-                char_name: {
-                    name: '👤 Charaktername',
-                    description: 'Konfiguriere die Einstellungen für Charakternamen auf deinem Server.'
-                },
                 language: {
                     name: '🌍 Sprache',
                     description: 'Ändere die Sprache, die der Bot auf deinem Server verwendet.',
                     current: 'Aktuelle Sprache: {language}'
                 },
+                char_name: {
+                    name: '👤 Charaktername',
+                    description: 'Konfiguriere die Einstellungen für Charakternamen auf deinem Server.'
+                },
+                status: {
+                    enabled: '✅ Aktiviert',
+                    disabled: '❌ Deaktiviert',
+                    channel: 'Kanal: {channel}'
+                },
                 leveling: {
                     name: '📊 Leveling System',
                     description: 'Konfiguriere das Leveling-System für deinen Server.'
+                },
+                blacklist_words: {
+                    name: '🚫 Blacklisted Words',
+                    description: 'When enabled, the bot will automatically detect and handle messages containing blacklisted words.'
                 }
             },
-
             buttons: {
                 welcome_message: 'Willkommensnachricht',
                 char_name_ask: 'Charaktername Abfrage',
@@ -189,7 +192,9 @@ module.exports = {
                 logging: 'Protokollierung',
                 change_language: 'Sprache ändern',
                 select_language: 'Sprache auswählen',
-                edit_charname_dm: 'Charakternamen DM bearbeiten'
+                edit_charname_dm: 'Charakternamen DM bearbeiten',
+                leveling: 'Leveling System',
+                blacklist_words: 'Blacklisted Words'
             },
             select_log_channel: 'Protokollkanal auswählen',
             select_welcome_channel: 'Willkommenskanal auswählen',
@@ -241,11 +246,44 @@ module.exports = {
                 },
                 footer: 'Kontoinformationen • {guildName}'
             }
+        },
+        blacklistword: {
+            word_already_exists: 'Das Wort "{word}" ist bereits auf der schwarzen Liste.',
+            word_not_found: 'Das Wort "{word}" ist nicht auf der schwarzen Liste.',
+            no_words: 'Es gibt keine Wörter auf der schwarzen Liste für diesen Server.',
+            added_title: '✅ Wort zur schwarzen Liste hinzugefügt',
+            added_description: 'Das Wort "{word}" wurde erfolgreich zur schwarzen Liste hinzugefügt.',
+            removed_title: '❌ Wort von der schwarzen Liste entfernt',
+            removed_description: 'Das Wort "{word}" wurde erfolgreich von der schwarzen Liste entfernt.',
+            list_title: '📝 Wörter auf der schwarzen Liste',
+            list_description: 'Hier sind alle Wörter auf der schwarzen Liste für diesen Server ({count} insgesamt):',
+            page_info: 'Seite {page} von {totalPages}',
+            toggle_title: '🔄 Wortstatus aktualisiert',
+            toggle_description: 'Das Wort "{word}" wurde {status}.',
+            enabled: 'aktiviert',
+            disabled: 'deaktiviert',
+            previous_page: 'Zurück',
+            next_page: 'Weiter',
+            no_reason: 'Kein Grund angegeben',
+            fields: {
+                word: 'Wort',
+                added_by: 'Hinzugefügt von',
+                removed_by: 'Entfernt von',
+                toggled_by: 'Umschalten von',
+                reason: 'Grund',
+                case_sensitive: 'Groß-/Kleinschreibung',
+                delete_message: 'Nachricht löschen',
+                warn_user: 'Benutzer warnen',
+                context_analysis: 'Kontextanalyse',
+                context_threshold: 'Kontext-Schwellenwert'
+            },
+            word_info: '**Hinzugefügt von:** {addedBy}\n**Groß-/Kleinschreibung:** {caseSensitive}\n**Nachricht löschen:** {deleteMessage}\n**Benutzer warnen:** {warnUser}\n**Kontextanalyse:** {useContextAnalysis}\n**Kontext-Schwellenwert:** {contextThreshold}\n**Grund:** {reason}'
         }
     },
     events: {
         guildMemberAdd: {
             blacklisted: 'Du wurdest von der Gilde auf die schwarze Liste gesetzt. Wenn du denkst, dass dies ein Fehler ist, kontaktiere bitte die Gildenleitung oder melde dich unter https://discord.gg/YDqBQU43Ht',
+            charname_ask: 'Hey, ich würde gerne nach deinem Hauptcharakter-Namen fragen.\nBitte antworte mit deinem Hauptcharakter-Namen für den Server.',
             invalid_response: 'Deine Antwort darf nicht leer oder zu lang sein.\nBitte gib eine gültige Antwort.',
             name_changed: 'Dein Name wurde erfolgreich zu {nickname} für die Gilde {guildName} geändert.',
             name_change_failed: 'Fehler beim Ändern deines Namens: {error}',
@@ -265,6 +303,15 @@ module.exports = {
             not_on_list_label: 'Nicht in der Liste',
             not_on_list_description: 'Einen anderen Charakternamen manuell eingeben',
             character_not_found: 'Ich konnte diesen Charakter nicht finden. Bitte versuche es mit einem gültigen Charakternamen erneut.'
+        },
+        blacklisted_word: {
+            title: '🚫 Blacklisted Word Detected',
+            description: '{username}, your message contained blacklisted word(s): **{words}**\nPlease avoid using these words in the future.',
+            fields: {
+                channel: 'Channel',
+                message_id: 'Message ID',
+                context_analysis: 'Context Analysis'
+            }
         }
     },
     logging: {
@@ -351,6 +398,47 @@ module.exports = {
             description: '{username} hat {command} verwendet',
             channel: 'Kanal',
             options: 'Optionen'
+        },
+        
+        // Blacklisted word logs
+        blacklisted_word_added: {
+            title: 'Blacklisted Word Added',
+            description: 'Added "{word}" to blacklist',
+            fields: {
+                added_by: 'Added By',
+                channel: 'Channel',
+                reason: 'Reason'
+            }
+        },
+        blacklisted_word_removed: {
+            title: 'Blacklisted Word Removed',
+            description: 'Removed "{word}" from blacklist',
+            fields: {
+                removed_by: 'Removed By',
+                channel: 'Channel'
+            }
+        },
+        blacklisted_word_toggled: {
+            title: 'Blacklisted Word Toggled',
+            description: 'Toggled "{word}" {status}',
+            enabled: 'enabled',
+            disabled: 'disabled',
+            fields: {
+                toggled_by: 'Toggled By',
+                channel: 'Channel'
+            }
+        },
+        blacklisted_word_used: {
+            title: 'Blacklisted Word Used',
+            description: '{username} used blacklisted word(s): {words}',
+            fields: {
+                user: 'User',
+                channel: 'Channel',
+                message_id: 'Message ID',
+                action_taken: 'Action Taken',
+                message_content: 'Message Content'
+            },
+            no_action: 'No action taken'
         }
     }
 };

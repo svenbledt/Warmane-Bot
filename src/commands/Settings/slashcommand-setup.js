@@ -66,6 +66,12 @@ function createSettingsEmbed(guildSettings, language = 'en') {
                 inline: false
             },
             {
+                name: f('blacklist_words.name'),
+                value: `${f('status.' + (guildSettings.blacklistWords ? 'enabled' : 'disabled'))}\n` +
+               `${f('blacklist_words.description')}`,
+                inline: false
+            },
+            {
                 name: f('language.name'),
                 value: `${f('language.current').replace('{language}', languageNames[guildSettings.language])}\n` +
 
@@ -152,6 +158,11 @@ function createSettingsButtons(guildSettings) {
                 .setLabel(t('leveling'))
                 .setStyle(guildSettings.levelingSystem ? ButtonStyle.Success : ButtonStyle.Danger)
                 .setEmoji('📊'),
+            new ButtonBuilder()
+                .setCustomId('toggle_blacklistWords')
+                .setLabel(t('blacklist_words'))
+                .setStyle(guildSettings.blacklistWords ? ButtonStyle.Success : ButtonStyle.Danger)
+                .setEmoji('🚫'),
             new ButtonBuilder()
                 .setCustomId('change_language')
                 .setLabel(t('change_language'))

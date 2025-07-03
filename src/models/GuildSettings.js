@@ -12,6 +12,7 @@ const guildSettingsSchema = new mongoose.Schema({
     enableLogging: { type: Boolean, default: false },
     levelingSystem: { type: Boolean, default: false },
     levelingChannel: { type: String, default: '' },
+    blacklistWords: { type: Boolean, default: false }, // Enable/disable blacklist word system
     charNameAskDM: { 
         type: String, 
         default: 'Hey, I would like to ask you for your main Character name.\nPlease respond with your main Character name for the Server.'
