@@ -1,7 +1,7 @@
 title: Warmane Bot Documentation
 description: Complete documentation for the Warmane Discord Bot
 baseurl: ""
-url: "https://your-username.github.io/Warmane-Bot"
+url: "https://svenbledt.github.io/Warmane-Bot"
 
 # Build settings
 theme: jekyll-theme-cayman
@@ -36,14 +36,14 @@ nav:
 
 # Social links
 social:
-  github: your-username/Warmane-Bot
+  github: svenbledt/Warmane-Bot
 
 # Footer
 footer:
   links:
     - title: GitHub
-      url: https://github.com/your-username/Warmane-Bot
+      url: https://github.com/svenbledt/Warmane-Bot
     - title: Issues
-      url: https://github.com/your-username/Warmane-Bot/issues
+      url: https://github.com/svenbledt/Warmane-Bot/issues
     - title: License
-      url: https://github.com/your-username/Warmane-Bot/blob/main/LICENSE.txt 
+      url: https://github.com/svenbledt/Warmane-Bot/blob/main/LICENSE.txt 

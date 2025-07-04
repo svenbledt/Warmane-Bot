@@ -66,11 +66,11 @@ This documentation is organized into several sections:
 
 ## 🤝 Contributing
 
-Found an issue or want to contribute? Check out our [GitHub repository](https://github.com/your-username/Warmane-Bot) or [report an issue](https://github.com/your-username/Warmane-Bot/issues).
+Found an issue or want to contribute? Check out our [GitHub repository](https://github.com/svenbledt/Warmane-Bot) or [report an issue](https://github.com/svenbledt/Warmane-Bot/issues).
 
 ## 📄 License
 
-This project is licensed under the GPL-3.0 License - see the [LICENSE](https://github.com/your-username/Warmane-Bot/blob/main/LICENSE.txt) file for details.
+This project is licensed under the GPL-3.0 License - see the [LICENSE](https://github.com/svenbledt/Warmane-Bot/blob/main/LICENSE.txt) file for details.
 
 ---
 
