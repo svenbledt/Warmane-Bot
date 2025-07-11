@@ -3,6 +3,7 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    MessageFlags,
 } = require('discord.js');
 const Component = require('../../structure/Component');
 const LanguageManager = require('../../utils/LanguageManager');
@@ -28,7 +29,7 @@ module.exports = new Component({
                         'commands.global_strings.no_permission',
                         lang
                     ),
-                    ephemeral: true,
+                    flags: [MessageFlags.Ephemeral],
                 });
             }
 
@@ -40,7 +41,7 @@ module.exports = new Component({
             if (!pageMatch) {
                 return interaction.reply({
                     content: LanguageManager.getText('commands.blacklistword.invalid_pagination_state', lang),
-                    ephemeral: true,
+                    flags: [MessageFlags.Ephemeral],
                 });
             }
 
@@ -65,7 +66,7 @@ module.exports = new Component({
                         'commands.blacklistword.no_words',
                         lang
                     ),
-                    ephemeral: true,
+                    flags: [MessageFlags.Ephemeral],
                 });
             }
 
@@ -153,7 +154,7 @@ module.exports = new Component({
             console.error('Error handling blacklist word pagination:', error);
             await interaction.reply({
                 content: LanguageManager.getText('commands.blacklistword.pagination_error', lang),
-                ephemeral: true,
+                flags: [MessageFlags.Ephemeral],
             });
         }
     },
