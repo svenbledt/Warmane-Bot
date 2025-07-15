@@ -91,6 +91,11 @@ class CharacterUtils {
             
             return response;
         } catch (error) {
+            // Handle 403 errors specifically
+            if (error.isWarmaneBlocked || error.response?.status === 403) {
+                throw new Error('Warmane services have blocked this request. Please try again later.');
+            }
+            
             if (error.response?.status === 429) {
                 await new Promise((resolve) => setTimeout(resolve, 4000));
                 return this.makeRequest(url);

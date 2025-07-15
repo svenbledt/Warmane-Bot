@@ -481,15 +481,26 @@ async function handleInfoCommand(client, interaction, lang) {
         );
     } catch (error) {
         console.error('Error in info command:', error);
-        await interaction.editReply({
-            content: LanguageManager.getText(
-                'commands.global_strings.error_occurred',
-                lang,
-                {
-                    error: error.message,
-                }
-            ),
-        });
+        
+        // Check if it's a Warmane blocked error
+        if (error.message.includes('Warmane services have blocked this request')) {
+            await interaction.editReply({
+                content: LanguageManager.getText(
+                    'commands.global_strings.warmane_blocked',
+                    lang
+                ),
+            });
+        } else {
+            await interaction.editReply({
+                content: LanguageManager.getText(
+                    'commands.global_strings.error_occurred',
+                    lang,
+                    {
+                        error: error.message,
+                    }
+                ),
+            });
+        }
     }
 }
 

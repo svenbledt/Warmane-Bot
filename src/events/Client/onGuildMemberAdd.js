@@ -40,6 +40,12 @@ async function checkSpecificRealm(charName, realm) {
         const exists = response.data && response.data.name;
         return exists;
     } catch (error) {
+        // Check if it's a Warmane blocked error
+        if (error.isWarmaneBlocked || error.message.includes('Warmane services have blocked this request')) {
+            console.log('Warmane services blocked request for character check');
+            // Return 'blocked' to indicate Warmane services are blocked
+            return 'blocked';
+        }
         console.log(error.message);
         return false;
     }
@@ -47,11 +53,21 @@ async function checkSpecificRealm(charName, realm) {
 
 // Function to check all realms (for manual input)
 async function checkAllRealms(charName) {
+    let warmaneBlocked = false;
+    
     for (const realm of REALMS) {
-        const exists = await checkSpecificRealm(charName, realm.value);
-        if (exists) {
+        const result = await checkSpecificRealm(charName, realm.value);
+        if (result === 'blocked') {
+            warmaneBlocked = true;
+            continue; // Try other realms even if one is blocked
+        }
+        if (result === true) {
             return { found: true, realm: realm.value };
         }
+    }
+    
+    if (warmaneBlocked) {
+        return { found: false, warmaneBlocked: true };
     }
     return { found: false };
 }
@@ -138,6 +154,15 @@ async function handleManualInput(
                     response,
                     existingCharacter.realm
                 );
+                if (exists === 'blocked') {
+                    await dmChannel.send(
+                        LanguageManager.getText(
+                            'commands.charname.warmane_blocked',
+                            lang
+                        )
+                    );
+                    return;
+                }
                 if (!exists) {
                     await dmChannel.send(
                         LanguageManager.getText(
@@ -160,6 +185,15 @@ async function handleManualInput(
             } else {
                 // New character, check all realms
                 const result = await checkAllRealms(response);
+                if (result.warmaneBlocked) {
+                    await dmChannel.send(
+                        LanguageManager.getText(
+                            'commands.charname.warmane_blocked',
+                            lang
+                        )
+                    );
+                    return;
+                }
                 if (!result.found) {
                     await dmChannel.send(
                         LanguageManager.getText(
@@ -807,7 +841,12 @@ async function fetchUserCharacters(client, userId) {
             characters = response.data;
         }
     } catch (error) {
-        console.error(`[DEBUG] Error fetching API characters: ${error.message}`);
+        // Check if it's a Warmane blocked error
+        if (error.isWarmaneBlocked || error.message.includes('Warmane services have blocked this request')) {
+            console.error(`[DEBUG] Warmane services blocked request for user characters: ${error.message}`);
+        } else {
+            console.error(`[DEBUG] Error fetching API characters: ${error.message}`);
+        }
     }
 
     // Get characters from database

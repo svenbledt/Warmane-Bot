@@ -9,14 +9,16 @@ module.exports = {
             not_in_guild: 'Dieser Befehl kann nur in einem Server verwendet werden.',
             error_occurred: 'Ein Fehler ist aufgetreten: {error}',
             user_not_found: 'Benutzer nicht gefunden.',
-            bot_developer_only: 'Dieser Befehl ist nur für Bot-Entwickler verfügbar.'
+            bot_developer_only: 'Dieser Befehl ist nur für Bot-Entwickler verfügbar.',
+            warmane_blocked: 'Warmane-Dienste haben diese Anfrage blockiert. Bitte versuche es später erneut.'
         },
         charname: {
             dm_initial: 'Hey, ich würde gerne nach deinem Hauptcharakter-Namen fragen.\nBitte antworte mit deinem Hauptcharakter-Namen für den Server.\n\nDu hast 10 Minuten Zeit zum Antworten.',
             empty_response: 'Deine Antwort darf nicht leer sein. Bitte gib eine gültige Antwort.',
             nickname_success: 'Dein Hauptcharakter-Name wurde erfolgreich zu {nickname} geändert.',
             nickname_failed: 'Fehler beim Ändern deines Hauptcharakter-Namens: {error}',
-            dm_timeout_message: 'Zeit abgelaufen. Bitte kontaktiere einen Mitarbeiter von {guildName} für eine neue Chance.'
+            dm_timeout_message: 'Zeit abgelaufen. Bitte kontaktiere einen Mitarbeiter von {guildName} für eine neue Chance.',
+            warmane_blocked: 'Warmane-Dienste sind derzeit nicht verfügbar. Bitte versuche es später erneut oder kontaktiere einen Mitarbeiter.'
         },
         globalcheck: {
             no_blacklisted: 'Es gibt keine Benutzer auf der schwarzen Liste.',

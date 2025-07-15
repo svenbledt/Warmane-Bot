@@ -10,4 +10,19 @@ const https = axios.create({
     },
 });
 
+// Add response interceptor to handle 403 errors
+https.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 403) {
+            // Create a custom error for 403 responses
+            const customError = new Error('Warmane services have blocked this request. Please try again later.');
+            customError.isWarmaneBlocked = true;
+            customError.status = 403;
+            throw customError;
+        }
+        throw error;
+    }
+);
+
 module.exports = { https }; 
