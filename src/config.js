@@ -29,7 +29,7 @@ const config = {
         reportChannel: process.env.REPORT_CHANNEL || '1257409168265187428',
         inviteChannel: process.env.INVITE_CHANNEL || '1257459204948627638',
         announcementChannel: process.env.ANNOUNCEMENT_CHANNEL || '1257409143724310609',
-        staffAnnouncementChannel: process.env.STAFF_ANNOUNCEMENT_CHANNEL || '1257409165769314435',
+        staffAnnouncementChannel: process.env.STAFF_ANNOUNCEMENT_CHANNEL || '1257409143724310609',
         logChannel: process.env.LOG_CHANNEL || '1333610717630300210',
     },
     commands: {
