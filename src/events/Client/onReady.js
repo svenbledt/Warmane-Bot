@@ -199,7 +199,7 @@ async function generateAndSendInvites(client) {
 }
 
 module.exports = new Event({
-    event: 'ready',
+    event: 'clientReady',
     once: true,
     run: async (client) => {
         await new Promise((resolve) => setTimeout(resolve, 5000));
