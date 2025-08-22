@@ -80,13 +80,20 @@ class CharacterUtils {
         };
     }
 
-    static async makeRequest(url) {
+    static async makeRequest(url, retryCount = 0) {
+        const maxRetries = 3;
+        const retryDelay = 5000; // 5 seconds delay between retries
+        
         try {
             const response = await https.get(url);
             
             if (response.data?.error === 'Too many requests.') {
-                await new Promise((resolve) => setTimeout(resolve, 4000));
-                return this.makeRequest(url);
+                console.log(`Rate limited by Warmane API, attempt ${retryCount + 1}/${maxRetries + 1}`);
+                if (retryCount < maxRetries) {
+                    await new Promise((resolve) => setTimeout(resolve, retryDelay));
+                    return this.makeRequest(url, retryCount + 1);
+                }
+                throw new Error('Rate limited by Warmane API. Please try again in a few seconds.');
             }
             
             return response;
@@ -96,10 +103,15 @@ class CharacterUtils {
                 throw new Error('Warmane services have blocked this request. Please try again later.');
             }
             
-            if (error.response?.status === 429) {
-                await new Promise((resolve) => setTimeout(resolve, 4000));
-                return this.makeRequest(url);
+            // Handle rate limiting (429) and service unavailable (503)
+            if (error.response?.status === 429 || error.response?.status === 503) {
+                console.log(`Rate limited/service unavailable, attempt ${retryCount + 1}/${maxRetries + 1}`);
+                if (retryCount < maxRetries) {
+                    await new Promise((resolve) => setTimeout(resolve, retryDelay));
+                    return this.makeRequest(url, retryCount + 1);
+                }
             }
+            
             throw error;
         }
     }

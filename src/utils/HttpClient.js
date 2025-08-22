@@ -1,13 +1,16 @@
 // New utility file for HTTP client
 const axios = require('axios');
+const rateLimit = require('axios-rate-limit');
 
-const https = axios.create({
-    maxRequests: 1,
-    perMilliseconds: 4000,
+// Create rate-limited axios instance with improved settings
+const https = rateLimit(axios.create({
     headers: {
         'User-Agent': 'Warmane-Tool/1.0',
         'Accept': 'application/json, text/html',
     },
+}), {
+    maxRequests: 1,
+    perMilliseconds: 2000, // Reduced from 4000ms to 2000ms for better responsiveness
 });
 
 // Add response interceptor to handle 403 errors

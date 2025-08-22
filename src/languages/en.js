@@ -348,7 +348,7 @@ module.exports = {
             assigned_chars_found: 'I found some characters assigned to your account. Please select one to use as your nickname:',
             not_on_list_label: 'Not on the list',
             not_on_list_description: 'Enter a different character name manually',
-            character_not_found: 'I couldn\'t find that character. Please try again with a valid character name.',
+            character_not_found: 'I couldn\'t find that character on any realm. Please check the spelling and try again. Supported realms: Lordaeron, Frostmourne, Icecrown, Blackrock, Frostwolf, Onyxia.',
         },
         blacklisted_word: {
             title: '🚫 Blacklisted Word Detected',

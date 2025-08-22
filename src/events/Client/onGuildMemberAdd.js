@@ -20,19 +20,24 @@ const MAX_CHAR_LENGTH = 16;
 // Define an axios instance with rate limit
 const https = rateLimit(axios.create(), {
     maxRequests: 1,
-    perMilliseconds: 4000,
+    perMilliseconds: 5000,
 });
 
-// Add realm constants
+// Add realm constants - Updated to include all supported realms
 const REALMS = [
     { name: 'Lordaeron', value: 'Lordaeron' },
     { name: 'Frostmourne', value: 'Frostmourne' },
     { name: 'Icecrown', value: 'Icecrown' },
     { name: 'Blackrock', value: 'Blackrock' },
+    { name: 'Frostwolf', value: 'Frostwolf' },
+    { name: 'Onyxia', value: 'Onyxia' },
 ];
 
-// Function to check specific realm (for database characters)
-async function checkSpecificRealm(charName, realm) {
+// Function to check specific realm with retry logic
+async function checkSpecificRealm(charName, realm, retryCount = 0) {
+    const maxRetries = 3;
+    const retryDelay = 5000; // 5 seconds delay between retries
+    
     try {
         const response = await https.get(
             `${config.users.url}/api/character/${charName}/${realm}/summary`
@@ -40,13 +45,31 @@ async function checkSpecificRealm(charName, realm) {
         const exists = response.data && response.data.name;
         return exists;
     } catch (error) {
-        // Check if it's a Warmane blocked error
-        if (error.isWarmaneBlocked || error.message.includes('Warmane services have blocked this request')) {
-            console.log('Warmane services blocked request for character check');
-            // Return 'blocked' to indicate Warmane services are blocked
+        // Check if it's a Warmane blocked error or rate limit error
+        if (error.isWarmaneBlocked || 
+            error.message.includes('Warmane services have blocked this request') ||
+            error.response?.status === 429 ||
+            error.response?.status === 503) {
+            
+            console.log(`Warmane services blocked/rate limited request for character check on ${realm}, attempt ${retryCount + 1}/${maxRetries + 1}`);
+            
+            // Retry logic for rate limiting
+            if (retryCount < maxRetries) {
+                console.log(`Waiting ${retryDelay}ms before retry...`);
+                await new Promise(resolve => setTimeout(resolve, retryDelay));
+                return await checkSpecificRealm(charName, realm, retryCount + 1);
+            }
+            
+            // Return 'blocked' to indicate Warmane services are blocked after max retries
             return 'blocked';
         }
-        console.log(error.message);
+        
+        // For other errors (like 404 - character not found), just return false
+        if (error.response?.status === 404) {
+            return false;
+        }
+        
+        console.log(`Error checking character ${charName} on ${realm}: ${error.message}`);
         return false;
     }
 }
@@ -54,17 +77,27 @@ async function checkSpecificRealm(charName, realm) {
 // Function to check all realms (for manual input)
 async function checkAllRealms(charName) {
     let warmaneBlocked = false;
+    let checkedRealms = [];
+    
+    console.log(`Checking character "${charName}" across all realms...`);
     
     for (const realm of REALMS) {
+        console.log(`Checking ${charName} on ${realm.value}...`);
         const result = await checkSpecificRealm(charName, realm.value);
+        checkedRealms.push({ realm: realm.value, result });
+        
         if (result === 'blocked') {
             warmaneBlocked = true;
+            console.log(`Realm ${realm.value} is blocked, continuing to next realm...`);
             continue; // Try other realms even if one is blocked
         }
         if (result === true) {
+            console.log(`Character "${charName}" found on ${realm.value}!`);
             return { found: true, realm: realm.value };
         }
     }
+    
+    console.log(`Character "${charName}" not found on any realm. Checked realms:`, checkedRealms);
     
     if (warmaneBlocked) {
         return { found: false, warmaneBlocked: true };
@@ -105,9 +138,21 @@ async function handleManualInput(
             return;
         }
 
-        let response = collected.content.trim().replace(/[^a-zA-Z ]/g, '');
-
+        let response = collected.content.trim();
+        
+        // Remove any extra whitespace and normalize
+        response = response.replace(/\s+/g, ' ').trim();
+        
+        // Check if the response is empty or too long
         if (!response || response.length > MAX_CHAR_LENGTH) {
+            await dmChannel.send(
+                LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
+            );
+            return;
+        }
+        
+        // Check if the response contains only valid characters (letters, spaces, hyphens, apostrophes)
+        if (!/^[a-zA-Z\s\-']+$/.test(response)) {
             await dmChannel.send(
                 LanguageManager.getText('events.guildMemberAdd.invalid_response', lang)
             );
@@ -411,9 +456,48 @@ async function handleDevServer(client, member, guildSettings, lang) {
         });
 
         collector.on('collect', async (collected) => {
-            let response = collected.content.trim().replace(/[^a-zA-Z ]/g, '');
-
+            let response = collected.content.trim();
+            
+            // Remove any extra whitespace and normalize
+            response = response.replace(/\s+/g, ' ').trim();
+            
+            // Check if the response is empty or too long
             if (!response || response.length > MAX_CHAR_LENGTH) {
+                await dmChannel.send(
+                    LanguageManager.getText(
+                        'events.guildMemberAdd.invalid_response',
+                        lang
+                    )
+                );
+
+                // Log invalid response
+                await Logger.log(client, member.guild.id, {
+                    titleKey: 'invalid_response',
+                    descData: { username: member.user.tag },
+                    color: '#ff9900',
+                    fields: [
+                        {
+                            nameKey: 'dm.user_label',
+                            nameData: {},
+                            value: member.user.tag,
+                        },
+                        {
+                            nameKey: 'dm.user_id',
+                            nameData: {},
+                            value: member.user.id,
+                        },
+                        {
+                            nameKey: 'dm.response',
+                            nameData: {},
+                            value: response || 'empty',
+                        },
+                    ],
+                });
+                return;
+            }
+            
+            // Check if the response contains only valid characters (letters, spaces, hyphens, apostrophes)
+            if (!/^[a-zA-Z\s\-']+$/.test(response)) {
                 await dmChannel.send(
                     LanguageManager.getText(
                         'events.guildMemberAdd.invalid_response',
@@ -945,8 +1029,20 @@ async function validateCharacterName(client, charName, userChars, lang) {
         }
     }
 
+    console.log(`Validating character name: "${charName}"`);
     const result = await checkAllRealms(charName);
     if (!result.found) {
+        if (result.warmaneBlocked) {
+            console.log(`Warmane services blocked during validation of "${charName}"`);
+            return {
+                valid: false,
+                message: LanguageManager.getText(
+                    'events.guildMemberAdd.warmane_blocked',
+                    lang
+                ),
+            };
+        }
+        console.log(`Character "${charName}" not found on any realm`);
         return {
             valid: false,
             message: LanguageManager.getText(

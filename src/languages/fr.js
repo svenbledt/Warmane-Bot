@@ -344,7 +344,7 @@ module.exports = {
             assigned_chars_found: 'J\'ai trouvé quelques personnages assignés à votre compte. Veuillez en sélectionner un pour l\'utiliser comme votre surnom :',
             not_on_list_label: 'Pas sur la liste',
             not_on_list_description: 'Entrez un nom de personnage différent manuellement',
-            character_not_found: 'Je n\'ai pas pu trouver ce personnage. Veuillez réessayer avec un nom de personnage valide.'
+            character_not_found: 'Je n\'ai pas pu trouver ce personnage sur aucun royaume. Veuillez vérifier l\'orthographe et réessayer. Royaumes pris en charge: Lordaeron, Frostmourne, Icecrown, Blackrock, Frostwolf, Onyxia.'
         },
         blacklisted_word: {
             title: '🚫 Blacklisted Word Detected',
