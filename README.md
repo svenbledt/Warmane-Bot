@@ -9,8 +9,6 @@ A Discord bot that handles Warmane's API and provides useful information for pla
 - **Settings**: Change the bot's settings. (disable or enable features)
 - **Servertime**: Get the current servertime of the server.
 
-- **Github Token**: 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
-
 ## TODO
 - [ ] Excesive Testing of logging system.
 
